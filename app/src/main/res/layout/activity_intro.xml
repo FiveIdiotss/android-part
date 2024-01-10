@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".IntroActivity">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/introGuideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="50dp" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:src="@drawable/temporarylogo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/introGuideline" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/joinGuideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_end="400dp" />
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="소셜 계정으로 로그인하기"
+        android:gravity="center"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        android:layout_marginBottom="13dp"
+        app:layout_constraintBottom_toTopOf="@+id/joinGuideline"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:weightSum="5"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/joinGuideline">
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:layout_width="30dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:src="@drawable/kakao"
+            app:shapeAppearance="@drawable/circle_button" />
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:layout_width="50dp"
+            android:layout_height="37dp"
+            android:layout_weight="1"
+            android:src="@drawable/google"
+            app:shapeAppearance="@style/Circle" />
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:layout_width="50dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:src="@drawable/naver"
+            app:shapeAppearance="@style/Circle" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="또는"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:gravity="center"
+            android:layout_margin="25dp"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:text="회원가입"
+            android:textSize="16dp"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:background="@drawable/radius_btn"/>
+
+    </LinearLayout>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="70dp"
+        android:background="@drawable/radius_btn"
+        android:text="로그인"
+        android:textSize="16dp"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
