@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/join_nav"
+    app:startDestination="@id/schoolInfoFragment">
+
+    <fragment
+        android:id="@+id/schoolInfoFragment"
+        android:name="com.minhoi.memento.ui.join.SchoolInfoFragment"
+        android:label="fragment_school_info"
+        tools:layout="@layout/fragment_school_info" >
+        <action
+            android:id="@+id/action_schoolInfoFragment_to_schoolMajorFragment"
+            app:destination="@id/schoolMajorFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/schoolMajorFragment"
+        android:name="com.minhoi.memento.ui.join.SchoolMajorFragment"
+        android:label="fragment_school_major"
+        tools:layout="@layout/fragment_school_major" />
+</navigation>
