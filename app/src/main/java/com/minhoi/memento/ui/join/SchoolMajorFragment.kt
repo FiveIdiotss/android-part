@@ -37,7 +37,7 @@ class SchoolMajorFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        majorAdapter = MajorAdapter() {}
+        majorAdapter = MajorAdapter(requireContext()) {}
         binding.majorRv.apply {
             adapter = majorAdapter
             layoutManager = LinearLayoutManager(requireActivity())
