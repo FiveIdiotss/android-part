@@ -2,21 +2,28 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/join_nav"
+    android:id="@+id/nav_join"
     app:startDestination="@id/schoolInfoFragment">
 
     <fragment
+        android:id="@+id/schoolMajorFragment"
+        android:name="com.minhoi.memento.ui.join.SchoolMajorFragment"
+        android:label="SchoolMajorFragment" >
+        <action
+            android:id="@+id/action_schoolMajorFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
+    </fragment>
+    <fragment
         android:id="@+id/schoolInfoFragment"
         android:name="com.minhoi.memento.ui.join.SchoolInfoFragment"
-        android:label="fragment_school_info"
-        tools:layout="@layout/fragment_school_info" >
+        android:label="SchoolInfoFragment" >
         <action
             android:id="@+id/action_schoolInfoFragment_to_schoolMajorFragment"
             app:destination="@id/schoolMajorFragment" />
     </fragment>
     <fragment
-        android:id="@+id/schoolMajorFragment"
-        android:name="com.minhoi.memento.ui.join.SchoolMajorFragment"
-        android:label="fragment_school_major"
-        tools:layout="@layout/fragment_school_major" />
+        android:id="@+id/profileFragment"
+        android:name="com.minhoi.memento.ui.join.ProfileFragment"
+        android:label="fragment_profile"
+        tools:layout="@layout/fragment_profile" />
 </navigation>
