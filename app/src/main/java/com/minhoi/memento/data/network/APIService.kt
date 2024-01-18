@@ -15,4 +15,9 @@ interface APIService {
     suspend fun getMajors(
         @Path(value = "schoolName") schoolName: String
     ): Response<List<MajorDto>>
+
+    @POST("/api/member/signup")
+    suspend fun signUp(
+        @Body member: MemberDto
+    ): Response<String>
 }
