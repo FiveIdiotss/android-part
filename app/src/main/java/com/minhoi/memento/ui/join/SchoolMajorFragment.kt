@@ -31,13 +31,17 @@ class SchoolMajorFragment : Fragment() {
     ): View? {
         val fragmentBinding = FragmentSchoolMajorBinding.inflate(inflater, container, false)
         binding = fragmentBinding
+
         return fragmentBinding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        majorAdapter = MajorAdapter(requireContext()) {}
+        majorAdapter = MajorAdapter(requireContext()) {
+            joinViewModel.setMajorId(it.majorId)
+        }
+
         binding.majorRv.apply {
             adapter = majorAdapter
             layoutManager = LinearLayoutManager(requireActivity())
