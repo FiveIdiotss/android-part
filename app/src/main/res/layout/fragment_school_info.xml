@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <data>
+        <variable
+            name="viewmodel"
+            type="com.minhoi.memento.ui.join.JoinViewModel" />
+    </data>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -15,7 +21,7 @@
             android:layout_marginBottom="10dp"
             android:text="학교 선택"
             android:textColor="@color/black"
-            android:textSize="18dp"
+            android:textSize="21dp"
             android:textStyle="bold" />
 
         <TextView
@@ -36,7 +42,8 @@
             android:layout_marginBottom="7dp"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
-            android:background="@drawable/edittext_login_stroke"
+            android:onTextChanged="@{(s, start, before, count) -> viewmodel.onSchoolTextChanged(s)}"
+            android:background="@drawable/round_corner_purple_color"
             android:completionThreshold="1"
             android:hint="학교 입력" />
 
@@ -49,6 +56,7 @@
             android:textSize="15dp" />
 
         <EditText
+            android:id="@+id/inputYear"
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:layout_marginLeft="18dp"
@@ -56,8 +64,11 @@
             android:layout_marginBottom="15dp"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
-            android:background="@drawable/edittext_login_stroke"
-            android:hint="입학년도 입력" />
+            android:calendarViewShown="false"
+            android:spinnersShown="true"
+            android:hint="학번 입력"
+            android:onTextChanged="@{(s, start, before, count) -> viewmodel.onYearTextChanged(s)}"
+            android:background="@drawable/round_corner_purple_color" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/infoNextBtn"

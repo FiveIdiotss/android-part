@@ -3,6 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+        <variable
+            name="viewmodel"
+            type="com.minhoi.memento.ui.join.JoinViewModel" />
+    </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -17,7 +23,7 @@
             android:layout_marginBottom="10dp"
             android:text="학과 선택"
             android:textColor="@color/black"
-            android:textSize="18dp"
+            android:textSize="21dp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -28,14 +34,16 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginLeft="18dp"
+            android:layout_marginRight="18dp"
             android:layout_marginTop="15dp"
-            app:layout_constraintBottom_toTopOf="@+id/appCompatButton2"
+            android:layout_marginBottom="18dp"
+            app:layout_constraintBottom_toTopOf="@+id/majorNextBtn"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView" />
 
         <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/appCompatButton2"
+            android:id="@+id/majorNextBtn"
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:layout_marginLeft="20dp"
