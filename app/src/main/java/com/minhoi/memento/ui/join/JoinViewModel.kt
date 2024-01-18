@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.minhoi.memento.repository.JoinRepository
 import com.minhoi.memento.data.dto.MajorDto
+import com.minhoi.memento.data.dto.MemberDto
 import com.minhoi.memento.data.dto.SchoolDto
 import kotlinx.coroutines.launch
 
@@ -15,8 +16,26 @@ class JoinViewModel : ViewModel() {
     private var _schools = MutableLiveData<List<SchoolDto>>()
     val schools: LiveData<List<SchoolDto>> = _schools
 
+    private var _school = MutableLiveData<String>()
+    val school: LiveData<String> = _school
+
+    private var _year = MutableLiveData<String>()
+    val year: LiveData<String> = _year
+
+    private var _majorId = MutableLiveData<Int>()
+    val majorId: LiveData<Int> = _majorId
+
     private var _majors = MutableLiveData<List<MajorDto>>()
     val majors: LiveData<List<MajorDto>> = _majors
+
+    private var _email = MutableLiveData<String>()
+    val email: LiveData<String> = _email
+
+    private var _password = MutableLiveData<String>()
+    val password: LiveData<String> = _password
+
+    private var _gender = MutableLiveData<String>()
+    val gender: LiveData<String> = _gender
 
     init {
         viewModelScope.launch {
@@ -26,7 +45,7 @@ class JoinViewModel : ViewModel() {
 
     private suspend fun getSchools() {
         val schoolsData = joinRepository.getSchools()
-        when(schoolsData.isSuccessful) {
+        when (schoolsData.isSuccessful) {
             true -> _schools.value = schoolsData.body()
             else -> {}
         }
