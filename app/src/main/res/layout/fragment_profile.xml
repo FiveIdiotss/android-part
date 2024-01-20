@@ -78,9 +78,10 @@
             android:layout_height="40dp"
             android:layout_marginLeft="18dp"
             android:layout_marginRight="18dp"
-            android:layout_marginBottom="25dp"
+            android:layout_marginBottom="35dp"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
+            android:onTextChanged="@{(s, start, before, count) -> viewmodel.onPasswordCheckTextChanged(s)}"
             android:background="@drawable/round_corner_purple_color"
             android:hint="비밀번호 확인" />
 
