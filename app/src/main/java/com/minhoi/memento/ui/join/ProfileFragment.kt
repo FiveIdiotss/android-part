@@ -7,12 +7,15 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import com.minhoi.memento.R
 import com.minhoi.memento.databinding.FragmentProfileBinding
 
 class ProfileFragment : Fragment() {
 
     private lateinit var binding: FragmentProfileBinding
+    private val joinViewModel: JoinViewModel by activityViewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -26,6 +29,8 @@ class ProfileFragment : Fragment() {
 
         val fragmentBinding = FragmentProfileBinding.inflate(inflater, container, false)
         binding = fragmentBinding
+        binding.viewmodel = joinViewModel
+        binding.lifecycleOwner = this
         return fragmentBinding.root
     }
 

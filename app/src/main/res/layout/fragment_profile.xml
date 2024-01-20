@@ -84,6 +84,19 @@
             android:background="@drawable/round_corner_purple_color"
             android:hint="비밀번호 확인" />
 
+        <EditText
+            android:id="@+id/inputName"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginLeft="18dp"
+            android:layout_marginRight="18dp"
+            android:layout_marginBottom="15dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:onTextChanged="@{(s, start, before, count) -> viewmodel.onNameTextChanged(s)}"
+            android:background="@drawable/round_corner_purple_color"
+            android:hint="이름" />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
