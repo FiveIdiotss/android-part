@@ -50,10 +50,10 @@ class ProfileFragment : Fragment() {
         binding.inputEmail.addTextChangedListener(emailInputFormal)
     }
 
-    private val emailInputFormal = object : TextWatcher {
-        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
-        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        observeIsRegularEmail()
+        observeIsRegularPassword()
+        observeIsPasswordEqual()
+    }
 
     private fun observeIsRegularEmail() {
         joinViewModel.email.observe(viewLifecycleOwner) { input ->
@@ -114,5 +114,10 @@ class ProfileFragment : Fragment() {
             }
         }
     }
+
+    private fun isEmailBlank() = joinViewModel.email.value.isNullOrBlank()
+    private fun isNameBlank() = joinViewModel.name.value.isNullOrBlank()
+    private fun isPasswordBlank() = joinViewModel.password.value.isNullOrBlank()
+    private fun isPasswordCheckBlank() = joinViewModel.passwordCheck.value.isNullOrBlank()
 
 }
