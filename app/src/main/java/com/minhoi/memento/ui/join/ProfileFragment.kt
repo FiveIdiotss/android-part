@@ -11,7 +11,14 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.minhoi.memento.R
 import com.minhoi.memento.databinding.FragmentProfileBinding
+import kotlinx.coroutines.launch
+import java.util.regex.Pattern
 
+private const val INVALID_EMAIL_FORMAT_TEXT = "이메일 형식이 아닙니다"
+private const val MISMATCH_PASSWORD_TEXT = "비밀번호가 일치하지 않습니다"
+private const val INVALID_PASSWORD_FORMAT_TEXT = "비밀번호는 영어, 숫자, 특수문자를 포함하여 8~16자 입니다"
+private const val VALID_INPUT_TEXT = ""
+private const val PASSWORD_FORMAT = "^(?=.*[A-Za-z])(?=.*[0-9])(?=.*[$@$!%*#?&.])[A-Za-z[0-9]$@$!%*#?&.]{8,16}$"
 class ProfileFragment : Fragment() {
 
     private lateinit var binding: FragmentProfileBinding
