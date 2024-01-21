@@ -22,6 +22,8 @@ private const val PASSWORD_FORMAT = "^(?=.*[A-Za-z])(?=.*[0-9])(?=.*[$@$!%*#?&.]
 class ProfileFragment : Fragment() {
 
     private lateinit var binding: FragmentProfileBinding
+    private var regularEmailFlag = false
+
     private val joinViewModel: JoinViewModel by activityViewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,15 +54,21 @@ class ProfileFragment : Fragment() {
 
         override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
 
-        override fun afterTextChanged(s: Editable?) {
-            if (!android.util.Patterns.EMAIL_ADDRESS.matcher(s.toString()).matches()) {
-                binding.emailCheckText.text = "이메일 형식으로 입력해주세요."
-                binding.inputEmail.setBackgroundResource(R.drawable.round_corner_red_color)  // 적색 테두리
+    private fun observeIsRegularEmail() {
+        joinViewModel.email.observe(viewLifecycleOwner) { input ->
+            if (!android.util.Patterns.EMAIL_ADDRESS.matcher(input).matches()) {
+                binding.apply {
+                    emailCheckText.text = INVALID_EMAIL_FORMAT_TEXT
+                    inputEmail.setBackgroundResource(R.drawable.round_corner_red_color)
+                }
+                regularEmailFlag = false
             } else {
-                binding.emailCheckText.text = ("")        //에러 메세지 제거
-                binding.inputEmail.setBackgroundResource(R.drawable.round_corner_purple_color)  //보라색 테두리
+                binding.apply {
+                    binding.emailCheckText.text = VALID_INPUT_TEXT      //에러 메세지 제거
+                    binding.inputEmail.setBackgroundResource(R.drawable.round_corner_purple_color)
+                }
+                regularEmailFlag = true
             }
         }
     }
-
 }
