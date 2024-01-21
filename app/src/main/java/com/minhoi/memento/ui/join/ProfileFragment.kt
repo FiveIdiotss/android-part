@@ -22,6 +22,7 @@ private const val PASSWORD_FORMAT = "^(?=.*[A-Za-z])(?=.*[0-9])(?=.*[$@$!%*#?&.]
 class ProfileFragment : Fragment() {
 
     private lateinit var binding: FragmentProfileBinding
+    private var passwordCheckFlag = false
     private var regularEmailFlag = false
 
     private val joinViewModel: JoinViewModel by activityViewModels()
@@ -68,6 +69,29 @@ class ProfileFragment : Fragment() {
                     binding.inputEmail.setBackgroundResource(R.drawable.round_corner_purple_color)
                 }
                 regularEmailFlag = true
+            }
+        }
+    }
+
+    private fun observeIsRegularPassword() {
+
+        joinViewModel.password.observe(viewLifecycleOwner) { input ->
+            val pattern = Pattern.matches(PASSWORD_FORMAT, input) // 패턴이 맞는지 확인
+            when (pattern) {
+                true -> {
+                    binding.apply {
+                        inputPassword.setBackgroundResource(R.drawable.round_corner_purple_color)
+                        passwordText.text = VALID_INPUT_TEXT
+                    }
+                    passwordCheckFlag = true
+                }
+                else -> {
+                    binding.apply {
+                        inputPassword.setBackgroundResource(R.drawable.round_corner_red_color)
+                        passwordText.text = INVALID_PASSWORD_FORMAT_TEXT
+                    }
+                    passwordCheckFlag = false
+                }
             }
         }
     }
