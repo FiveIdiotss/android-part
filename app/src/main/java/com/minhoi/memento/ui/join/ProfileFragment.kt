@@ -95,4 +95,24 @@ class ProfileFragment : Fragment() {
             }
         }
     }
+
+    private fun observeIsPasswordEqual() {
+        joinViewModel.passwordCheck.observe(viewLifecycleOwner) { input ->
+            val password = joinViewModel.password.value.toString()
+            val isPasswordEqual = input.equals(password)
+
+            if (isPasswordEqual) {
+                binding.apply {
+                    inputPasswordCheck.setBackgroundResource(R.drawable.round_corner_purple_color)
+                    passwordCheckText.text = VALID_INPUT_TEXT
+                }
+            } else {
+                binding.apply {
+                    inputPasswordCheck.setBackgroundResource(R.drawable.round_corner_red_color)
+                    passwordCheckText.text = MISMATCH_PASSWORD_TEXT
+                }
+            }
+        }
+    }
+
 }
