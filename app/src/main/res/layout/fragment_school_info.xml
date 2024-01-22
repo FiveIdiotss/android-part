@@ -36,10 +36,10 @@
         <AutoCompleteTextView
             android:id="@+id/inputSchoolName"
             android:layout_width="match_parent"
-            android:layout_height="40dp"
+            android:layout_height="60dp"
             android:layout_marginLeft="18dp"
             android:layout_marginRight="18dp"
-            android:layout_marginBottom="7dp"
+            android:layout_marginBottom="25dp"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
             android:onTextChanged="@{(s, start, before, count) -> viewmodel.onSchoolTextChanged(s)}"
@@ -51,6 +51,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="18dp"
+            android:layout_marginBottom="7dp"
             android:text="학번"
             android:textColor="@color/black"
             android:textSize="15dp" />
@@ -58,7 +59,7 @@
         <EditText
             android:id="@+id/inputYear"
             android:layout_width="match_parent"
-            android:layout_height="40dp"
+            android:layout_height="60dp"
             android:layout_marginLeft="18dp"
             android:layout_marginRight="18dp"
             android:layout_marginBottom="15dp"
@@ -73,7 +74,7 @@
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/infoNextBtn"
             android:layout_width="match_parent"
-            android:layout_height="40dp"
+            android:layout_height="50dp"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
             android:layout_marginBottom="70dp"
