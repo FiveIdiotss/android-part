@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="viewmodel"
+            type="com.minhoi.memento.ui.join.JoinViewModel" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ui.join.EmailVerifyCodeInputFragment"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="18dp"
+            android:layout_marginBottom="8dp"
+            android:text="인증 코드를 입력해주세요"
+            android:textSize="20dp"
+            android:textColor="#000000"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="18dp"
+            android:layout_marginBottom="25dp"
+            android:text="이메일이 수신되지 않았을 경우 재전송 버튼을 눌러주세요"/>
+
+        <EditText
+            android:id="@+id/inputEmailVerifyCode"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="18dp"
+            android:layout_marginEnd="18dp"
+            android:layout_marginBottom="5dp"
+            android:digits="0123456789"
+            android:onTextChanged="@{(s, start, before, count) -> viewmodel.onVerifyCodeChanged(s)}"
+            android:inputType="numberSigned"
+            android:maxLength="5"/>
+
+        <TextView
+            android:id="@+id/codeValidationHint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="15dp"
+            android:layout_marginStart="18dp"
+            android:layout_marginEnd="18dp"
+            android:layout_marginBottom="25dp"
+            android:textColor="#FF0000"/>
+
+    </LinearLayout>
+</layout>
