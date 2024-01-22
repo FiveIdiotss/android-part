@@ -1,17 +1,17 @@
 package com.minhoi.memento.ui.join
 
-import android.icu.lang.UCharacter.VerticalOrientation
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.fragment.app.activityViewModels
-import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.minhoi.memento.MajorAdapter
 import com.minhoi.memento.MajorItemDecoration
+import com.minhoi.memento.R
 import com.minhoi.memento.databinding.FragmentSchoolMajorBinding
 
 class SchoolMajorFragment : Fragment() {
@@ -50,7 +50,11 @@ class SchoolMajorFragment : Fragment() {
         setUpMajors()
 
         binding.majorNextBtn.setOnClickListener {
-            findNavController().navigate(R.id.action_schoolMajorFragment_to_profileFragment)
+            if (isMajorSelected()) {
+                Toast.makeText(requireContext(), "학과는 필수 선택사항입니다.", Toast.LENGTH_LONG).show()
+            } else {
+                findNavController().navigate(R.id.action_schoolMajorFragment_to_emailInputFragment)
+            }
         }
     }
 
@@ -60,5 +64,6 @@ class SchoolMajorFragment : Fragment() {
         }
     }
 
+    private fun isMajorSelected() = joinViewModel.majorId.value?.toString().isNullOrBlank()
 
 }
