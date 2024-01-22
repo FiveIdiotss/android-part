@@ -5,14 +5,27 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.minhoi.memento.data.dto.VerifyCodeRequest
+import com.minhoi.memento.data.dto.EmailVerificationRequest
 import com.minhoi.memento.repository.JoinRepository
 import com.minhoi.memento.data.dto.MajorDto
 import com.minhoi.memento.data.dto.MemberDto
 import com.minhoi.memento.data.dto.SchoolDto
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+
+private val TAG = JoinViewModel::class.simpleName
 
 class JoinViewModel : ViewModel() {
     private val joinRepository = JoinRepository()
+
+    private var _verificationCode = MutableLiveData<String>()
+    val verificationCode: LiveData<String> = _verificationCode
+
+    private var _verificationState = MutableLiveData<Boolean>()
+    val verificationState: LiveData<Boolean> = _verificationState
+
     private var _schools = MutableLiveData<List<SchoolDto>>()
     val schools: LiveData<List<SchoolDto>> = _schools
 
@@ -44,6 +57,7 @@ class JoinViewModel : ViewModel() {
     val gender: LiveData<String> = _gender
 
     init {
+        _verificationState.postValue(false)
         viewModelScope.launch {
             getSchools()
         }
@@ -64,6 +78,7 @@ class JoinViewModel : ViewModel() {
                 true -> {
                     _majors.value = majorsData.body()
                 }
+
                 else -> {}
             }
         }
