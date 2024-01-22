@@ -48,6 +48,10 @@ class SchoolMajorFragment : Fragment() {
             addItemDecoration(MajorItemDecoration(80))
         }
         setUpMajors()
+
+        binding.majorNextBtn.setOnClickListener {
+            findNavController().navigate(R.id.action_schoolMajorFragment_to_profileFragment)
+        }
     }
 
     private fun setUpMajors() {
