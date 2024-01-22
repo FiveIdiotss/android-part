@@ -41,7 +41,16 @@ class EmailVerifyCodeInputFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         observeIsValidCode()
+        observeVerificationState()
 
+    }
+
+    private fun observeVerificationState() {
+        joinViewModel.verificationState.observe(viewLifecycleOwner) {
+            if(it) {
+                findNavController().navigate(R.id.action_emailVerifyCodeInputFragment_to_profileFragment)
+            }
+        }
     }
 
     private fun observeIsValidCode() {
