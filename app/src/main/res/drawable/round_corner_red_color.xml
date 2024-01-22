@@ -2,12 +2,12 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
         <shape android:shape="rectangle">
-            <stroke android:width="3dp" android:color="#C1BBEB"/>
+            <stroke android:width="3dp" android:color="#FF0000"/>
             <corners
-                android:bottomRightRadius="100dp"
-                android:bottomLeftRadius="100dp"
-                android:topLeftRadius="100dp"
-                android:topRightRadius="100dp"/>
+                android:bottomRightRadius="10dp"
+                android:bottomLeftRadius="10dp"
+                android:topLeftRadius="10dp"
+                android:topRightRadius="10dp"/>
         </shape>
     </item>
 
@@ -19,10 +19,10 @@
         <shape android:shape="rectangle">
             <solid android:color="#FFFFFF"/>
             <corners
-                android:bottomRightRadius="100dp"
-                android:bottomLeftRadius="100dp"
-                android:topLeftRadius="100dp"
-                android:topRightRadius="100dp"/>
+                android:bottomRightRadius="10dp"
+                android:bottomLeftRadius="10dp"
+                android:topLeftRadius="10dp"
+                android:topRightRadius="10dp"/>
         </shape>
     </item>
 </layer-list>
