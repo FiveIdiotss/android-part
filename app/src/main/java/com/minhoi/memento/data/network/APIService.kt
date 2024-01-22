@@ -20,4 +20,24 @@ interface APIService {
     suspend fun signUp(
         @Body member: MemberDto
     ): Response<String>
+
+    @POST("api/member/signIn")
+    suspend fun signIn(
+        @Body loginRequest: LoginRequest
+    ): Response<LoginResponse>
+
+    @POST("login/email")
+    suspend fun getVerificationCode(
+        @Body emailVerificationRequest: EmailVerificationRequest
+    ): Response<String>
+
+    @POST("login/email/verify")
+    suspend fun verificationWithCode(
+        @Body verifyCodeRequest: VerifyCodeRequest
+    ): Response<String>
+
+    @POST("api/v1/clear")
+    suspend fun clear(
+        @Body clearDto: ClearDto
+    ): Response<String>
 }

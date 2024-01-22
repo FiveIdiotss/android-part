@@ -84,4 +84,72 @@ class JoinViewModel : ViewModel() {
         }
     }
 
+    suspend fun join() {
+        val member = MemberDto(
+            _email.value.toString(),
+            _name.value.toString(),
+            _password.value.toString(),
+            year.value!!.toInt(),
+            "MALE",
+            _school.value.toString(),
+            _majorId.value!!
+        )
+
+        Log.d("memberDto", "join: ${member.toString()} ")
+
+        viewModelScope.launch {
+            val response = joinRepository.join(member)
+            if (response.isSuccessful) {
+                Log.d("hahahahaha", "${response.body()}")
+            } else {
+                Log.d("hahahahaha", "${response.body()}")
+            }
+        }
+    }
+
+    suspend fun verifyCode() {
+        val request = VerifyCodeRequest(
+            _email.value.toString(),
+            _school.value.toString(),
+            _verificationCode.value.toString().toInt())
+
+        viewModelScope.launch {
+            val response = joinRepository.verifyCode(request)
+            withContext (Dispatchers.Main) {
+                if(response.isSuccessful && !response.body()!!.contains("false")) {
+                    _verificationState.postValue(true)
+                }
+            }
+        }
+    }
+
+    fun onVerifyCodeChanged(text: CharSequence) {
+        _verificationCode.value = text.toString()
+    }
+
+    fun onSchoolTextChanged(text: CharSequence) {
+        _school.value = text.toString()
+    }
+
+    fun onEmailTextChanged(text: CharSequence) {
+        _email.value = text.toString()
+    }
+
+    fun onPasswordTextChanged(text: CharSequence) {
+        _password.value = text.toString()
+    }
+
+    fun onPasswordCheckTextChanged(text: CharSequence) {
+        _passwordCheck.value = text.toString()
+    }
+
+    fun onNameTextChanged(text: CharSequence) {
+        _name.value = text.toString()
+    }
+
+    fun setMajorId(id: Int) {
+        _majorId.value = id
+    }
+
+
 }
