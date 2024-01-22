@@ -35,7 +35,7 @@ class SchoolInfoFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setObserve()
+        setUpSchoolNames()
 
         binding.infoNextBtn.setOnClickListener {
             // 유효성 검사 진행 해야함
@@ -45,7 +45,7 @@ class SchoolInfoFragment : Fragment() {
         }
     }
 
-    private fun setObserve() {
+    private fun setUpSchoolNames() {
         joinViewModel.schools.observe(viewLifecycleOwner) { schools ->
             binding.inputSchoolName.setAdapter(ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, schools.map { it.name }))
         }
