@@ -34,6 +34,12 @@ class JoinViewModel : ViewModel() {
     private var _password = MutableLiveData<String>()
     val password: LiveData<String> = _password
 
+    private var _passwordCheck = MutableLiveData<String>()
+    val passwordCheck: LiveData<String> = _passwordCheck
+
+    private var _name= MutableLiveData<String>()
+    val name: LiveData<String> = _name
+
     private var _gender = MutableLiveData<String>()
     val gender: LiveData<String> = _gender
 
