@@ -61,44 +61,116 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
 
-        <EditText
-            android:id="@+id/inputPassword"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:layout_marginLeft="18dp"
-            android:layout_marginRight="18dp"
-            android:layout_marginBottom="35dp"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:onTextChanged="@{(s, start, before, count) -> viewmodel.onPasswordTextChanged(s)}"
-            android:background="@drawable/round_corner_purple_color"
-            android:hint="비밀번호" />
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp">
 
-        <EditText
-            android:id="@+id/inputPasswordCheck"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:layout_marginLeft="18dp"
-            android:layout_marginRight="18dp"
-            android:layout_marginBottom="35dp"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:onTextChanged="@{(s, start, before, count) -> viewmodel.onPasswordCheckTextChanged(s)}"
-            android:background="@drawable/round_corner_purple_color"
-            android:hint="비밀번호 확인" />
+            <EditText
+                android:id="@+id/inputPassword"
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:inputType="textPassword"
+                android:background="@drawable/round_corner_purple_color"
+                android:hint="비밀번호"
+                android:onTextChanged="@{(s, start, before, count) -> viewmodel.onPasswordTextChanged(s)}"
+                android:layout_marginStart="18dp"
+                android:layout_marginEnd="18dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        <EditText
-            android:id="@+id/inputName"
+            <TextView
+                android:id="@+id/passwordText"
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:textColor="#FF0000"
+                android:textSize="15dp"
+                android:layout_marginStart="18dp"
+                android:layout_marginEnd="18dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/inputPassword" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:layout_marginLeft="18dp"
-            android:layout_marginRight="18dp"
-            android:layout_marginBottom="15dp"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:onTextChanged="@{(s, start, before, count) -> viewmodel.onNameTextChanged(s)}"
-            android:background="@drawable/round_corner_purple_color"
-            android:hint="이름" />
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp">
+
+            <EditText
+                android:id="@+id/inputPasswordCheck"
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:inputType="textPassword"
+                android:background="@drawable/round_corner_purple_color"
+                android:hint="비밀번호 확인"
+                android:onTextChanged="@{(s, start, before, count) -> viewmodel.onPasswordCheckTextChanged(s)}"
+                android:layout_marginStart="18dp"
+                android:layout_marginEnd="18dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/passwordCheckText"
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:textColor="#FF0000"
+                android:textSize="15dp"
+                android:layout_marginStart="18dp"
+                android:layout_marginEnd="18dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/inputPasswordCheck" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp">
+
+            <EditText
+                android:id="@+id/inputName"
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:background="@drawable/round_corner_purple_color"
+                android:hint="이름"
+                android:onTextChanged="@{(s, start, before, count) -> viewmodel.onNameTextChanged(s)}"
+                android:layout_marginStart="18dp"
+                android:layout_marginEnd="18dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/nameText"
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:textColor="#FF0000"
+                android:textSize="15dp"
+                android:layout_marginStart="18dp"
+                android:layout_marginEnd="18dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/inputName" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
 
         <TextView
             android:layout_width="wrap_content"
