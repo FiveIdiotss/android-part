@@ -47,10 +47,10 @@ class SchoolMajorFragment : Fragment() {
             layoutManager = LinearLayoutManager(requireActivity())
             addItemDecoration(MajorItemDecoration(80))
         }
-        setObserve()
+        setUpMajors()
     }
 
-    private fun setObserve() {
+    private fun setUpMajors() {
         joinViewModel.majors.observe(viewLifecycleOwner) { majors ->
             majorAdapter.setItems(majors)
         }
