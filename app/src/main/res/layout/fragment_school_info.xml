@@ -56,20 +56,20 @@
             android:textColor="@color/black"
             android:textSize="15dp" />
 
-        <EditText
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/inputYear"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:layout_marginLeft="18dp"
             android:layout_marginRight="18dp"
-            android:layout_marginBottom="15dp"
+            android:layout_marginBottom="25dp"
+            android:background="@drawable/round_corner_purple_color"
+            android:gravity="left|center"
+            android:hint="학번 선택"
+            android:textSize="18dp"
+            android:text="@={viewmodel.year}"
             android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:calendarViewShown="false"
-            android:spinnersShown="true"
-            android:hint="학번 입력"
-            android:onTextChanged="@{(s, start, before, count) -> viewmodel.onYearTextChanged(s)}"
-            android:background="@drawable/round_corner_purple_color" />
+            android:paddingRight="10dp"/>
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/infoNextBtn"
