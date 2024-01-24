@@ -11,12 +11,12 @@ interface APIService {
     @GET("/api/schools")
     suspend fun getSchools(): Response<List<SchoolDto>>
 
-    @GET("/api/{schoolName}")
+    @GET("/api/school/{schoolName}")
     suspend fun getMajors(
         @Path(value = "schoolName") schoolName: String
     ): Response<List<MajorDto>>
 
-    @POST("/api/member/signup")
+    @POST("/api/member/signUp")
     suspend fun signUp(
         @Body member: MemberDto
     ): Response<String>
