@@ -10,7 +10,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.minhoi.memento.R
 import com.minhoi.memento.databinding.FragmentEmailVerifyBinding
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 private const val INVALID_EMAIL_FORMAT_TEXT = "이메일 형식이 아닙니다"
 private const val VALID_INPUT_TEXT = ""
@@ -20,7 +22,8 @@ class EmailInputFragment : Fragment() {
     private lateinit var binding: FragmentEmailVerifyBinding
     private val joinViewModel: JoinViewModel by activityViewModels()
 
-    private var regularEmailFlag = false
+    private var regularEmailState = false
+    private var validEmailState = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
@@ -41,12 +44,24 @@ class EmailInputFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         observeIsRegularEmail()
+        observeIsValidSchoolEmail()
+
         binding.verifyBtn.setOnClickListener {
-            if(!isEmailBlank() && regularEmailFlag) {
+            if (!isEmailBlank() && regularEmailState) {
                 lifecycleScope.launch {
-                    joinViewModel.requestVerificationCode()
+                    joinViewModel.verifySchoolAndEmail()
+                    withContext(Dispatchers.Main) {
+                        when (validEmailState) {
+                            true -> {
+                                findNavController().navigate(R.id.action_emailInputFragment_to_emailVerifyCodeInputFragment)
+                            }
+
+                            else -> {
+                                binding.emailVerificationHint.text = "유효하지 않은 대학교 이메일입니다. 다시 입력해주세요"
+                            }
+                        }
+                    }
                 }
-                findNavController().navigate(R.id.action_emailInputFragment_to_emailVerifyCodeInputFragment)
             }
         }
     }
@@ -58,13 +73,24 @@ class EmailInputFragment : Fragment() {
                     emailVerificationHint.text = INVALID_EMAIL_FORMAT_TEXT
                     inputEmail.setBackgroundResource(R.drawable.round_corner_red_color)
                 }
-                regularEmailFlag = false
+                regularEmailState = false
             } else {
                 binding.apply {
                     binding.emailVerificationHint.text = VALID_INPUT_TEXT      //에러 메세지 제거
                     binding.inputEmail.setBackgroundResource(R.drawable.round_corner_purple_color)
                 }
-                regularEmailFlag = true
+                regularEmailState = true
+            }
+        }
+    }
+
+    private fun observeIsValidSchoolEmail() {
+        joinViewModel.emailAndSchoolVerificationState.observe(viewLifecycleOwner) {
+            when (it) {
+                true -> {
+                    validEmailState = true
+                }
+                else -> {}
             }
         }
     }

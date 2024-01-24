@@ -26,6 +26,9 @@ class JoinViewModel : ViewModel() {
     private var _verificationState = MutableLiveData<Boolean>()
     val verificationState: LiveData<Boolean> = _verificationState
 
+    private var _emailAndSchoolVerificationState = MutableLiveData<Boolean>()
+    val emailAndSchoolVerificationState: LiveData<Boolean> = _emailAndSchoolVerificationState
+
     private var _schools = MutableLiveData<List<SchoolDto>>()
     val schools: LiveData<List<SchoolDto>> = _schools
 
@@ -58,6 +61,7 @@ class JoinViewModel : ViewModel() {
 
     init {
         _verificationState.postValue(false)
+        _emailAndSchoolVerificationState.postValue(false)
         viewModelScope.launch {
             getSchools()
         }
@@ -107,16 +111,33 @@ class JoinViewModel : ViewModel() {
         }
     }
 
+    suspend fun verifySchoolAndEmail() {
+        val request = EmailVerificationRequest(
+            _email.value.toString(),
+            _school.value.toString()
+        )
+
+        viewModelScope.launch {
+            val response = joinRepository.verifyEmail(request)
+            withContext(Dispatchers.Main) {
+                if (response.isSuccessful && !response.body()!!.contains("false")) {
+                    _emailAndSchoolVerificationState.postValue(true)
+                }
+            }
+        }
+    }
+
     suspend fun verifyCode() {
         val request = VerifyCodeRequest(
             _email.value.toString(),
             _school.value.toString(),
-            _verificationCode.value.toString().toInt())
+            _verificationCode.value.toString().toInt()
+        )
 
         viewModelScope.launch {
             val response = joinRepository.verifyCode(request)
-            withContext (Dispatchers.Main) {
-                if(response.isSuccessful && !response.body()!!.contains("false")) {
+            withContext(Dispatchers.Main) {
+                if (response.isSuccessful && !response.body()!!.contains("false")) {
                     _verificationState.postValue(true)
                 }
             }
