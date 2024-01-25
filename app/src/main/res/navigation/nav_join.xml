@@ -10,8 +10,8 @@
         android:name="com.minhoi.memento.ui.join.SchoolMajorFragment"
         android:label="SchoolMajorFragment" >
         <action
-            android:id="@+id/action_schoolMajorFragment_to_profileFragment"
-            app:destination="@id/profileFragment" />
+            android:id="@+id/action_schoolMajorFragment_to_emailInputFragment"
+            app:destination="@id/emailInputFragment" />
     </fragment>
     <fragment
         android:id="@+id/schoolInfoFragment"
@@ -26,4 +26,23 @@
         android:name="com.minhoi.memento.ui.join.ProfileFragment"
         android:label="fragment_profile"
         tools:layout="@layout/fragment_profile" />
+    <fragment
+        android:id="@+id/emailVerifyCodeInputFragment"
+        android:name="com.minhoi.memento.ui.join.EmailVerifyCodeInputFragment"
+        android:label="EmailVerifyCodeInputFragment" >
+        <action
+            android:id="@+id/action_emailVerifyCodeInputFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
+        <action
+            android:id="@+id/action_emailVerifyCodeInputFragment_to_emailInputFragment"
+            app:destination="@id/emailInputFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/emailInputFragment"
+        android:name="com.minhoi.memento.ui.join.EmailInputFragment"
+        android:label="EmailInputFragment" >
+        <action
+            android:id="@+id/action_emailInputFragment_to_emailVerifyCodeInputFragment"
+            app:destination="@id/emailVerifyCodeInputFragment" />
+    </fragment>
 </navigation>
