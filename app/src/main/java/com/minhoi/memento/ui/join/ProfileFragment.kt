@@ -59,23 +59,7 @@ class ProfileFragment : Fragment() {
         observeIsPasswordEqual()
     }
 
-    private fun observeIsRegularEmail() {
-        joinViewModel.email.observe(viewLifecycleOwner) { input ->
-            if (!android.util.Patterns.EMAIL_ADDRESS.matcher(input).matches()) {
-                binding.apply {
-                    emailCheckText.text = INVALID_EMAIL_FORMAT_TEXT
-                    inputEmail.setBackgroundResource(R.drawable.round_corner_red_color)
-                }
-                regularEmailFlag = false
-            } else {
-                binding.apply {
-                    binding.emailCheckText.text = VALID_INPUT_TEXT      //에러 메세지 제거
-                    binding.inputEmail.setBackgroundResource(R.drawable.round_corner_purple_color)
-                }
-                regularEmailFlag = true
-            }
-        }
-    }
+
 
     private fun observeIsRegularPassword() {
 
