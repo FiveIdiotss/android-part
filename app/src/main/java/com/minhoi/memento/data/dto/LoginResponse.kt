@@ -6,8 +6,11 @@ data class LoginResponse(
     @SerializedName("memberDTO")
     val memberDTO: MemberDto,
 
-    @SerializedName("token")
-    val token: String,
+    @SerializedName("accessToken")
+    val accessToken: String,
+
+    @SerializedName("refreshToken")
+    val refreshToken: String,
 
     @SerializedName("message")
     val message: String
