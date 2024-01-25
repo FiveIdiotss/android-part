@@ -3,8 +3,8 @@ package com.minhoi.memento.data.dto
 import com.google.gson.annotations.SerializedName
 
 data class LoginResponse(
-    @SerializedName("memberId")
-    val memberId: Int,
+    @SerializedName("memberDTO")
+    val memberDTO: MemberDto,
 
     @SerializedName("token")
     val token: String,
