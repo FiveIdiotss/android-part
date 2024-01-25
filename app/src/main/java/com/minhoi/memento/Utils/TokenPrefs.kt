@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 
 private const val ACCESS_TOKEN = "Access_Token"
-
+private const val REFRESH_TOKEN = "Refresh_Token"
 class TokenPrefs(context: Context) {
 
     private lateinit var sharedPreference: SharedPreferences
@@ -20,5 +20,11 @@ class TokenPrefs(context: Context) {
     }
 
     fun getAccessToken(defValue: String) = sharedPreference.getString(ACCESS_TOKEN, defValue)
+
+    fun setRefreshToken(value: String) {
+        editor.putString(REFRESH_TOKEN, value).apply()
+    }
+
+    fun getRefreshToken(defValue: String) = sharedPreference.getString(REFRESH_TOKEN, defValue)
 
 }
