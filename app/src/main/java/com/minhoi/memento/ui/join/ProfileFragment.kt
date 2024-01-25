@@ -14,16 +14,16 @@ import com.minhoi.memento.databinding.FragmentProfileBinding
 import kotlinx.coroutines.launch
 import java.util.regex.Pattern
 
-private const val INVALID_EMAIL_FORMAT_TEXT = "이메일 형식이 아닙니다"
 private const val MISMATCH_PASSWORD_TEXT = "비밀번호가 일치하지 않습니다"
 private const val INVALID_PASSWORD_FORMAT_TEXT = "비밀번호는 영어, 숫자, 특수문자를 포함하여 8~16자 입니다"
 private const val VALID_INPUT_TEXT = ""
-private const val PASSWORD_FORMAT = "^(?=.*[A-Za-z])(?=.*[0-9])(?=.*[$@$!%*#?&.])[A-Za-z[0-9]$@$!%*#?&.]{8,16}$"
+private const val PASSWORD_FORMAT =
+    "^(?=.*[A-Za-z])(?=.*[0-9])(?=.*[$@$!%*#?&.])[A-Za-z[0-9]$@$!%*#?&.]{8,16}$"
+
 class ProfileFragment : Fragment() {
 
     private lateinit var binding: FragmentProfileBinding
     private var passwordCheckFlag = false
-    private var regularEmailFlag = false
 
     private val joinViewModel: JoinViewModel by activityViewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,10 +47,14 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.inputEmail.addTextChangedListener(emailInputFormal)
-    }
+        binding.joinBtn.setOnClickListener {
+            if (canPerformJoin()) {
+                lifecycleScope.launch {
+                    joinViewModel.join()
+                }
+            }
+        }
 
-        observeIsRegularEmail()
         observeIsRegularPassword()
         observeIsPasswordEqual()
     }
@@ -85,6 +89,7 @@ class ProfileFragment : Fragment() {
                     }
                     passwordCheckFlag = true
                 }
+
                 else -> {
                     binding.apply {
                         inputPassword.setBackgroundResource(R.drawable.round_corner_red_color)
@@ -115,9 +120,15 @@ class ProfileFragment : Fragment() {
         }
     }
 
-    private fun isEmailBlank() = joinViewModel.email.value.isNullOrBlank()
     private fun isNameBlank() = joinViewModel.name.value.isNullOrBlank()
     private fun isPasswordBlank() = joinViewModel.password.value.isNullOrBlank()
     private fun isPasswordCheckBlank() = joinViewModel.passwordCheck.value.isNullOrBlank()
+
+    private fun canPerformJoin(): Boolean {
+        return passwordCheckFlag &&
+                !isNameBlank() &&
+                !isPasswordBlank() &&
+                !isPasswordCheckBlank()
+    }
 
 }
