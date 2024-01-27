@@ -1,7 +1,7 @@
 package com.minhoi.memento
 
 import android.app.Application
-import com.minhoi.memento.Utils.TokenPrefs
+import com.minhoi.memento.utils.TokenPrefs
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
