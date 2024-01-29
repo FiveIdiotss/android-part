@@ -60,8 +60,8 @@ class JoinViewModel : ViewModel() {
     val gender: LiveData<String> = _gender
 
     init {
-        _verificationState.postValue(false)
-        _emailAndSchoolVerificationState.postValue(false)
+        _verificationState.value = false
+        _emailAndSchoolVerificationState.value = false
         viewModelScope.launch {
             getSchools()
         }
@@ -121,7 +121,7 @@ class JoinViewModel : ViewModel() {
             val response = joinRepository.verifyEmail(request)
             withContext(Dispatchers.Main) {
                 if (response.isSuccessful && !response.body()!!.contains("false")) {
-                    _emailAndSchoolVerificationState.postValue(true)
+                    _emailAndSchoolVerificationState.value = true
                 }
             }
         }
@@ -138,7 +138,7 @@ class JoinViewModel : ViewModel() {
             val response = joinRepository.verifyCode(request)
             withContext(Dispatchers.Main) {
                 if (response.isSuccessful && !response.body()!!.contains("false")) {
-                    _verificationState.postValue(true)
+                    _verificationState.value = true
                 }
             }
         }
