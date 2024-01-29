@@ -49,16 +49,12 @@ class ProfileFragment : Fragment() {
 
         binding.joinBtn.setOnClickListener {
             if (canPerformJoin()) {
-                lifecycleScope.launch {
-                    joinViewModel.join()
-                }
+                joinViewModel.join()
             }
         }
-
         observeIsRegularPassword()
         observeIsPasswordEqual()
     }
-
 
 
     private fun observeIsRegularPassword() {

@@ -67,15 +67,17 @@ class JoinViewModel : ViewModel() {
         }
     }
 
-    private suspend fun getSchools() {
-        val schoolsData = joinRepository.getSchools()
-        when (schoolsData.isSuccessful) {
-            true -> _schools.value = schoolsData.body()
-            else -> {}
+    private fun getSchools() {
+        viewModelScope.launch {
+            val schoolsData = joinRepository.getSchools()
+            when (schoolsData.isSuccessful) {
+                true -> _schools.value = schoolsData.body()
+                else -> {}
+            }
         }
     }
 
-    suspend fun getMajorsBySchool(name: String) {
+    fun getMajorsBySchool(name: String) {
         viewModelScope.launch {
             val majorsData = joinRepository.getMajors(name)
             when (majorsData.isSuccessful) {
@@ -88,7 +90,7 @@ class JoinViewModel : ViewModel() {
         }
     }
 
-    suspend fun join() {
+    fun join() {
         val member = MemberDto(
             _email.value.toString(),
             _name.value.toString(),
@@ -111,7 +113,7 @@ class JoinViewModel : ViewModel() {
         }
     }
 
-    suspend fun verifySchoolAndEmail() {
+    fun verifySchoolAndEmail() {
         val request = EmailVerificationRequest(
             _email.value.toString(),
             _school.value.toString()
@@ -127,7 +129,7 @@ class JoinViewModel : ViewModel() {
         }
     }
 
-    suspend fun verifyCode() {
+    fun verifyCode() {
         val request = VerifyCodeRequest(
             _email.value.toString(),
             _school.value.toString(),
