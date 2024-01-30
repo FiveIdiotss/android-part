@@ -1,6 +1,5 @@
 package com.minhoi.memento
 
-import android.os.Bundle
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.minhoi.memento.base.BaseActivity
@@ -13,10 +12,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
     private val retrofitOut = RetrofitClient.getInstance().create(APIService::class.java)
     override val layoutResourceId: Int = R.layout.activity_main
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-
+    override fun initView() {
         setBottomNavigation()
     }
 

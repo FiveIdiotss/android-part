@@ -11,9 +11,7 @@ class IntroActivity : BaseActivity<ActivityIntroBinding>() {
 
     override val layoutResourceId: Int = R.layout.activity_intro
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
+    override fun initView() {
         binding.apply {
             toJoinBtn.setOnClickListener {
                 startActivity(Intent(this@IntroActivity, JoinActivity::class.java))
