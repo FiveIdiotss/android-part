@@ -9,7 +9,7 @@ import com.minhoi.memento.data.dto.VerifyCodeRequest
 import com.minhoi.memento.data.dto.EmailVerificationRequest
 import com.minhoi.memento.repository.JoinRepository
 import com.minhoi.memento.data.dto.MajorDto
-import com.minhoi.memento.data.dto.MemberDto
+import com.minhoi.memento.data.dto.CreateMemberRequest
 import com.minhoi.memento.data.dto.SchoolDto
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -91,7 +91,7 @@ class JoinViewModel : ViewModel() {
     }
 
     fun join() {
-        val member = MemberDto(
+        val member = CreateMemberRequest(
             _email.value.toString(),
             _name.value.toString(),
             _password.value.toString(),
