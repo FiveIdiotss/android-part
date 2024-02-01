@@ -21,7 +21,8 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         NavController는 onNavDestinationSelected() 호출.
         따라서 MenuItem의 id가 대상의 id와 일치하면 Navcontroller는 그 대상으로 이동 가능
          */
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.bottomNavigationView) as NavHostFragment
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.mainFragmentContainerView) as NavHostFragment
         val navController = navHostFragment.navController
         binding.bottomNavigationView.setupWithNavController(navController)
     }
