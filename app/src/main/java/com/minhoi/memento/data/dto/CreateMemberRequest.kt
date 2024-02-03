@@ -1,6 +1,6 @@
 package com.minhoi.memento.data.dto
 
-data class MemberDto(
+data class CreateMemberRequest(
     val email: String,
     val name: String,
     val password: String,

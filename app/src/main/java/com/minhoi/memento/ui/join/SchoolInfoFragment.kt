@@ -91,7 +91,7 @@ class SchoolInfoFragment : Fragment(), YearPickerDialogFragment.YearPickerDialog
         }
     }
 
-    private suspend fun clickNextBtn() {
+    private fun clickNextBtn() {
         val schoolName = binding.inputSchoolName.text.toString()
         joinViewModel.getMajorsBySchool(schoolName)
         findNavController().navigate(R.id.action_schoolInfoFragment_to_schoolMajorFragment)

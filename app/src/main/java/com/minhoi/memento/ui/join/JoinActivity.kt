@@ -20,6 +20,10 @@
 
         }
 
+        override fun initView() {
+
+        }
+
         override fun onSupportNavigateUp(): Boolean {
             navController = findNavController(R.id.fragmentContainerView)
             return navController.navigateUp() || super.onSupportNavigateUp()

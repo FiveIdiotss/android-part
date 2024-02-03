@@ -1,4 +1,4 @@
-package com.minhoi.memento.Utils
+package com.minhoi.memento.utils
 
 import android.content.Context
 import android.content.SharedPreferences

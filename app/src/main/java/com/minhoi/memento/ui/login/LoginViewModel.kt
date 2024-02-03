@@ -1,6 +1,5 @@
 package com.minhoi.memento.ui.login
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -32,8 +31,8 @@ class LoginViewModel : ViewModel() {
             val response = loginRepository.signIn(loginRequest)
             if (response.isSuccessful) {
                 response.body()?.let {
-                    MentoApplication.prefs.setAccessToken(it.accessToken)
-                    MentoApplication.prefs.setRefreshToken(it.refreshToken)
+                    MentoApplication.prefs.setAccessToken(it.tokenDto.accessToken)
+                    MentoApplication.prefs.setRefreshToken(it.tokenDto.refreshToken)
                 }
             }
         }

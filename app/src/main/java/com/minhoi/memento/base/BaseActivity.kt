@@ -15,7 +15,11 @@ abstract class BaseActivity<T : ViewDataBinding> : AppCompatActivity() {
 
         binding = DataBindingUtil.setContentView(this, layoutResourceId)
         binding.lifecycleOwner = this@BaseActivity
+
+        initView()
     }
+
+    abstract fun initView()
 
     override fun onDestroy() {
         super.onDestroy()

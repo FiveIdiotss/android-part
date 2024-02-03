@@ -2,7 +2,7 @@ package com.minhoi.memento.repository
 
 import com.minhoi.memento.data.dto.VerifyCodeRequest
 import com.minhoi.memento.data.dto.EmailVerificationRequest
-import com.minhoi.memento.data.dto.MemberDto
+import com.minhoi.memento.data.dto.CreateMemberRequest
 import com.minhoi.memento.data.network.APIService
 import com.minhoi.memento.data.network.RetrofitClient
 
@@ -14,7 +14,7 @@ class JoinRepository {
 
     suspend fun getMajors(name: String) = retrofitClient.getMajors(name)
 
-    suspend fun join(member: MemberDto) = retrofitClient.signUp(member)
+    suspend fun join(member: CreateMemberRequest) = retrofitClient.signUp(member)
 
     suspend fun verifyEmail(emailVerificationRequest: EmailVerificationRequest) = retrofitClient.getVerificationCode(emailVerificationRequest)
 
