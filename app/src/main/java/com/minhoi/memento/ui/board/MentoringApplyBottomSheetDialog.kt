@@ -58,10 +58,15 @@ class MentoringApplyBottomSheetDialog : BottomSheetDialogFragment() {
         setTimeTable()
     }
 
-    private fun setTimeTable() {
-        viewModel.post.observe(viewLifecycleOwner) {
-            val timeTable = setTimeTable(it.timeTable, it.consultTime)
-            timeTableAdapter.setList(timeTable)
+    private fun observeIsAvailableDay() {
+        viewModel.isAvailableDay.observe(this) { isAvailable ->
+            if (isAvailable) {
+                binding.timeTableRv.visibility = View.VISIBLE
+                binding.noTimeTable.visibility = View.GONE
+            } else {
+                binding.timeTableRv.visibility = View.GONE
+                binding.noTimeTable.visibility = View.VISIBLE
+            }
         }
     }
 
