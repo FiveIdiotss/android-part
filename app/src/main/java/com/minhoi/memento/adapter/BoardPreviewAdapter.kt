@@ -5,14 +5,16 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.minhoi.memento.data.dto.BoardContentDto
 import com.minhoi.memento.databinding.PreviewBoardRowItemBinding
+import com.minhoi.memento.utils.setOnSingleClickListener
 
-class BoardPreviewAdapter : RecyclerView.Adapter<BoardPreviewAdapter.ViewHolder>() {
+class BoardPreviewAdapter(private val onClickListener: (BoardContentDto) -> Unit) : RecyclerView.Adapter<BoardPreviewAdapter.ViewHolder>() {
 
     private val boardContents = mutableListOf<BoardContentDto>()
     inner class ViewHolder(private val binding: PreviewBoardRowItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(item: BoardContentDto) {
             binding.boardContent = item
+            binding.root.setOnSingleClickListener { onClickListener(item) }
         }
     }
 
