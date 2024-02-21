@@ -6,13 +6,14 @@ import androidx.paging.PagingData
 import com.minhoi.memento.data.dto.BoardContentDto
 import com.minhoi.memento.data.network.APIService
 import com.minhoi.memento.data.network.RetrofitClient
+import com.minhoi.memento.utils.BoardType
 import kotlinx.coroutines.flow.Flow
 
 class BoardRepository {
 
     private val retrofitClient = RetrofitClient.getInstance().create(APIService::class.java)
 
-    suspend fun getMenteeBoards() = retrofitClient.getMenteeBoards()
+    suspend fun getPreviewBoards() = retrofitClient.getAllMenteeBoards(BoardType.MENTEE, 1, 10)
 
     fun getMenteeBoardsStream(pageSize: Int): Flow<PagingData<BoardContentDto>> {
         return Pager(
@@ -20,4 +21,6 @@ class BoardRepository {
             pagingSourceFactory = { BoardPagingSource(retrofitClient) }
         ).flow
     }
+
+    suspend fun getBoardContent(boardId: Long) = retrofitClient.getBoardContent(boardId)
 }
