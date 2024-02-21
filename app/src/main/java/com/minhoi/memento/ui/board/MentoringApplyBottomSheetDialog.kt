@@ -42,7 +42,6 @@ class MentoringApplyBottomSheetDialog : BottomSheetDialogFragment() {
         val dialog: Dialog = super.onCreateDialog(savedInstanceState)
         dialog.setOnShowListener {
             val bottomSheetDialog = it as BottomSheetDialog
-            // 다이얼로그 크기 설정 (인자값 : DialogInterface)
             setupRatio(bottomSheetDialog)
         }
         return dialog
@@ -55,7 +54,13 @@ class MentoringApplyBottomSheetDialog : BottomSheetDialogFragment() {
             adapter = timeTableAdapter
             layoutManager = GridLayoutManager(requireContext(), 3)
         }
-        setTimeTable()
+
+        binding.calendarView.setOnDateChangeListener { _, year, month, dayOfMonth ->
+            viewModel.onDateSelected(year, month, dayOfMonth)
+        }
+
+        observeIsAvailableDay()
+        observeTimeTable()
     }
 
     private fun observeIsAvailableDay() {
