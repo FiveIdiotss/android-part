@@ -70,6 +70,13 @@ class MentoringApplyBottomSheetDialog : BottomSheetDialogFragment() {
         }
     }
 
+    private fun observeTimeTable() {
+        viewModel.post.observe(viewLifecycleOwner) {
+            val timeTable = setTimeTable(it.timeTable, it.consultTime)
+            timeTableAdapter.setList(timeTable)
+        }
+    }
+
     private fun setupRatio(bottomSheetDialog: BottomSheetDialog) {
         val bottomSheet = bottomSheetDialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet) as View
         val behavior = BottomSheetBehavior.from<View>(bottomSheet)
