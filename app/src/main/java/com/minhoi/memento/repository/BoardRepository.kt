@@ -4,6 +4,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.minhoi.memento.data.dto.BoardContentDto
+import com.minhoi.memento.data.dto.MentoringApplyRequest
 import com.minhoi.memento.data.network.APIService
 import com.minhoi.memento.data.network.RetrofitClient
 import com.minhoi.memento.utils.BoardType
@@ -12,6 +13,7 @@ import kotlinx.coroutines.flow.Flow
 class BoardRepository {
 
     private val retrofitClient = RetrofitClient.getInstance().create(APIService::class.java)
+    private val loggedInRetrofitClient = RetrofitClient.getLoggedInInstance().create(APIService::class.java)
 
     suspend fun getPreviewBoards() = retrofitClient.getAllMenteeBoards(BoardType.MENTEE, 1, 10)
 
@@ -23,4 +25,7 @@ class BoardRepository {
     }
 
     suspend fun getBoardContent(boardId: Long) = retrofitClient.getBoardContent(boardId)
+
+    suspend fun applyMentoring(boardId: Long, applyRequest: MentoringApplyRequest) = loggedInRetrofitClient.applyMentoring(boardId, applyRequest)
+
 }
