@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -18,6 +19,9 @@ import com.minhoi.memento.R
 import com.minhoi.memento.adapter.SelectTimeTableAdapter
 import com.minhoi.memento.data.dto.TimeTableDto
 import com.minhoi.memento.databinding.BottomSheetFragmentMentoringApplyBinding
+import com.minhoi.memento.utils.setOnSingleClickListener
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
@@ -49,7 +53,11 @@ class MentoringApplyBottomSheetDialog : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        timeTableAdapter = SelectTimeTableAdapter()
+        timeTableAdapter = SelectTimeTableAdapter {
+            // onSelectListener
+            viewModel.setSelectedTime(it)
+        }
+
         binding.timeTableRv.apply {
             adapter = timeTableAdapter
             layoutManager = GridLayoutManager(requireContext(), 3)
@@ -57,6 +65,10 @@ class MentoringApplyBottomSheetDialog : BottomSheetDialogFragment() {
 
         binding.calendarView.setOnDateChangeListener { _, year, month, dayOfMonth ->
             viewModel.onDateSelected(year, month, dayOfMonth)
+        }
+
+        binding.applyBtn.setOnSingleClickListener {
+            apply()
         }
 
         observeIsAvailableDay()
@@ -115,4 +127,10 @@ class MentoringApplyBottomSheetDialog : BottomSheetDialogFragment() {
         return times
     }
 
+    fun apply() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val response = viewModel.applyMentoring()
+        }
+        dismiss()
+    }
 }
