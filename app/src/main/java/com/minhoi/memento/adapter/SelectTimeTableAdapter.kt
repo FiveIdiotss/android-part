@@ -7,7 +7,7 @@ import com.minhoi.memento.R
 import com.minhoi.memento.databinding.TimetableSelectItemBinding
 import com.minhoi.memento.utils.setOnSingleClickListener
 
-class SelectTimeTableAdapter : RecyclerView.Adapter<SelectTimeTableAdapter.TimeTableViewHolder>() {
+class SelectTimeTableAdapter(private val onSelectListener: (String) -> Unit) : RecyclerView.Adapter<SelectTimeTableAdapter.TimeTableViewHolder>() {
 
     private val timeTable = mutableListOf<String>()
     private var selectedPosition = -1
