@@ -50,6 +50,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/calendarView" />
 
             <FrameLayout
+                android:id="@+id/frameLayout"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -60,15 +61,24 @@
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/timeTableRv"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content" />
 
                 <TextView
                     android:id="@+id/noTimeTable"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="상담 가능한 시간이 없습니다. 다른 날짜를 선택해주세요."/>
+                    android:text="상담 가능한 시간이 없습니다. 다른 날짜를 선택해주세요." />
             </FrameLayout>
 
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/applyBtn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/frameLayout"
+                android:text="지원하기"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
