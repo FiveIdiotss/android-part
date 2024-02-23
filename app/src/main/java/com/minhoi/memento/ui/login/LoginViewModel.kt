@@ -33,6 +33,7 @@ class LoginViewModel : ViewModel() {
                 response.body()?.let {
                     MentoApplication.prefs.setAccessToken(it.tokenDto.accessToken)
                     MentoApplication.prefs.setRefreshToken(it.tokenDto.refreshToken)
+                    MentoApplication.memberPrefs.setMemberPrefs(it.memberDTO)
                 }
             }
         }
