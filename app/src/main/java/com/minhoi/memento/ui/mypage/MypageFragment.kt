@@ -16,8 +16,18 @@ class MypageFragment : BaseFragment<FragmentMypageBinding>() {
     override val layoutResourceId: Int = R.layout.fragment_mypage
 
     override fun initView() {
-        binding.applyListBtn.setOnSingleClickListener {
-            startActivity(Intent(requireContext(), ApplyListActivity::class.java))
+
+        binding.apply {
+            applyListBtn.setOnSingleClickListener {
+                startActivity(Intent(requireContext(), ApplyListActivity::class.java).apply {
+                    putExtra("requestType", "APPLY")
+                })
+            }
+            appliedListBtn.setOnSingleClickListener {
+                startActivity(Intent(requireContext(), ApplyListActivity::class.java).apply {
+                    putExtra("requestType", "RECEIVE")
+                })
+            }
         }
     }
 
