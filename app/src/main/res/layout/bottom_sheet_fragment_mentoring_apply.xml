@@ -35,6 +35,7 @@
                 android:id="@+id/calendarView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                app:onDateChanged="@{viewModel}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView13" />
@@ -61,12 +62,14 @@
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/timeTableRv"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:visibility="@{viewModel.isAvailableDay ? View.VISIBLE : View.GONE}" />
 
                 <TextView
                     android:id="@+id/noTimeTable"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:visibility="@{viewModel.isAvailableDay ? View.GONE : View.VISIBLE}"
                     android:text="상담 가능한 시간이 없습니다. 다른 날짜를 선택해주세요." />
             </FrameLayout>
 

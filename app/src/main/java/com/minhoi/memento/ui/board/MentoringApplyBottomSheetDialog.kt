@@ -38,6 +38,8 @@ class MentoringApplyBottomSheetDialog : BottomSheetDialogFragment() {
     ): View {
         viewModel = ViewModelProvider(requireActivity())[BoardViewModel::class.java]
         binding = DataBindingUtil.inflate(inflater, R.layout.bottom_sheet_fragment_mentoring_apply, container, false)
+        binding.viewModel = viewModel
+        binding.lifecycleOwner = viewLifecycleOwner
 
         return binding.root
     }
@@ -63,28 +65,11 @@ class MentoringApplyBottomSheetDialog : BottomSheetDialogFragment() {
             layoutManager = GridLayoutManager(requireContext(), 3)
         }
 
-        binding.calendarView.setOnDateChangeListener { _, year, month, dayOfMonth ->
-            viewModel.onDateSelected(year, month, dayOfMonth)
-        }
-
         binding.applyBtn.setOnSingleClickListener {
             apply()
         }
 
-        observeIsAvailableDay()
         observeTimeTable()
-    }
-
-    private fun observeIsAvailableDay() {
-        viewModel.isAvailableDay.observe(this) { isAvailable ->
-            if (isAvailable) {
-                binding.timeTableRv.visibility = View.VISIBLE
-                binding.noTimeTable.visibility = View.GONE
-            } else {
-                binding.timeTableRv.visibility = View.GONE
-                binding.noTimeTable.visibility = View.VISIBLE
-            }
-        }
     }
 
     private fun observeTimeTable() {
@@ -97,7 +82,7 @@ class MentoringApplyBottomSheetDialog : BottomSheetDialogFragment() {
     private fun setupRatio(bottomSheetDialog: BottomSheetDialog) {
         val bottomSheet = bottomSheetDialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet) as View
         val behavior = BottomSheetBehavior.from<View>(bottomSheet)
-        val layoutParams = bottomSheet!!.layoutParams
+        val layoutParams = bottomSheet.layoutParams
         layoutParams.height = getBottomSheetDialogDefaultHeight()
         bottomSheet.layoutParams = layoutParams
         behavior.state = BottomSheetBehavior.STATE_EXPANDED
