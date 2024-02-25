@@ -1,6 +1,5 @@
 package com.minhoi.memento.ui.board
 
-import android.util.Log
 import androidx.activity.viewModels
 import com.minhoi.memento.R
 import com.minhoi.memento.base.BaseActivity
@@ -13,14 +12,16 @@ class BoardActivity : BaseActivity<ActivityBoardBinding>() {
 
     override fun initView() {
         val boardId = intent.getLongExtra("boardId", -1L)
-        showBoardContent(boardId)
+        getBoardContent(boardId)
 
         binding.mentorApplyBtn.setOnSingleClickListener {
-            // 멘토 지원하기
+            // 멘토링 신청 Dialog Show
+            val bottomSheetDialog = MentoringApplyBottomSheetDialog()
+            bottomSheetDialog.show(supportFragmentManager, bottomSheetDialog.tag)
         }
     }
 
-    private fun showBoardContent(boardId: Long) {
+    private fun getBoardContent(boardId: Long) {
         if (boardId != -1L) {
             viewModel.getBoardContent(boardId)
         }
