@@ -6,32 +6,30 @@ import androidx.activity.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.minhoi.memento.R
 import com.minhoi.memento.adapter.ApplyListAdapter
+import com.minhoi.memento.adapter.ReceivedListAdapter
 import com.minhoi.memento.base.BaseActivity
 import com.minhoi.memento.databinding.ActivityApplyListBinding
-import com.minhoi.memento.ui.mypage.applied.ReceivedContentActivity
+import com.minhoi.memento.ui.mypage.received.ReceivedContentActivity
 
 class ApplyListActivity : BaseActivity<ActivityApplyListBinding>() {
     private val viewModel by viewModels<MypageViewModel>()
     override val layoutResourceId: Int = R.layout.activity_apply_list
     private lateinit var requestType: String
     private lateinit var applyListAdapter: ApplyListAdapter
+    private lateinit var receivedListAdapter: ReceivedListAdapter
 
     override fun initView() {
         val intent = intent
         // apply or receive
         requestType = intent.getStringExtra("requestType")!!
 
+
         when (requestType) {
-            "APPLY" -> binding.requestTypeTitle.text = APPLY_TITLE
-            "RECEIVE" -> binding.requestTypeTitle.text = RECEIVE_TITLE
-        }
-
-        viewModel.getApplyList(requestType)
-
-        applyListAdapter = ApplyListAdapter() {
-            // onClickListener
-            when (requestType) {
-                "APPLY" -> {
+            TYPE_APPLY -> {
+                viewModel.getApplyList(requestType)
+                binding.requestTypeTitle.text = APPLY_TITLE
+                applyListAdapter = ApplyListAdapter() {
+                    // onClickListener
                     // 선택한 신청서 내용 ViewModel에 저장
                     viewModel.selectApplyContent(it)
 
@@ -39,18 +37,35 @@ class ApplyListActivity : BaseActivity<ActivityApplyListBinding>() {
                     val applyContentDialogFragment = ApplyContentDialogFragment()
                     applyContentDialogFragment.show(supportFragmentManager, applyContentDialogFragment.tag)
                 }
-                "RECEIVE" -> {
+                observeApplyList()
+            }
+
+            TYPE_RECEIVE -> {
+                viewModel.getReceivedList()
+                binding.requestTypeTitle.text = RECEIVE_TITLE
+                receivedListAdapter = ReceivedListAdapter() {
+                    // onClickListener
+                    // 선택한 신청서 내용 Activity에 전달
                     startActivity(Intent(this, ReceivedContentActivity::class.java).apply {
+                        putExtra("receivedDto", it)
                     })
                 }
+                observeReceivedList()
             }
         }
 
+
         binding.applyListRv.apply {
-            adapter = applyListAdapter
+            when(requestType) {
+                TYPE_APPLY -> adapter = applyListAdapter
+                TYPE_RECEIVE -> adapter = receivedListAdapter
+            }
             layoutManager = LinearLayoutManager(this@ApplyListActivity, LinearLayoutManager.VERTICAL, false)
         }
 
+    }
+
+    private fun observeApplyList() {
         viewModel.applyList.observe(this) {
             if (it.isNullOrEmpty()) {
                 binding.emptyApplyList.visibility = View.VISIBLE
@@ -61,7 +76,20 @@ class ApplyListActivity : BaseActivity<ActivityApplyListBinding>() {
         }
     }
 
+    private fun observeReceivedList() {
+        viewModel.receivedList.observe(this) {
+            if (it.isNullOrEmpty()) {
+                binding.emptyApplyList.visibility = View.VISIBLE
+            } else {
+                binding.emptyApplyList.visibility = View.GONE
+                receivedListAdapter.setList(it)
+            }
+        }
+    }
+
     companion object {
+        private const val TYPE_APPLY = "APPLY"
+        private const val TYPE_RECEIVE = "RECEIVE"
         private const val APPLY_TITLE = "멘토링 신청 내역"
         private const val RECEIVE_TITLE = "멘토링 신청 받은 내역"
     }
