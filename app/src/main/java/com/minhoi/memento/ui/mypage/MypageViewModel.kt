@@ -7,7 +7,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.minhoi.memento.MentoApplication
 import com.minhoi.memento.data.dto.MentoringApplyDto
+import com.minhoi.memento.data.dto.MentoringReceivedDto
 import com.minhoi.memento.repository.MemberRepository
+import com.minhoi.memento.ui.UiState
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class MypageViewModel : ViewModel() {
@@ -20,6 +28,16 @@ class MypageViewModel : ViewModel() {
 
     private val _applyContent = MutableLiveData<MentoringApplyDto>()
     val applyContent: LiveData<MentoringApplyDto> = _applyContent
+
+    private val _receivedList = MutableLiveData<List<MentoringReceivedDto>>()
+    val receivedList: LiveData<List<MentoringReceivedDto>> = _receivedList
+
+    private val _acceptState = MutableStateFlow<UiState>(UiState.Empty)
+    val acceptState: StateFlow<UiState> = _acceptState.asStateFlow()
+
+    private val _rejectState = MutableStateFlow<UiState>(UiState.Empty)
+    val rejectState: StateFlow<UiState> = _acceptState.asStateFlow()
+
 
     fun getApplyList() {
         viewModelScope.launch {
@@ -34,6 +52,46 @@ class MypageViewModel : ViewModel() {
             }
         }
     }
+
+    fun getReceivedList() {
+        viewModelScope.launch {
+            member.let { member ->
+                memberRepository.getReceivedList(member.id)
+                .catch { e ->
+                    Log.d("ReceivedList", "getReceivedListFailed: ${e.message}")
+                }
+                .collectLatest {
+                    _receivedList.value = it
+                    Log.d("ReceivedList", "getReceivedListSuccess: $it")
+                }
+            }
+        }
+    }
+
+    fun acceptApply(applyId: Long) {
+        viewModelScope.launch {
+            _acceptState.update { UiState.Loading }
+            val response = memberRepository.acceptApply(applyId)
+            if (response.isSuccessful) {
+                _acceptState.update { UiState.Success(response.body())}
+            } else {
+                _acceptState.update { UiState.Error(null) }
+            }
+        }
+    }
+
+    fun rejectApply(applyId: Long) {
+        _rejectState.update { UiState.Loading }
+        viewModelScope.launch {
+            val response = memberRepository.rejectApply(applyId)
+            if (response.isSuccessful) {
+                _rejectState.update { UiState.Success(response.body())  }
+            }
+            else {
+                _rejectState.update { UiState.Error(null) }
+                }
+            }
+        }
 
     fun selectApplyContent(applyContent: MentoringApplyDto) {
         _applyContent.value = applyContent
