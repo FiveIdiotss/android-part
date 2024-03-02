@@ -6,6 +6,12 @@ import androidx.lifecycle.viewModelScope
 import com.minhoi.memento.MentoApplication
 import com.minhoi.memento.data.dto.LoginRequest
 import com.minhoi.memento.repository.LoginRepository
+import com.minhoi.memento.ui.UiState
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 
 class LoginViewModel : ViewModel() {
@@ -13,6 +19,9 @@ class LoginViewModel : ViewModel() {
 
     private var _email = MutableLiveData<String>()
     private var _password = MutableLiveData<String>()
+
+    private val _loginState = MutableStateFlow<UiState>(UiState.Empty)
+    val loginState = _loginState.asStateFlow()
 
     fun onEmailTextChanged(text: CharSequence) {
         _email.value = text.toString()
@@ -22,20 +31,28 @@ class LoginViewModel : ViewModel() {
         _password.value = text.toString()
     }
 
-    suspend fun signIn() {
+    fun signIn() {
         val email = _email.value.toString()
         val password = _password.value.toString()
 
         val loginRequest = LoginRequest(email, password)
         viewModelScope.launch {
-            val response = loginRepository.signIn(loginRequest)
-            if (response.isSuccessful) {
-                response.body()?.let {
-                    MentoApplication.prefs.setAccessToken(it.tokenDto.accessToken)
-                    MentoApplication.prefs.setRefreshToken(it.tokenDto.refreshToken)
-                    MentoApplication.memberPrefs.setMemberPrefs(it.memberDTO)
+            loginRepository.signIn(loginRequest)
+                .onStart {
+                    _loginState.value = UiState.Loading
                 }
-            }
+                .catch { e ->
+                    _loginState.value = UiState.Error(e)
+                }
+                .collectLatest { response ->
+                    if (response.isSuccessful) {
+                        MentoApplication.memberPrefs.setMemberPrefs(response.body()!!.memberDTO)
+                        _loginState.value = UiState.Success(response.body())
+                    } else {
+                        _loginState.value =
+                            UiState.Error(Exception(""))
+                    }
+                }
         }
     }
 
