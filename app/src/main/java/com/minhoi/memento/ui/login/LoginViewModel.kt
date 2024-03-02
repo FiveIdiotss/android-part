@@ -1,5 +1,6 @@
 package com.minhoi.memento.ui.login
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -46,6 +47,8 @@ class LoginViewModel : ViewModel() {
                 }
                 .collectLatest { response ->
                     if (response.isSuccessful) {
+                        MentoApplication.prefs.setAccessToken(response.body()!!.tokenDto.accessToken)
+                        MentoApplication.prefs.setRefreshToken(response.body()!!.tokenDto.refreshToken)
                         MentoApplication.memberPrefs.setMemberPrefs(response.body()!!.memberDTO)
                         _loginState.value = UiState.Success(response.body())
                     } else {
