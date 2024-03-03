@@ -23,10 +23,9 @@ class ApplyListActivity : BaseActivity<ActivityApplyListBinding>() {
         // apply or receive
         requestType = intent.getStringExtra("requestType")!!
 
-
         when (requestType) {
             TYPE_APPLY -> {
-                viewModel.getApplyList(requestType)
+                viewModel.getApplyList()
                 binding.requestTypeTitle.text = APPLY_TITLE
                 applyListAdapter = ApplyListAdapter() {
                     // onClickListener
