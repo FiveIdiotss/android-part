@@ -93,6 +93,15 @@ class MypageViewModel : ViewModel() {
             }
         }
 
+    private suspend fun getApplyState(): List<MentoringMatchInfo> {
+        val response = memberRepository.getMatchedMentoringInfo(member.id)
+        if (response.isSuccessful) {
+            return response.body() ?: emptyList()
+        } else {
+            return emptyList()
+        }
+    }
+
     fun selectApplyContent(applyContent: MentoringApplyDto) {
         _applyContent.value = applyContent
     }

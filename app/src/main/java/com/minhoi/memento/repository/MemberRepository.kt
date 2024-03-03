@@ -3,6 +3,7 @@ package com.minhoi.memento.repository
 import com.minhoi.memento.data.dto.MentoringReceivedDto
 import com.minhoi.memento.data.network.APIService
 import com.minhoi.memento.data.network.RetrofitClient
+import com.minhoi.memento.utils.BoardType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
@@ -21,6 +22,8 @@ class MemberRepository {
             throw Exception("Network error: ${response.code()}")
         }
     }
+
+    suspend fun getMatchedMentoringInfo(memberId: Long) = loggedInRetrofitClient.getMatchedMentoringInfo(memberId, BoardType.MENTEE)
 
     suspend fun acceptApply(applyId: Long) = loggedInRetrofitClient.acceptApply(applyId)
 
