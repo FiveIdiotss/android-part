@@ -2,7 +2,7 @@ package com.minhoi.memento.data.dto
 
 import com.google.gson.annotations.SerializedName
 
-data class BoardResponse(
+data class BoardListResponse(
     @SerializedName("size") val size: Int,
     @SerializedName("content") val content: List<BoardContentDto>,
     @SerializedName("number") val number: Int,
