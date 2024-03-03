@@ -7,9 +7,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.minhoi.memento.MentoApplication
 import com.minhoi.memento.data.dto.MentoringApplyDto
+import com.minhoi.memento.data.dto.MentoringMatchInfo
 import com.minhoi.memento.data.dto.MentoringReceivedDto
 import com.minhoi.memento.repository.MemberRepository
 import com.minhoi.memento.ui.UiState
+import com.minhoi.memento.utils.ApplyStatus
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,8 +25,8 @@ class MypageViewModel : ViewModel() {
     private val memberRepository = MemberRepository()
     private val member = MentoApplication.memberPrefs.getMemberPrefs()
 
-    private val _applyList = MutableLiveData<List<MentoringApplyDto>>()
-    val applyList: LiveData<List<MentoringApplyDto>> = _applyList
+    private val _applyList = MutableLiveData<List<Pair<MentoringApplyDto, ApplyStatus>>>()
+    val applyList: LiveData<List<Pair<MentoringApplyDto, ApplyStatus>>> = _applyList
 
     private val _applyContent = MutableLiveData<MentoringApplyDto>()
     val applyContent: LiveData<MentoringApplyDto> = _applyContent
@@ -38,16 +40,28 @@ class MypageViewModel : ViewModel() {
     private val _rejectState = MutableStateFlow<UiState>(UiState.Empty)
     val rejectState: StateFlow<UiState> = _acceptState.asStateFlow()
 
-
     fun getApplyList() {
         viewModelScope.launch {
             member.let { member ->
+                val applyStates = getApplyState()
+                val applyStateIds = applyStates.map { it.applyId }.toSet()
+
                 val response = memberRepository.getApplyList(member.id)
                 if (response.isSuccessful) {
-                    _applyList.value = response.body()
-                    Log.d("ApplyList", "getApplyListSuccess: ${response.body()}")
-                } else {
-                    Log.d("ApplyList", "getApplyListFailed: ${response.code()}")
+                    val applyList = response.body() ?: throw Exception("ApplyList is null")
+                    val applyListWithState = applyList.map { applyItem ->
+                        when (applyItem.applyState) {
+                            "HOLDING" -> Pair(applyItem, ApplyStatus.ACCEPTANCE_PENDING)
+                            else -> {
+                                if (applyItem.applyId in applyStateIds) {
+                                    Pair(applyItem, ApplyStatus.ACCEPTED)
+                                } else {
+                                    Pair(applyItem, ApplyStatus.REJECTED)
+                                }
+                            }
+                        }
+                    }
+                    _applyList.value = applyListWithState
                 }
             }
         }
