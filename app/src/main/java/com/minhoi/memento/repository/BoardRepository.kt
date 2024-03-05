@@ -7,13 +7,16 @@ import com.minhoi.memento.data.dto.BoardContentDto
 import com.minhoi.memento.data.dto.MentoringApplyRequest
 import com.minhoi.memento.data.network.APIService
 import com.minhoi.memento.data.network.RetrofitClient
-import com.minhoi.memento.utils.BoardType
+import com.minhoi.memento.data.model.BoardType
+import com.minhoi.memento.data.network.ApiResult
+import com.minhoi.memento.data.network.service.BoardService
 import kotlinx.coroutines.flow.Flow
+import retrofit2.Response
 
 class BoardRepository {
 
-    private val retrofitClient = RetrofitClient.getInstance().create(APIService::class.java)
-    private val loggedInRetrofitClient = RetrofitClient.getLoggedInInstance().create(APIService::class.java)
+    private val retrofitClient = RetrofitClient.getInstance().create(BoardService::class.java)
+    private val loggedInRetrofitClient = RetrofitClient.getLoggedInInstance().create(BoardService::class.java)
 
     suspend fun getPreviewBoards() = retrofitClient.getAllMenteeBoards(BoardType.MENTEE, 1, 10)
 

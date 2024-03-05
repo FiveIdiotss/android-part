@@ -1,43 +1,33 @@
 package com.minhoi.memento.data.network
 
+import com.minhoi.memento.data.dto.BoardContentResponse
+import com.minhoi.memento.data.dto.VerifyCodeRequest
+import com.minhoi.memento.data.dto.EmailVerificationRequest
+import com.minhoi.memento.data.dto.LoginRequest
+import com.minhoi.memento.data.dto.LoginResponse
 import com.minhoi.memento.data.dto.MajorDto
+import com.minhoi.memento.data.dto.CreateMemberRequest
+import com.minhoi.memento.data.dto.BoardListResponse
+import com.minhoi.memento.data.dto.MentorBoardPostDto
+import com.minhoi.memento.data.dto.MentoringApplyDto
+import com.minhoi.memento.data.dto.MentoringApplyRequest
+import com.minhoi.memento.data.dto.MentoringMatchInfo
+import com.minhoi.memento.data.dto.MentoringReceivedDto
 import com.minhoi.memento.data.dto.SchoolDto
+import com.minhoi.memento.data.model.BoardType
 import retrofit2.Response
+import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.Header
+import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface APIService {
 
-    @GET("/api/schools")
-    suspend fun getSchools(): Response<List<SchoolDto>>
 
-    @GET("/api/school/{schoolName}")
-    suspend fun getMajors(
-        @Path(value = "schoolName") schoolName: String
-    ): Response<List<MajorDto>>
 
-    @POST("/api/member/signUp")
-    suspend fun signUp(
-        @Body member: MemberDto
-    ): Response<String>
 
-    @POST("api/member/signIn")
-    suspend fun signIn(
-        @Body loginRequest: LoginRequest
-    ): Response<LoginResponse>
 
-    @POST("login/email")
-    suspend fun getVerificationCode(
-        @Body emailVerificationRequest: EmailVerificationRequest
-    ): Response<String>
-
-    @POST("login/email/verify")
-    suspend fun verificationWithCode(
-        @Body verifyCodeRequest: VerifyCodeRequest
-    ): Response<String>
-
-    @POST("api/v1/clear")
-    suspend fun clear(
-        @Body clearDto: ClearDto
-    ): Response<String>
+    suspend fun test(): Response<String>
 }

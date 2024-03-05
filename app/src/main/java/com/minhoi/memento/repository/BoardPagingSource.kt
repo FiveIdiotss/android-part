@@ -5,10 +5,10 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.minhoi.memento.data.dto.BoardContentDto
 import com.minhoi.memento.data.network.APIService
-import com.minhoi.memento.utils.BoardType
-import kotlinx.coroutines.delay
+import com.minhoi.memento.data.model.BoardType
+import com.minhoi.memento.data.network.service.BoardService
 
-class BoardPagingSource(private val api: APIService) : PagingSource<Int, BoardContentDto>() {
+class BoardPagingSource(private val api: BoardService) : PagingSource<Int, BoardContentDto>() {
     override fun getRefreshKey(state: PagingState<Int, BoardContentDto>): Int? {
         return state.anchorPosition?.let { position ->
             state.closestPageToPosition(position)?.prevKey?.plus(1)
