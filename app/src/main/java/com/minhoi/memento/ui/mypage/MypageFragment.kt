@@ -28,6 +28,9 @@ class MypageFragment : BaseFragment<FragmentMypageBinding>() {
                     putExtra("requestType", "RECEIVE")
                 })
             }
+            myMentorBtn.setOnSingleClickListener {
+                startActivity(Intent(requireContext(), MyMentoringActivity::class.java))
+            }
         }
     }
 

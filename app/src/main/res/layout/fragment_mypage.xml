@@ -13,27 +13,54 @@
         tools:context=".ui.mypage.MypageFragment">
 
         <TextView
-            android:id="@+id/applyListBtn"
+            android:id="@+id/textView16"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="멘토링 신청 내역"
-            android:textSize="17dp"
+            android:text="name"
+            android:textColor="@color/black"
+            android:textSize="24dp"
+            android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
+            android:id="@+id/applyListBtn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="멘토링 신청 내역"
+            android:textSize="17dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView16" />
+
+        <TextView
             android:id="@+id/appliedListBtn"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
             android:text="멘토링 신청 받은 내역"
             android:textSize="17dp"
-            android:layout_marginTop="15dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/applyListBtn" />
+
+        <TextView
+            android:id="@+id/myMentorBtn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:text="내 멘토/멘티"
+            android:textSize="17dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/appliedListBtn" />
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
