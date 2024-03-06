@@ -12,13 +12,13 @@ import kotlinx.coroutines.flow.flow
 
 class MemberRepository {
 
-    private val loggedInRetrofitClient =
+    private val matchingService =
         RetrofitClient.getLoggedInInstance().create(MatchingService::class.java)
 
     suspend fun getApplyList(memberId: Long) = loggedInRetrofitClient.getMyApply(memberId, "SEND")
 
     suspend fun getReceivedList(memberId: Long): Flow<List<MentoringReceivedDto>> = flow {
-        val response = loggedInRetrofitClient.getReceived(memberId, "RECEIVE")
+        val response = matchingService.getReceived(memberId, "RECEIVE")
         if (response.isSuccessful) {
             emit(response.body() ?: throw Exception("ReceivedList is null"))
         } else {
@@ -26,10 +26,12 @@ class MemberRepository {
         }
     }
 
-    suspend fun getMatchedMentoringInfo(memberId: Long) = loggedInRetrofitClient.getMatchedMentoringInfo(memberId, BoardType.MENTEE)
+    suspend fun getMatchedMentoringInfo(memberId: Long): Flow<ApiResult<List<MentoringMatchInfo>>> = safeFlow {
+        matchingService.getMatchedMentoringInfo(memberId, BoardType.MENTEE)
+    }
 
-    suspend fun acceptApply(applyId: Long) = loggedInRetrofitClient.acceptApply(applyId)
+    suspend fun acceptApply(applyId: Long) = matchingService.acceptApply(applyId)
 
-    suspend fun rejectApply(applyId: Long) = loggedInRetrofitClient.rejectApply(applyId)
+    suspend fun rejectApply(applyId: Long) = matchingService.rejectApply(applyId)
 
 }

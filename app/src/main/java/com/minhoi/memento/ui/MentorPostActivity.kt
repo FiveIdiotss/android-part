@@ -10,8 +10,9 @@ import com.minhoi.memento.data.dto.MentorBoardPostDto
 import com.minhoi.memento.data.network.APIService
 import com.minhoi.memento.data.network.RetrofitClient
 import com.minhoi.memento.databinding.ActivityMentorPostBinding
-import com.minhoi.memento.utils.BoardType
-import com.minhoi.memento.utils.DayOfWeek
+import com.minhoi.memento.data.model.BoardType
+import com.minhoi.memento.data.model.DayOfWeek
+import com.minhoi.memento.data.network.service.BoardService
 import com.minhoi.memento.utils.setOnSingleClickListener
 import com.minhoi.memento.utils.showToast
 import kotlinx.coroutines.launch
@@ -21,7 +22,7 @@ class MentorPostActivity : BaseActivity<ActivityMentorPostBinding>() {
     private lateinit var mentorTimeTableAdapter: MentorTimeTableAdapter
     private val selectedCheckBoxes = mutableSetOf<DayOfWeek>()
     private var consultTime: Int = 0
-    private val retrofitClient = RetrofitClient.getLoggedInInstance().create(APIService::class.java)
+    private val retrofitClient = RetrofitClient.getLoggedInInstance().create(BoardService::class.java)
     private var timePickerDialog: StartEndTimePickerDialog? = null
 
     override fun initView() {

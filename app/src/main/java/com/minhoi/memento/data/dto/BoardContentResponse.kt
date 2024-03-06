@@ -1,7 +1,7 @@
 package com.minhoi.memento.data.dto
 
 import com.google.gson.annotations.SerializedName
-import com.minhoi.memento.utils.DayOfWeek
+import com.minhoi.memento.data.model.DayOfWeek
 
 data class BoardContentResponse(
     @SerializedName("boardDTO")

@@ -9,7 +9,7 @@ import androidx.paging.cachedIn
 import com.minhoi.memento.data.dto.BoardContentResponse
 import com.minhoi.memento.data.dto.MentoringApplyRequest
 import com.minhoi.memento.repository.BoardRepository
-import com.minhoi.memento.utils.DayOfWeek
+import com.minhoi.memento.data.model.DayOfWeek
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 

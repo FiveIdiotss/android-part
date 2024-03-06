@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.minhoi.memento.data.dto.MentoringApplyDto
 import com.minhoi.memento.databinding.ApplyListRowItemBinding
-import com.minhoi.memento.utils.ApplyStatus
+import com.minhoi.memento.data.model.ApplyStatus
 import com.minhoi.memento.utils.setOnSingleClickListener
 
 class ApplyListAdapter(private val onClickListener: (MentoringApplyDto) -> Unit) : RecyclerView.Adapter<ApplyListAdapter.ViewHolder>() {
