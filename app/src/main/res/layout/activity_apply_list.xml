@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+        <import type="android.view.View"/>
         <variable
             name="viewModel"
             type="com.minhoi.memento.ui.mypage.MypageViewModel" />
@@ -15,7 +16,7 @@
         tools:context=".ui.mypage.ApplyListActivity">
 
         <TextView
-            android:id="@+id/textView14"
+            android:id="@+id/requestTypeTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:gravity="center"
@@ -33,19 +34,20 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView14">
+            app:layout_constraintTop_toBottomOf="@+id/requestTypeTitle">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/applyListRv"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="match_parent" />
 
             <TextView
                 android:id="@+id/emptyApplyList"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:text="멘토링 신청 내역이 없습니다"
                 android:textSize="18dp"
+                android:visibility="gone"
                 android:layout_gravity="center"/>
 
         </FrameLayout>
