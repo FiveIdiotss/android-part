@@ -1,4 +1,4 @@
-package com.minhoi.memento.utils
+package com.minhoi.memento.data.model
 
 enum class BoardType {
     MENTEE,

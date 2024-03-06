@@ -1,4 +1,4 @@
-package com.minhoi.memento.utils
+package com.minhoi.memento.data.model
 
 import java.util.Calendar
 
