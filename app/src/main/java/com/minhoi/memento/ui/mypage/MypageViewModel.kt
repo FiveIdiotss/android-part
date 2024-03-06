@@ -59,8 +59,8 @@ class MypageViewModel : ViewModel() {
     fun getApplyList() {
         viewModelScope.launch {
             member.let { member ->
-                val applyStates = getApplyState()
-                val applyStateIds = applyStates.map { it.applyId }.toSet()
+                getApplyState()
+                val applyStateIds = _matchedMentoringList.value?.map { it.applyId }?.toSet()
 
                 val response = memberRepository.getApplyList(member.id)
                 if (response.isSuccessful) {
@@ -69,7 +69,7 @@ class MypageViewModel : ViewModel() {
                         when (applyItem.applyState) {
                             "HOLDING" -> Pair(applyItem, ApplyStatus.ACCEPTANCE_PENDING)
                             else -> {
-                                if (applyItem.applyId in applyStateIds) {
+                                if (applyItem.applyId in applyStateIds!!) {
                                     Pair(applyItem, ApplyStatus.ACCEPTED)
                                 } else {
                                     Pair(applyItem, ApplyStatus.REJECTED)
