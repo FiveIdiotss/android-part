@@ -5,13 +5,10 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.minhoi.memento.data.dto.BoardContentDto
 import com.minhoi.memento.data.dto.MentoringApplyRequest
-import com.minhoi.memento.data.network.APIService
 import com.minhoi.memento.data.network.RetrofitClient
 import com.minhoi.memento.data.model.BoardType
-import com.minhoi.memento.data.network.ApiResult
 import com.minhoi.memento.data.network.service.BoardService
 import kotlinx.coroutines.flow.Flow
-import retrofit2.Response
 
 class BoardRepository {
 

@@ -2,7 +2,6 @@ package com.minhoi.memento.data.network.interceptor
 
 import android.util.Log
 import com.minhoi.memento.MentoApplication
-import com.minhoi.memento.data.network.APIService
 import com.minhoi.memento.data.network.RetrofitClient
 import com.minhoi.memento.data.network.service.AuthService
 import com.minhoi.memento.data.network.service.JoinService

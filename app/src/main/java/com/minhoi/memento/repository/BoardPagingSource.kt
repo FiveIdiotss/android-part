@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.minhoi.memento.data.dto.BoardContentDto
-import com.minhoi.memento.data.network.APIService
 import com.minhoi.memento.data.model.BoardType
 import com.minhoi.memento.data.network.service.BoardService
 

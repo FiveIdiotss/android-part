@@ -1,7 +1,6 @@
 package com.minhoi.memento.repository
 
 import com.minhoi.memento.data.dto.LoginRequest
-import com.minhoi.memento.data.network.APIService
 import com.minhoi.memento.data.network.RetrofitClient
 import com.minhoi.memento.data.network.service.AuthService
 import kotlinx.coroutines.flow.flow

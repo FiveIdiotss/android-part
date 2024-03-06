@@ -3,7 +3,6 @@ package com.minhoi.memento.repository
 import com.minhoi.memento.data.dto.VerifyCodeRequest
 import com.minhoi.memento.data.dto.EmailVerificationRequest
 import com.minhoi.memento.data.dto.CreateMemberRequest
-import com.minhoi.memento.data.network.APIService
 import com.minhoi.memento.data.network.RetrofitClient
 import com.minhoi.memento.data.network.service.JoinService
 
