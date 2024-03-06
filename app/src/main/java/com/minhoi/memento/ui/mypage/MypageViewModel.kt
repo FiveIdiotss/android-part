@@ -123,12 +123,29 @@ class MypageViewModel : ViewModel() {
             }
         }
 
-    private suspend fun getApplyState(): List<MentoringMatchInfo> {
+    private suspend fun getApplyState() {
         val response = memberRepository.getMatchedMentoringInfo(member.id)
-        if (response.isSuccessful) {
-            return response.body() ?: emptyList()
-        } else {
-            return emptyList()
+        response.collectLatest { res ->
+            res.handleResponse(
+                onSuccess = { matchedMentoringList ->
+                    // Update _matchedMentoringList with the received data
+                    _matchedMentoringList.value = matchedMentoringList
+                },
+                onError = { Log.d("MatchedMentoring", "getMatchedMentoringFailed: ${it}") }
+            )
+        }
+    }
+
+    suspend fun getMatchedMentoring() {
+        viewModelScope.launch {
+            memberRepository.getMatchedMentoringInfo(member.id).collectLatest {
+                it.handleResponse(
+                    onSuccess = { matchedMentoringList ->
+                        _matchedMentoringList.value = matchedMentoringList
+                    },
+                    onError = { Log.d("MatchedMentoring", "getMatchedMentoringFailed: ${it}") }
+                )
+            }
         }
     }
 
