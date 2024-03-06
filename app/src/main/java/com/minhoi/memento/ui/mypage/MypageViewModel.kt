@@ -6,12 +6,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.minhoi.memento.MentoApplication
+import com.minhoi.memento.data.dto.MemberDTO
 import com.minhoi.memento.data.dto.MentoringApplyDto
 import com.minhoi.memento.data.dto.MentoringMatchInfo
 import com.minhoi.memento.data.dto.MentoringReceivedDto
 import com.minhoi.memento.repository.MemberRepository
 import com.minhoi.memento.ui.UiState
-import com.minhoi.memento.utils.ApplyStatus
+import com.minhoi.memento.data.model.ApplyStatus
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -39,6 +40,21 @@ class MypageViewModel : ViewModel() {
 
     private val _rejectState = MutableStateFlow<UiState>(UiState.Empty)
     val rejectState: StateFlow<UiState> = _acceptState.asStateFlow()
+
+    private val _matchedMentoringList = MutableLiveData<List<MentoringMatchInfo>>()
+    val matchedMentoringList: LiveData<List<MentoringMatchInfo>> = _matchedMentoringList
+
+
+    suspend fun getMemberInfo(memberId: Long): MemberDTO? {
+        val response = memberRepository.getMemberInfo(memberId)
+        return if (response.isSuccessful) {
+            Log.d("memberInfo", "getMemberInfo: ${response.body()} ")
+            response.body()
+        } else {
+            Log.d("memberInfo", "getMemberInfo: ${response.message() + response.code()}")
+            null
+        }
+    }
 
     fun getApplyList() {
         viewModelScope.launch {
