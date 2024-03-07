@@ -104,12 +104,12 @@ class MentoringApplyBottomSheetDialog : BottomSheetDialogFragment() {
         timeTables.forEach {
             var start = LocalTime.parse(it.startTime, timeFormatter)
             val end = LocalTime.parse(it.endTime, timeFormatter)
-            while (start.isBefore(end) || start == end) {
+            while (start.isBefore(end)) {
                 times.add(start.format(timeFormatter))
                 start = start.plusMinutes(consultTime.toLong())
             }
         }
-        return times
+        return times.sorted()
     }
 
     fun apply() {
