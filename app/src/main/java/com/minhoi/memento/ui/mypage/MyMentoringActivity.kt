@@ -1,5 +1,6 @@
 package com.minhoi.memento.ui.mypage
 
+import android.content.Intent
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -9,6 +10,7 @@ import com.minhoi.memento.base.BaseActivity
 import com.minhoi.memento.data.dto.MemberDTO
 import com.minhoi.memento.data.dto.MentoringMatchInfo
 import com.minhoi.memento.databinding.ActivityMyMentoringBinding
+import com.minhoi.memento.ui.chat.ChatActivity
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
@@ -18,7 +20,14 @@ class MyMentoringActivity : BaseActivity<ActivityMyMentoringBinding>() {
     override val layoutResourceId: Int = R.layout.activity_my_mentoring
 
     private val viewModel by viewModels<MypageViewModel>()
-    private val matchedMentoringAdapter: MatchedMentoringAdapter by lazy { MatchedMentoringAdapter() }
+    private val matchedMentoringAdapter: MatchedMentoringAdapter by lazy {
+        MatchedMentoringAdapter {
+            // 채팅 버튼 클릭시 상대방의 id를 ChatActivity로 전달
+            startActivity(Intent(this, ChatActivity::class.java).apply {
+                putExtra("receiverId", it)
+            })
+        }
+    }
 
     override fun initView() {
 
