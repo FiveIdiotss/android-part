@@ -62,6 +62,18 @@ class ChatAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         }
     }
 
+    // 이전 대화를 불러올 경우 한번 사용되는 함수
+    fun setMessages(messages: List<ChatMessage>) {
+        this.messages.clear()
+        this.messages.addAll(messages)
+        notifyDataSetChanged()
+    }
+
+    fun addMessage(message: ChatMessage) {
+        messages.add(message)
+        notifyItemInserted(messages.size - 1)
+    }
+
     companion object {
         private const val VIEW_TYPE_SENDER = 0
         private const val VIEW_TYPE_RECEIVER = 1
