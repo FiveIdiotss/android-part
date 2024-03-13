@@ -80,12 +80,12 @@ class ReceivedContentActivity : BaseActivity<ActivityReceivedContentBinding>() {
         }
     }
 
-    private fun branchState(state: UiState) {
+    private fun branchState(state: UiState<Boolean>) {
         when (state) {
             // do nothing
             is UiState.Empty -> {}
 
-            is UiState.Success<*>-> {
+            is UiState.Success -> {
                 showToast("수락 완료")
                 progressDialog?.dismiss()
                 finish()

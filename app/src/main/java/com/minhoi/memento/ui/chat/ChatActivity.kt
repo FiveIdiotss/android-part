@@ -62,7 +62,7 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
                 viewModel.chatRoomState.collectLatest { state ->
                     when (state) {
                         is UiState.Loading -> {}
-                        is UiState.Success<*> -> {
+                        is UiState.Success -> {
                             viewModel.connectToWebSocket(receiverId)
                         }
                         is UiState.Error -> {

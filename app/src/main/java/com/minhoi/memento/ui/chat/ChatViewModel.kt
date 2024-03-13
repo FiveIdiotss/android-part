@@ -30,8 +30,8 @@ class ChatViewModel : ViewModel() {
     private val member = MentoApplication.memberPrefs.getMemberPrefs()
 
     //    private val _chatRooms: MutableStateFlow<>
-    private val _connectState = MutableStateFlow<UiState>(UiState.Empty)
-    val connectState: StateFlow<UiState> = _connectState.asStateFlow()
+    private val _connectState = MutableStateFlow<UiState<Boolean>>(UiState.Empty)
+    val connectState: StateFlow<UiState<Boolean>> = _connectState.asStateFlow()
 
     private val _messages = MutableLiveData<List<ChatMessage>>()
     val messages: LiveData<List<ChatMessage>> = _messages
@@ -48,8 +48,8 @@ class ChatViewModel : ViewModel() {
     private lateinit var stomp: StompClient
     private lateinit var stompConnection: Disposable
     private lateinit var topic: Disposable
-    private val _chatRoomState = MutableStateFlow<UiState>(UiState.Empty)
-    val chatRoomState: StateFlow<UiState> = _chatRoomState.asStateFlow()
+    private val _chatRoomState = MutableStateFlow<UiState<Long>>(UiState.Empty)
+    val chatRoomState: StateFlow<UiState<Long>> = _chatRoomState.asStateFlow()
 
     fun connectToWebSocket(receiverId: Long) {
         val url = "ws://menteetor.site:8080/ws"
@@ -74,7 +74,7 @@ class ChatViewModel : ViewModel() {
     }
 
     private fun handleWebSocketOpened() {
-        _connectState.update { UiState.Success("") }
+        _connectState.update { UiState.Success(true) }
         // 채팅방 구독
 
         topic = stomp.join("/sub/chats/52").subscribe { message ->

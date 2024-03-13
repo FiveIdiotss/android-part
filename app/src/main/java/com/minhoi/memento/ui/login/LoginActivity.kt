@@ -48,7 +48,7 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>() {
                         is UiState.Loading -> {
                             showLoading()
                         }
-                        is UiState.Success<*> -> {
+                        is UiState.Success -> {
                             hideLoading()
                             startActivity(Intent(this@LoginActivity, MainActivity::class.java))
                             finish()

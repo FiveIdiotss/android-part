@@ -35,11 +35,11 @@ class MypageViewModel : ViewModel() {
     private val _receivedList = MutableLiveData<List<MentoringReceivedDto>>()
     val receivedList: LiveData<List<MentoringReceivedDto>> = _receivedList
 
-    private val _acceptState = MutableStateFlow<UiState>(UiState.Empty)
-    val acceptState: StateFlow<UiState> = _acceptState.asStateFlow()
+    private val _acceptState = MutableStateFlow<UiState<Boolean>>(UiState.Empty)
+    val acceptState: StateFlow<UiState<Boolean>> = _acceptState.asStateFlow()
 
-    private val _rejectState = MutableStateFlow<UiState>(UiState.Empty)
-    val rejectState: StateFlow<UiState> = _acceptState.asStateFlow()
+    private val _rejectState = MutableStateFlow<UiState<Boolean>>(UiState.Empty)
+    val rejectState: StateFlow<UiState<Boolean>> = _acceptState.asStateFlow()
 
     private val _matchedMentoringList = MutableLiveData<List<MentoringMatchInfo>>()
     val matchedMentoringList: LiveData<List<MentoringMatchInfo>> = _matchedMentoringList
@@ -103,7 +103,7 @@ class MypageViewModel : ViewModel() {
             _acceptState.update { UiState.Loading }
             val response = memberRepository.acceptApply(applyId)
             if (response.isSuccessful) {
-                _acceptState.update { UiState.Success(response.body())}
+                _acceptState.update { UiState.Success(true)}
             } else {
                 _acceptState.update { UiState.Error(null) }
             }
@@ -115,7 +115,7 @@ class MypageViewModel : ViewModel() {
         viewModelScope.launch {
             val response = memberRepository.rejectApply(applyId)
             if (response.isSuccessful) {
-                _rejectState.update { UiState.Success(response.body())  }
+                _rejectState.update { UiState.Success(true)  }
             }
             else {
                 _rejectState.update { UiState.Error(null) }
