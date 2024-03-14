@@ -10,6 +10,7 @@ import com.gmail.bishoybasily.stomp.lib.StompClient
 import com.minhoi.memento.MentoApplication
 import com.minhoi.memento.data.dto.chat.ChatMessage
 import com.minhoi.memento.data.dto.chat.Receiver
+import com.minhoi.memento.data.dto.chat.Sender
 import com.minhoi.memento.repository.ChatRepository
 import com.minhoi.memento.ui.UiState
 import io.reactivex.disposables.Disposable
@@ -51,7 +52,7 @@ class ChatViewModel : ViewModel() {
     private val _chatRoomState = MutableStateFlow<UiState<Long>>(UiState.Empty)
     val chatRoomState: StateFlow<UiState<Long>> = _chatRoomState.asStateFlow()
 
-    fun connectToWebSocket(receiverId: Long) {
+    fun connectToWebSocket(roomId: Long) {
         val url = "ws://menteetor.site:8080/ws"
         stomp = StompClient(client, intervalMillis).apply {
             this@apply.url = url
@@ -61,7 +62,7 @@ class ChatViewModel : ViewModel() {
             try {
                 stompConnection = stomp.connect().subscribe { event ->
                     when (event.type) {
-                        Event.Type.OPENED -> handleWebSocketOpened()
+                        Event.Type.OPENED -> handleWebSocketOpened(roomId)
                         Event.Type.CLOSED -> handleWebSocketClosed()
                         Event.Type.ERROR -> handleWebSocketError()
                         else -> {}
@@ -73,11 +74,14 @@ class ChatViewModel : ViewModel() {
         }
     }
 
-    private fun handleWebSocketOpened() {
+    /**
+     * 소켓이 연결되었을 경우 서버에서 가져온 방 Id를 구독하여 메세지 수신 대기하는 함수
+     */
+    private fun handleWebSocketOpened(roomId: Long) {
         _connectState.update { UiState.Success(true) }
         // 채팅방 구독
 
-        topic = stomp.join("/sub/chats/52").subscribe { message ->
+        topic = stomp.join("/sub/chats/$roomId").subscribe { message ->
             Log.d("Messageqqq", "connectToWebSocket: $message")
             viewModelScope.launch(Dispatchers.Main) {
                 handleMessage(message)
@@ -93,20 +97,39 @@ class ChatViewModel : ViewModel() {
         _connectState.update { UiState.Error(exception ?: Exception("WebSocket Error")) }
     }
 
-    private fun handleMessage(message: Any) {
-        if (message is String) {
-            temp.add(Receiver("7:58", message, 1L))
+    private fun handleMessage(message: String) {
+        try {
+            val json = JSONObject(message)
+
+            val senderId = json.getString("senderId")
+            val senderName = json.getString("sender")
+            val content = json.getString("content")
+
+            when (senderId) {
+                member.id.toString() -> {
+                    temp.add(Sender(senderId.toLong(), senderName, content, "7:58"))
+                }
+                else -> {
+                    temp.add(Receiver(senderId.toLong(), senderName, content, "7:58"))
+                }
+            }
             _messages.value = temp
+        } catch (e: Exception) {
+            Log.d(TAG, "handleMessage: ${e.printStackTrace()}")
         }
     }
 
     fun sendMessage(message: String) {
-        val jsonObject = JSONObject()
-        jsonObject.put("content", message)
-        jsonObject.put("receiverId", 1)
+        val jsonObject = JSONObject().apply {
+            put("content", message)
+            put("senderId", member.id)
+            put("senderName", member.name)
+        }
+
         val body = jsonObject.toString()
-        viewModelScope.launch {
-            stomp.send("/pub/hello/52", body).subscribe {
+        Log.d(TAG, "sendMessage: $body")
+        viewModelScope.launch (Dispatchers.IO) {
+            stomp.send("/pub/hello", body).subscribe {
                 Log.d(TAG, "sendMessage: $it")
             }
         }
