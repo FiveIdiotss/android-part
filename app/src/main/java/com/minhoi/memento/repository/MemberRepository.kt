@@ -5,9 +5,9 @@ import com.minhoi.memento.data.dto.MentoringReceivedDto
 import com.minhoi.memento.data.network.RetrofitClient
 import com.minhoi.memento.data.model.BoardType
 import com.minhoi.memento.data.network.ApiResult
-import com.minhoi.memento.data.network.safeFlow
 import com.minhoi.memento.data.network.service.MatchingService
 import com.minhoi.memento.data.network.service.MemberService
+import com.minhoi.memento.utils.safeFlow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 

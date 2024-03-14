@@ -30,24 +30,6 @@ sealed class ApiResult<out T> {
     }
 }
 
-    /**
-     * Retrofit API 호출 시, flow로 변환하고 성공, 실패, 빈 응답에 대한 처리를 위한 함수
-     */
-    fun <T> safeFlow(apiFunc: suspend () -> Response<T>): Flow<ApiResult<T>> = flow {
-        try {
-            val response = apiFunc.invoke()
-            if (response.isSuccessful) {
-                val body = response.body() ?: throw NullPointerException("Response body is null")
-                emit(ApiResult.Success(body))
-            }
-        } catch (e: NullPointerException) {
-            emit(ApiResult.Empty)
-        } catch (e: HttpException) {
-            emit(ApiResult.Error(e))
-        } catch (e: Exception) {
-            emit(ApiResult.Error(e, e.message))
-        }
-    }
 
 
 
