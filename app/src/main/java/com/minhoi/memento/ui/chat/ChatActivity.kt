@@ -13,7 +13,6 @@ import com.minhoi.memento.databinding.ActivityChatBinding
 import com.minhoi.memento.ui.UiState
 import com.minhoi.memento.utils.setOnSingleClickListener
 import com.minhoi.memento.utils.showToast
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -63,10 +62,14 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
                     when (state) {
                         is UiState.Loading -> {}
                         is UiState.Success -> {
-                            viewModel.connectToWebSocket(receiverId)
+                            if (receiverId != -1L) {
+                                viewModel.connectToWebSocket(receiverId)
+                            } else {
+                                showToast(LOAD_ERROR_MESSAGE)
+                            }
                         }
                         is UiState.Error -> {
-                            showToast("채팅방을 불러오는데 실패했습니다. 다시 시도해주세요.")
+                            showToast(LOAD_ERROR_MESSAGE)
                         }
                         is UiState.Empty -> {}
                     }
@@ -78,5 +81,9 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
     override fun onDestroy() {
         super.onDestroy()
         viewModel.disconnect()
+    }
+
+    companion object {
+        private const val LOAD_ERROR_MESSAGE = "채팅방을 불러오는데 실패했습니다. 다시 시도해주세요."
     }
 }
