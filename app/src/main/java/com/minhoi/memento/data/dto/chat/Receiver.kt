@@ -1,7 +1,8 @@
 package com.minhoi.memento.data.dto.chat
 
 data class Receiver(
-    override val date: String,
+    val id: Long,
+    override val name: String,
     override val content: String,
-    val receiverEmail: String
+    override val date: String
 ) : ChatMessage

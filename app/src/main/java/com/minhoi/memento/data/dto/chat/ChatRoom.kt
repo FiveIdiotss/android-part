@@ -5,8 +5,10 @@ import com.google.gson.annotations.SerializedName
 data class ChatRoom(
     @SerializedName("chatRoomId")
     val id: Long,
-    @SerializedName("recevierId")
+    @SerializedName("receiverId")
     val receiverId: Long,
-    @SerializedName("recipientName")
-    val receiverName: String
+    @SerializedName("receiverName")
+    val receiverName: String,
+    @SerializedName("latestMessageSentTime")
+    val latestMessageSentTime: String
 )
