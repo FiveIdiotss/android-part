@@ -6,6 +6,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.minhoi.memento.R
 import com.minhoi.memento.adapter.ChatAdapter
 import com.minhoi.memento.base.BaseActivity
@@ -23,6 +24,8 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
     private var receiverId = -1L
     private val chatAdapter: ChatAdapter by lazy { ChatAdapter() }
     private val viewModel by viewModels<ChatViewModel>()
+    private var roomId = -1L
+    private var hasNextPage: Boolean = true
 
     override fun initView() {
         receiverId = intent.getLongExtra("receiverId", -1L)
@@ -41,12 +44,29 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
 
         binding.chatRv.apply {
             adapter = chatAdapter
-            layoutManager = LinearLayoutManager(this@ChatActivity, LinearLayoutManager.VERTICAL, false)
+            layoutManager =
+                LinearLayoutManager(this@ChatActivity, LinearLayoutManager.VERTICAL, false)
+            addOnScrollListener(chatScrollListener)
         }
 
+        observeChatMessages()
+        observeHasNextPage()
+    }
+
+    private fun observeChatMessages() {
         viewModel.messages.observe(this) {
             Log.d(TAG, "initView: $it")
-            chatAdapter.addMessage(it.last())
+            it.forEach { message ->
+                chatAdapter.addMessage(message)
+            }
+        }
+    }
+
+    private fun loadPreviousPage() {
+        if (roomId != -1L) {
+            viewModel.getMessageStream(roomId)
+        } else {
+            showToast(LOAD_ERROR_MESSAGE)
         }
     }
 
@@ -93,9 +113,32 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
         }
     }
 
+    private fun observeHasNextPage() {
+        viewModel.hasNextPage.observe(this) {
+            hasNextPage = it
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         viewModel.disconnect()
+    }
+
+    private val chatScrollListener = object : RecyclerView.OnScrollListener() {
+        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+            super.onScrolled(recyclerView, dx, dy)
+
+            val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+            val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
+
+            // 스크롤 방향이 위로이고, 최상단에 도달했는지 여부를 확인
+            if (dy < 0 && firstVisibleItemPosition == 0) {
+                // 최상단에 도달하고 위로 스크롤 중이므로 새로운 데이터를 불러옴
+                if (hasNextPage) {
+                    loadPreviousPage()
+                }
+            }
+        }
     }
 
     companion object {
