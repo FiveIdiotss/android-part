@@ -31,6 +31,9 @@ class ChatViewModel : ViewModel() {
     private val TAG = ChatViewModel::class.java.simpleName
     private val chatRepository = ChatRepository()
     private val member = MentoApplication.memberPrefs.getMemberPrefs()
+    private var currentPage: Int = 1
+    private val _hasNextPage = MutableLiveData<Boolean>(true)
+    val hasNextPage: LiveData<Boolean> = _hasNextPage
 
     //    private val _chatRooms: MutableStateFlow<>
     private val _connectState = MutableStateFlow<UiState<Boolean>>(UiState.Empty)
@@ -151,15 +154,24 @@ class ChatViewModel : ViewModel() {
         }
     }
 
-    fun getChatRooms() {
+    fun getMessageStream(roomId: Long) {
         viewModelScope.launch {
-            chatRepository.getChatRooms(2L).collectLatest { result ->
+            chatRepository.getMessages(roomId, currentPage, 20).collectLatest { result ->
+                Log.d(TAG, "getMessagesPage: $currentPage")
                 result.handleResponse(
-                    onSuccess = { chatRooms ->
-                        Log.d(TAG, "getChatRooms: $chatRooms")
+                    onSuccess = { messages ->
+                        Log.d(TAG, "getMessages: $messages")
+                        if (messages.last) {
+                            _hasNextPage.value = false
+                        }
+                        messages.content.forEach {
+                            temp.add(getSenderOrReceiver(it))
+                        }
+                        _messages.value = temp
+                        currentPage++
                     },
                     onError = { error ->
-                        // Handle error
+                        Log.d(TAG, "getMessagesError: $error")
                     }
                 )
             }
