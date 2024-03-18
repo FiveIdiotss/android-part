@@ -39,6 +39,9 @@ class ChatViewModel : ViewModel() {
     private val _connectState = MutableStateFlow<UiState<Boolean>>(UiState.Empty)
     val connectState: StateFlow<UiState<Boolean>> = _connectState.asStateFlow()
 
+    private val _chatRoomState = MutableStateFlow<UiState<Long>>(UiState.Loading)
+    val chatRoomState: StateFlow<UiState<Long>> = _chatRoomState.asStateFlow()
+
     private val _messages = MutableLiveData<List<ChatMessage>>()
     val messages: LiveData<List<ChatMessage>> = _messages
 
