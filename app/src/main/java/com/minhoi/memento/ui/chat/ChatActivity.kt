@@ -51,8 +51,13 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
     }
 
     private fun sendMessage() {
-        viewModel.sendMessage(binding.message.text.toString())
-        binding.message.text.clear()
+        if (roomId == -1L) {
+            showToast(LOAD_ERROR_MESSAGE)
+            return
+        } else {
+            viewModel.sendMessage(binding.message.text.toString(), roomId)
+            binding.message.text.clear()
+        }
     }
 
     /**
