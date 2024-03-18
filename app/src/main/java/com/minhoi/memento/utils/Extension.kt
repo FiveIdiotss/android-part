@@ -62,3 +62,16 @@ fun <T> safeFlow(apiFunc: suspend () -> Response<T>): Flow<ApiResult<T>> = flow 
     }
 }
 
+fun parseLocalDateTime(localDateTimeString: String): String {
+    // 문자열을 LocalDateTime으로 파싱
+    val dateTime = LocalDateTime.parse(localDateTimeString)
+
+    // DateTimeFormatter를 사용하여 원하는 형식으로 포맷
+    val formatter = DateTimeFormatter.ofPattern("a h:mm", Locale.getDefault())
+    val formattedDateTime = dateTime.format(formatter)
+
+    // 오후/오전 텍스트 추가
+    val amPm = if (dateTime.hour < 12) "오전" else "오후"
+    return "$amPm $formattedDateTime"
+}
+
