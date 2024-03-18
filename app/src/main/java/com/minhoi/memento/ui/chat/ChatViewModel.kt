@@ -9,10 +9,12 @@ import com.gmail.bishoybasily.stomp.lib.Event
 import com.gmail.bishoybasily.stomp.lib.StompClient
 import com.minhoi.memento.MentoApplication
 import com.minhoi.memento.data.dto.chat.ChatMessage
+import com.minhoi.memento.data.dto.chat.MessageDto
 import com.minhoi.memento.data.dto.chat.Receiver
 import com.minhoi.memento.data.dto.chat.Sender
 import com.minhoi.memento.repository.ChatRepository
 import com.minhoi.memento.ui.UiState
+import com.minhoi.memento.utils.parseLocalDateTime
 import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -168,4 +170,17 @@ class ChatViewModel : ViewModel() {
             }
         }
     }
+
+    // 메세지 보낸 멤버가 로그인 한 멤버인지 다른 멤버인지 구분하는 함수
+    private fun getSenderOrReceiver(chatMessage: MessageDto): ChatMessage {
+        return when (chatMessage.senderId) {
+            member.id -> {
+                Sender(chatMessage.senderId, chatMessage.senderName, chatMessage.content, parseLocalDateTime(chatMessage.date))
+            }
+            else -> {
+                Receiver(chatMessage.senderId, chatMessage.senderName, chatMessage.content, parseLocalDateTime(chatMessage.date))
+            }
+        }
+    }
+
 }
