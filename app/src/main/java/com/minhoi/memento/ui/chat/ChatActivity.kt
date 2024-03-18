@@ -55,20 +55,30 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
         binding.message.text.clear()
     }
 
+    /**
+     * viewModel에서 roomId를 성공적으로 가져올 경우에만 소켓 연결하고, 방의 채팅 목록 일부를 가져오는 함수
+     */
     private fun connectSocket() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.chatRoomState.collectLatest { state ->
                     when (state) {
-                        is UiState.Loading -> {}
+                        is UiState.Loading -> {
+                            binding.sendBtn.isEnabled = false
+                        }
                         is UiState.Success -> {
+                            binding.sendBtn.isEnabled = true
                             if (receiverId != -1L) {
-                                viewModel.connectToWebSocket(receiverId)
+                                Log.d(TAG, "connectSocket: ${state.data}")
+                                roomId = state.data
+                                viewModel.connectToWebSocket(state.data)
+                                viewModel.getMessageStream(state.data)
                             } else {
                                 showToast(LOAD_ERROR_MESSAGE)
                             }
                         }
                         is UiState.Error -> {
+                            Log.d(TAG, "connectSocket: Error")
                             showToast(LOAD_ERROR_MESSAGE)
                         }
                         is UiState.Empty -> {}
