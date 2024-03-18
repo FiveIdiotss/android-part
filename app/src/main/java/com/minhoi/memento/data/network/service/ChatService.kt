@@ -1,5 +1,6 @@
 package com.minhoi.memento.data.network.service
 
+import com.minhoi.memento.data.dto.chat.AllChatMessageResponse
 import com.minhoi.memento.data.dto.chat.ChatRoom
 import retrofit2.Response
 import retrofit2.http.GET
@@ -11,4 +12,7 @@ interface ChatService {
 
     @GET("api/chat/chatRoom")
     suspend fun getRoomId(@Query("receiverId") receiverId: Long): Response<ChatRoom>
+
+    @GET("api/chat/messages")
+    suspend fun getChatMessages(@Query("chatRoomId") roomId: Long, @Query("page") page: Int, @Query("size") size: Int): Response<AllChatMessageResponse>
 }

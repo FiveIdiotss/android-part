@@ -17,4 +17,8 @@ class ChatRepository {
     suspend fun getRoomId(receiverId: Long): Flow<ApiResult<ChatRoom>> = safeFlow {
         chatService.getRoomId(receiverId)
     }
+
+    suspend fun getMessages(roomId: Long, page: Int, size: Int) = safeFlow {
+        chatService.getChatMessages(roomId, page, size)
+    }
 }
