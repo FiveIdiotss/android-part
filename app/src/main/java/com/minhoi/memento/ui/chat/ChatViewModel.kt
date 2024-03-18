@@ -41,18 +41,15 @@ class ChatViewModel : ViewModel() {
 
     private val temp = mutableListOf<ChatMessage>()
 
+    private val intervalMillis = 5000L
+    private lateinit var stomp: StompClient
+    private lateinit var stompConnection: Disposable
+    private lateinit var topic: Disposable
     private val client = OkHttpClient.Builder()
         .readTimeout(10, TimeUnit.SECONDS)
         .writeTimeout(10, TimeUnit.SECONDS)
         .connectTimeout(10, TimeUnit.SECONDS)
         .build()
-
-    private val intervalMillis = 5000L
-    private lateinit var stomp: StompClient
-    private lateinit var stompConnection: Disposable
-    private lateinit var topic: Disposable
-    private val _chatRoomState = MutableStateFlow<UiState<Long>>(UiState.Empty)
-    val chatRoomState: StateFlow<UiState<Long>> = _chatRoomState.asStateFlow()
 
     fun connectToWebSocket(roomId: Long) {
         val url = "ws://menteetor.site:8080/ws"
@@ -102,29 +99,27 @@ class ChatViewModel : ViewModel() {
     private fun handleMessage(message: String) {
         try {
             val json = JSONObject(message)
-
-            val senderId = json.getString("senderId")
-            val senderName = json.getString("sender")
+            Log.d(TAG, "handleMessage: $json")
+            val senderId = json.getLong("senderId")
+            val senderName = json.getString("senderName")
             val content = json.getString("content")
+            val date = json.getString("localDateTime")
 
-            when (senderId) {
-                member.id.toString() -> {
-                    temp.add(Sender(senderId.toLong(), senderName, content, "7:58"))
-                }
-                else -> {
-                    temp.add(Receiver(senderId.toLong(), senderName, content, "7:58"))
-                }
-            }
+            val messageObject = MessageDto(senderId, content, date, senderName)
+
+            temp.add(getSenderOrReceiver(messageObject))
             _messages.value = temp
+
         } catch (e: Exception) {
             Log.d(TAG, "handleMessage: ${e.printStackTrace()}")
         }
     }
 
-    fun sendMessage(message: String) {
+    fun sendMessage(message: String, roomId: Long) {
         val jsonObject = JSONObject().apply {
             put("content", message)
             put("senderId", member.id)
+            put("chatRoomId", roomId)
             put("senderName", member.name)
         }
 
