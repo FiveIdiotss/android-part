@@ -42,10 +42,9 @@ class ChatViewModel : ViewModel() {
     private val _chatRoomState = MutableStateFlow<UiState<Long>>(UiState.Loading)
     val chatRoomState: StateFlow<UiState<Long>> = _chatRoomState.asStateFlow()
 
-    private val _messages = MutableLiveData<List<ChatMessage>>()
-    val messages: LiveData<List<ChatMessage>> = _messages
-
-    private val temp = mutableListOf<ChatMessage>()
+    private val _messages = MutableLiveData<ArrayDeque<ChatMessage>>()
+    val messages: LiveData<ArrayDeque<ChatMessage>> = _messages
+    private val tempMessages = ArrayDeque<ChatMessage>()
 
     private val intervalMillis = 5000L
     private lateinit var stomp: StompClient
@@ -113,8 +112,8 @@ class ChatViewModel : ViewModel() {
 
             val messageObject = MessageDto(senderId, content, date, senderName)
 
-            temp.add(getSenderOrReceiver(messageObject))
-            _messages.value = temp
+            tempMessages.addLast(getSenderOrReceiver(messageObject))
+            _messages.value = tempMessages
 
         } catch (e: Exception) {
             Log.d(TAG, "handleMessage: ${e.printStackTrace()}")
@@ -168,9 +167,9 @@ class ChatViewModel : ViewModel() {
                             _hasNextPage.value = false
                         }
                         messages.content.forEach {
-                            temp.add(getSenderOrReceiver(it))
+                            tempMessages.addFirst(getSenderOrReceiver(it))
                         }
-                        _messages.value = temp
+                        _messages.value = tempMessages
                         currentPage++
                     },
                     onError = { error ->
