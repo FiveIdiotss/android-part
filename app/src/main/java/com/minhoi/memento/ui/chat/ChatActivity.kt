@@ -26,6 +26,7 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
     private val viewModel by viewModels<ChatViewModel>()
     private var roomId = -1L
     private var hasNextPage: Boolean = true
+    private var isFirstLoad = true
 
     override fun initView() {
         receiverId = intent.getLongExtra("receiverId", -1L)
@@ -49,16 +50,33 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
             addOnScrollListener(chatScrollListener)
         }
 
+        /**
+         * 채팅방의 채팅 목록을 관찰하여 초기 로딩 시에는 로딩 후 최하단으로 스크롤하고
+         * 그 이후에 이전 메세지 불러와도 아래로 스크롤 되지 않도록 구현.
+         * 소켓으로 전달된 단일 메세지 수신 시 최하단 스크롤.
+         */
+        chatAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                super.onItemRangeInserted(positionStart, itemCount)
+
+                val chatCount = chatAdapter.itemCount
+                // 채팅방의 채팅 목록이 처음 로딩되거나, 실시간으로 새로운 메세지가 전달되었을 때 최하단으로 스크롤
+                if (itemCount == 1 && (positionStart >= (chatCount - 1)) || isFirstLoad) {
+                    isFirstLoad = false
+                    binding.chatRv.post {
+                        binding.chatRv.scrollToPosition(chatCount - 1)
+                    }
+                }
+            }
+        })
+
         observeChatMessages()
         observeHasNextPage()
     }
 
     private fun observeChatMessages() {
         viewModel.messages.observe(this) {
-            Log.d(TAG, "initView: $it")
-            it.forEach { message ->
-                chatAdapter.addMessage(message)
-            }
+            chatAdapter.submitList(it.toList())
         }
     }
 
