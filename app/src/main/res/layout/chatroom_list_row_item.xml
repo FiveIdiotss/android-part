@@ -27,18 +27,30 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
-            android:text="Username"
-            android:textSize="20sp"
+            android:text="@{chatRoom.receiverName}"
+            android:textSize="19sp"
             android:textColor="@color/black"
             app:layout_constraintStart_toEndOf="@id/profileImage"
             app:layout_constraintTop_toTopOf="@id/profileImage" />
 
         <TextView
+            android:id="@+id/latestSentMessage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="time"
+            android:maxLines="1"
+            android:textColor="#999999"
+            android:textSize="15sp"
+            android:text="latestText"
+            app:layout_constraintTop_toBottomOf="@id/username"
+            app:layout_constraintStart_toStartOf="@id/username"/>
+
+        <TextView
+            android:id="@+id/latestSentTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:textSize="16sp"
             android:layout_marginEnd="10dp"
+            app:formatChatRoomDate="@{chatRoom.latestMessageSentTime}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
