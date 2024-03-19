@@ -22,9 +22,13 @@
             android:autoLink="web"
             android:gravity="start|center_vertical"
             android:linksClickable="true"
-            android:padding="10dp"
+            android:padding="8dp"
+            android:layout_marginEnd="10dp"
             android:text="@{senderData.content}"
-            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:textColor="@color/white"
+            android:maxWidth="200dp"
+            android:background="@drawable/sender_chat_item"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -33,13 +37,10 @@
             android:id="@+id/senderDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="10dp"
-            android:layout_marginRight="10dp"
-            android:text="@{senderData.date}"
+            android:text="@{senderData.date.substring(0,9)}"
+            android:layout_marginEnd="3dp"
             android:textSize="12dp"
             app:layout_constraintBottom_toBottomOf="@+id/senderMessage"
-            app:layout_constraintEnd_toStartOf="@+id/senderMessage"
-            app:layout_constraintTop_toTopOf="@+id/senderMessage"
-            app:layout_constraintVertical_bias="0.8" />
+            app:layout_constraintEnd_toStartOf="@+id/senderMessage"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
