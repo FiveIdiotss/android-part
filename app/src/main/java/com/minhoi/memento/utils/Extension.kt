@@ -67,7 +67,7 @@ fun parseLocalDateTime(localDateTimeString: String): String {
     val dateTime = LocalDateTime.parse(localDateTimeString)
 
     // DateTimeFormatter를 사용하여 원하는 형식으로 포맷
-    val formatter = DateTimeFormatter.ofPattern("a h:mm", Locale.getDefault())
+    val formatter = DateTimeFormatter.ofPattern("hh:mm:ss", Locale.getDefault())
     val formattedDateTime = dateTime.format(formatter)
 
     // 오후/오전 텍스트 추가
