@@ -47,8 +47,8 @@ class ChatViewModel : ViewModel() {
     private val tempMessages = ArrayDeque<ChatMessage>()
 
     private val intervalMillis = 5000L
-    private lateinit var stomp: StompClient
-    private lateinit var stompConnection: Disposable
+    private var stomp: StompClient? = null
+    private var stompConnection: Disposable? = null
     private lateinit var topic: Disposable
     private val client = OkHttpClient.Builder()
         .readTimeout(10, TimeUnit.SECONDS)
@@ -64,7 +64,7 @@ class ChatViewModel : ViewModel() {
 
         viewModelScope.launch {
             try {
-                stompConnection = stomp.connect().subscribe { event ->
+                stompConnection = stomp!!.connect().subscribe { event ->
                     when (event.type) {
                         Event.Type.OPENED -> handleWebSocketOpened(roomId)
                         Event.Type.CLOSED -> handleWebSocketClosed()
@@ -85,7 +85,7 @@ class ChatViewModel : ViewModel() {
         _connectState.update { UiState.Success(true) }
         // 채팅방 구독
 
-        topic = stomp.join("/sub/chats/$roomId").subscribe { message ->
+        topic = stomp!!.join("/sub/chats/$roomId").subscribe { message ->
             Log.d("Messageqqq", "connectToWebSocket: $message")
             viewModelScope.launch(Dispatchers.Main) {
                 handleMessage(message)
@@ -131,14 +131,14 @@ class ChatViewModel : ViewModel() {
         val body = jsonObject.toString()
         Log.d(TAG, "sendMessage: $body")
         viewModelScope.launch (Dispatchers.IO) {
-            stomp.send("/pub/hello", body).subscribe {
+            stomp!!.send("/pub/hello", body).subscribe {
                 Log.d(TAG, "sendMessage: $it")
             }
         }
     }
 
     fun disconnect() {
-        stompConnection.dispose()
+        stompConnection?.dispose()
     }
 
     fun getChatRoomId(receiverId: Long) {
