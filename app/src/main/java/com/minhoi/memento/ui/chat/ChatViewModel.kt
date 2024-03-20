@@ -46,6 +46,9 @@ class ChatViewModel : ViewModel() {
     val messages: LiveData<ArrayDeque<ChatMessage>> = _messages
     private val tempMessages = ArrayDeque<ChatMessage>()
 
+    private val _isPageLoading = MutableStateFlow<UiState<Boolean>>(UiState.Empty)
+    val isPageLoading: StateFlow<UiState<Boolean>> = _isPageLoading.asStateFlow()
+
     private val intervalMillis = 5000L
     private var stomp: StompClient? = null
     private var stompConnection: Disposable? = null
@@ -157,11 +160,13 @@ class ChatViewModel : ViewModel() {
     }
 
     fun getMessageStream(roomId: Long) {
+        _isPageLoading.value = UiState.Loading
         viewModelScope.launch {
             chatRepository.getMessages(roomId, currentPage, 20).collectLatest { result ->
                 Log.d(TAG, "getMessagesPage: $currentPage")
                 result.handleResponse(
                     onSuccess = { messages ->
+                        _isPageLoading.value = UiState.Success(true)
                         Log.d(TAG, "getMessages: $messages")
                         if (messages.last) {
                             _hasNextPage.value = false
@@ -173,6 +178,7 @@ class ChatViewModel : ViewModel() {
                         currentPage++
                     },
                     onError = { error ->
+                        _isPageLoading.value = UiState.Error(Throwable(error))
                         Log.d(TAG, "getMessagesError: $error")
                     }
                 )

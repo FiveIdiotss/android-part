@@ -72,6 +72,7 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
 
         observeChatMessages()
         observeHasNextPage()
+        observePageLoadingState()
     }
 
     private fun observeChatMessages() {
@@ -80,11 +81,23 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
         }
     }
 
+    private fun observePageLoadingState() {
+        lifecycleScope.launch {
+            viewModel.isPageLoading.collectLatest {
+                if (it is UiState.Error) {
+                    showToast(LOAD_ERROR_MESSAGE)
+                }
+            }
+        }
+    }
+
     private fun loadPreviousPage() {
-        if (roomId != -1L) {
-            viewModel.getMessageStream(roomId)
-        } else {
+        if (roomId == -1L) {
             showToast(LOAD_ERROR_MESSAGE)
+            return
+        }
+        if (viewModel.isPageLoading.value !is UiState.Loading) {
+            viewModel.getMessageStream(roomId)
         }
     }
 
