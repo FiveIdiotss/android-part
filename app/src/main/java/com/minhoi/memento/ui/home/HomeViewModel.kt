@@ -5,18 +5,35 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.minhoi.memento.MentoApplication
 import com.minhoi.memento.data.dto.BoardContentDto
+import com.minhoi.memento.data.dto.chat.ChatRoom
 import com.minhoi.memento.repository.BoardRepository
+import com.minhoi.memento.repository.ChatRepository
+import com.minhoi.memento.ui.UiState
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 
 class HomeViewModel : ViewModel() {
     private val boardRepository = BoardRepository()
+    private val chatRepository = ChatRepository()
 
-    private var _menteeBoardContents = MutableLiveData<List<BoardContentDto>>()
+    private val member = MentoApplication.memberPrefs.getMemberPrefs()
+
+    private val _menteeBoardContents = MutableLiveData<List<BoardContentDto>>()
     val menteeBoardContent: LiveData<List<BoardContentDto>> = _menteeBoardContents
+
+    private val _chatRooms = MutableStateFlow<UiState<List<ChatRoom>>>(UiState.Loading)
+    val chatRooms: StateFlow<UiState<List<ChatRoom>>> = _chatRooms.asStateFlow()
 
     init {
         getPreviewBoards()
+        getChatRooms()
     }
 
     fun getPreviewBoards() {
@@ -29,4 +46,19 @@ class HomeViewModel : ViewModel() {
         }
     }
 
+    fun getChatRooms() {
+        viewModelScope.launch {
+            chatRepository.getChatRooms(member.id).collectLatest { result ->
+                result.handleResponse(
+                    onSuccess = { chatRooms ->
+                        Log.d("HomeViewModel", "getChatRooms: $chatRooms")
+                        _chatRooms.update { UiState.Success(chatRooms) }
+                    },
+                    onError = { error ->
+                        _chatRooms.update { UiState.Error(Throwable(error)) }
+                    }
+                )
+            }
+        }
+    }
 }
