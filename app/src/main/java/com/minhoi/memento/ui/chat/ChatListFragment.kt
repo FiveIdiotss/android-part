@@ -13,7 +13,8 @@ import com.minhoi.memento.base.BaseFragment
 import com.minhoi.memento.databinding.FragmentChatListBinding
 import com.minhoi.memento.ui.UiState
 import com.minhoi.memento.ui.home.HomeViewModel
-import com.minhoi.memento.utils.ProgressDialog
+import com.minhoi.memento.utils.hideLoading
+import com.minhoi.memento.utils.showLoading
 import com.minhoi.memento.utils.showToast
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -22,7 +23,6 @@ class ChatListFragment : BaseFragment<FragmentChatListBinding>() {
 
     override val layoutResourceId: Int = R.layout.fragment_chat_list
     private val viewModel by viewModels<HomeViewModel>()
-    private val progressDialog: ProgressDialog by lazy { ProgressDialog() }
     private val chatRoomListAdapter: ChatRoomListAdapter by lazy {
         ChatRoomListAdapter {
             // onCLickListener
@@ -35,12 +35,10 @@ class ChatListFragment : BaseFragment<FragmentChatListBinding>() {
 
     override fun initView() {
         observeChatRooms()
-
         binding.chatRoomRv.apply {
             adapter = chatRoomListAdapter
             layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         }
-
     }
 
     /*
@@ -53,14 +51,15 @@ class ChatListFragment : BaseFragment<FragmentChatListBinding>() {
                     when (state) {
                         is UiState.Empty -> {}
                         is UiState.Loading -> {
-                            showLoading()
+                            parentFragmentManager.showLoading()
                         }
                         is UiState.Success -> {
-                            hideLoading()
+                            parentFragmentManager.hideLoading()
                             Log.d("ChatRooms", "observeChatRooms: ${state.data}")
                             chatRoomListAdapter.setList(state.data)
                         }
                         is UiState.Error -> {
+                            parentFragmentManager.hideLoading()
                             requireContext().showToast("네트워크 오류가 발생하였습니다. 다시 시도해주세요")
                         }
                     }

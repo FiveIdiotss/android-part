@@ -75,3 +75,22 @@ fun parseLocalDateTime(localDateTimeString: String): String {
     return "$amPm $formattedDateTime"
 }
 
+
+private const val PROGRESS_DIALOG_TAG = "progress_dialog"
+// FragmentManager 확장 함수로 ProgressDialog의 표시 여부를 확인
+private val FragmentManager.isProgressDialogShowing: Boolean
+    get() = findFragmentByTag(PROGRESS_DIALOG_TAG) != null
+
+fun FragmentManager.showLoading() {
+    if (!isProgressDialogShowing) {
+        val progressDialog = ProgressDialog()
+        progressDialog.show(this, PROGRESS_DIALOG_TAG)
+    }
+}
+
+fun FragmentManager.hideLoading() {
+    if (isProgressDialogShowing) {
+        (findFragmentByTag(PROGRESS_DIALOG_TAG) as? ProgressDialog)?.dismiss()
+    }
+}
+
