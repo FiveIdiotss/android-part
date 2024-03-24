@@ -13,16 +13,15 @@
         android:id="@+id/background"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp">
+        android:layout_marginBottom="1dp">
 
         <ImageView
             android:id="@+id/profileImage"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_marginTop="10dp"
             android:layout_marginStart="10dp"
             android:src="@drawable/profile"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -30,39 +29,38 @@
             android:id="@+id/receiverMessage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
             android:autoLink="web"
             android:background="@drawable/receiver_chat_item"
             android:gravity="start|center_vertical"
             android:linksClickable="true"
-            android:padding="8dp"
-            android:textSize="16sp"
-            android:layout_marginStart="5dp"
+            android:maxWidth="200dp"
+            android:padding="7dp"
             android:text="@{receiverData.content}"
             android:textColor="@color/black"
-            android:maxWidth="200dp"
+            android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/profileImage"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintStart_toEndOf="@+id/profileImage" />
 
         <TextView
             android:id="@+id/receiverDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="3dp"
             android:text="@{receiverData.date.substring(0,8)}"
             android:textSize="12dp"
-            android:layout_marginStart="3dp"
             app:layout_constraintBottom_toBottomOf="@+id/receiverMessage"
             app:layout_constraintStart_toEndOf="@+id/receiverMessage" />
 
         <TextView
             android:id="@+id/receiverName"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="18dp"
             android:layout_marginStart="5dp"
             android:text="@{receiverData.name}"
             android:textColor="@color/black"
             android:textStyle="bold"
-            app:layout_constraintBottom_toTopOf="@id/receiverMessage"
+            app:layout_constraintBottom_toTopOf="@+id/receiverMessage"
             app:layout_constraintStart_toEndOf="@+id/profileImage"
             app:layout_constraintTop_toTopOf="@+id/profileImage" />
 
