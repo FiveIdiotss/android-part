@@ -10,11 +10,13 @@ import com.minhoi.memento.data.dto.BoardContentDto
 import com.minhoi.memento.data.dto.chat.ChatRoom
 import com.minhoi.memento.repository.BoardRepository
 import com.minhoi.memento.repository.ChatRepository
+import com.minhoi.memento.repository.MemberRepository
 import com.minhoi.memento.ui.UiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -22,6 +24,7 @@ import retrofit2.HttpException
 class HomeViewModel : ViewModel() {
     private val boardRepository = BoardRepository()
     private val chatRepository = ChatRepository()
+    private val memberRepository = MemberRepository()
 
     private val member = MentoApplication.memberPrefs.getMemberPrefs()
 
@@ -59,6 +62,15 @@ class HomeViewModel : ViewModel() {
                     }
                 )
             }
+        }
+    }
+
+    private suspend fun getMemberInfoAsFlow(memberId: Long) = flow {
+        val response = memberRepository.getMemberInfo(memberId)
+        if (response.isSuccessful) {
+            emit(response.body() ?: throw Exception("MemberInfo is null"))
+        } else {
+            throw Exception("Network error: ${response.code()}")
         }
     }
 }
