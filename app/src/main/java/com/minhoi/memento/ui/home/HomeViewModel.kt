@@ -7,16 +7,21 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.minhoi.memento.MentoApplication
 import com.minhoi.memento.data.dto.BoardContentDto
+import com.minhoi.memento.data.dto.MemberDTO
 import com.minhoi.memento.data.dto.chat.ChatRoom
 import com.minhoi.memento.repository.BoardRepository
 import com.minhoi.memento.repository.ChatRepository
 import com.minhoi.memento.repository.MemberRepository
 import com.minhoi.memento.ui.UiState
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -31,8 +36,8 @@ class HomeViewModel : ViewModel() {
     private val _menteeBoardContents = MutableLiveData<List<BoardContentDto>>()
     val menteeBoardContent: LiveData<List<BoardContentDto>> = _menteeBoardContents
 
-    private val _chatRooms = MutableStateFlow<UiState<List<ChatRoom>>>(UiState.Loading)
-    val chatRooms: StateFlow<UiState<List<ChatRoom>>> = _chatRooms.asStateFlow()
+    private val _chatRooms = MutableStateFlow<UiState<List<Pair<ChatRoom, MemberDTO>>>>(UiState.Loading)
+    val chatRooms: StateFlow<UiState<List<Pair<ChatRoom, MemberDTO>>>> = _chatRooms.asStateFlow()
 
     init {
         getPreviewBoards()
@@ -49,13 +54,33 @@ class HomeViewModel : ViewModel() {
         }
     }
 
+    /*
+    * 채팅방 목록을 가져오고, 채팅방 목록에 대한 멤버 정보를 가져와서 Pair로 묶어서 UI에 전달하는 함수
+     */
+    @OptIn(FlowPreview::class)
     fun getChatRooms() {
+        val chatRoomsWithMember = mutableListOf<Pair<ChatRoom, MemberDTO>>()
         viewModelScope.launch {
             chatRepository.getChatRooms(member.id).collectLatest { result ->
                 result.handleResponse(
                     onSuccess = { chatRooms ->
-                        Log.d("HomeViewModel", "getChatRooms: $chatRooms")
-                        _chatRooms.update { UiState.Success(chatRooms) }
+                        launch {
+                            try {
+                                // flatMapConcat을 사용하여 순차적으로 멤버 정보를 가져오고 temp 리스트에 추가
+                                chatRooms.asFlow().flatMapConcat { chatRoom ->
+                                    getMemberInfoAsFlow(chatRoom.receiverId).map { member ->
+                                        chatRoom to member
+                                    }
+                                }.collect { pair ->
+                                    chatRoomsWithMember.add(pair)
+                                }
+                                // 모든 멤버 정보가 temp 리스트에 추가된 후 UI 상태 업데이트 (flatMapConcat 사용 시 순차적으로 실행)
+                                _chatRooms.update { UiState.Success(chatRoomsWithMember) }
+                                Log.d("HomeViewModel", "getChatRooms: $chatRoomsWithMember")
+                            } catch (e: Exception) {
+                                _chatRooms.update { UiState.Error(e) }
+                            }
+                        }
                     },
                     onError = { error ->
                         _chatRooms.update { UiState.Error(Throwable(error)) }
