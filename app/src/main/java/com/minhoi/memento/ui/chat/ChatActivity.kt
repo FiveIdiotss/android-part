@@ -10,9 +10,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.minhoi.memento.R
 import com.minhoi.memento.adapter.ChatAdapter
 import com.minhoi.memento.base.BaseActivity
+import com.minhoi.memento.data.dto.chat.ChatMessage
 import com.minhoi.memento.databinding.ActivityChatBinding
 import com.minhoi.memento.ui.UiState
+import com.minhoi.memento.utils.hideLoading
 import com.minhoi.memento.utils.setOnSingleClickListener
+import com.minhoi.memento.utils.showLoading
 import com.minhoi.memento.utils.showToast
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -27,6 +30,7 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
     private var roomId = -1L
     private var hasNextPage: Boolean = true
     private var isFirstLoad = true
+    private var lastMessage: ChatMessage? = null
 
     override fun initView() {
         receiverId = intent.getLongExtra("receiverId", -1L)
@@ -77,8 +81,37 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
 
     private fun observeChatMessages() {
         viewModel.messages.observe(this) {
+            setShowProfileAndDate(it)
             chatAdapter.submitList(it.toList())
         }
+    }
+
+    /*
+    채팅 목록을 전달받아, 이전 메세지와 비교하여 날짜가 다르거나 사용자가 다르면 ChatMessage의 showDate를 true로 설정
+     */
+    private fun setShowProfileAndDate(messages: List<ChatMessage>): List<ChatMessage> {
+        // 처음 메세지 불러올 경우 lastMessage가 null이므로, 먼저 lastMessage 설정
+        if (lastMessage == null) {
+            lastMessage = messages[0]
+        }
+        // 서버에서 무한 스크롤 방식으로 데이터를 가져오기 때문에, 제일 마지막으로 불러온 메세지 목록의 첫번째 메세지와 비교
+        if (lastMessage!!.date == messages[0].date && lastMessage!!.id == messages[0].id) {
+            messages[0].showDate = false
+        }
+
+        for (i in 1 until messages.size) {
+            // 이전 메시지와 비교
+            val previousMessage = messages[i - 1]
+            val currentMessage = messages[i]
+
+            // 이전 메시지와 현재 메시지가 같은 날짜인지 확인 (분 단위까지 비교)
+            val isSameDay = previousMessage.date.substring(0,8) == currentMessage.date.substring(0,8)
+            val isSameUser = previousMessage.id == currentMessage.id
+
+            currentMessage.showDate = !isSameDay || !isSameUser
+        }
+        lastMessage = messages.firstOrNull()
+        return messages
     }
 
     private fun observePageLoadingState() {
@@ -120,9 +153,11 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
                 viewModel.chatRoomState.collectLatest { state ->
                     when (state) {
                         is UiState.Loading -> {
+                            supportFragmentManager.showLoading()
                             binding.sendBtn.isEnabled = false
                         }
                         is UiState.Success -> {
+                            supportFragmentManager.hideLoading()
                             binding.sendBtn.isEnabled = true
                             if (receiverId != -1L) {
                                 Log.d(TAG, "connectSocket: ${state.data}")
@@ -134,6 +169,7 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
                             }
                         }
                         is UiState.Error -> {
+                            supportFragmentManager.hideLoading()
                             Log.d(TAG, "connectSocket: Error")
                             showToast(LOAD_ERROR_MESSAGE)
                         }

@@ -1,6 +1,7 @@
 package com.minhoi.memento.adapter
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -16,12 +17,30 @@ class ChatAdapter : ListAdapter<ChatMessage, RecyclerView.ViewHolder>(DiffCallba
     inner class SenderViewHolder(private val binding: SenderMessageRowItemBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item: Sender) {
             binding.senderData = item
+            if (!item.showDate) {
+                binding.senderDate.visibility = View.GONE
+            } else {
+                binding.senderDate.visibility = View.VISIBLE
+            }
         }
     }
 
     inner class ReceiverViewHolder(private val binding: ReceiverMessageRowItemBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item: Receiver) {
             binding.receiverData = item
+            if (!item.showDate) {
+                binding.apply {
+                    receiverDate.visibility = View.GONE
+                    profileImage.visibility = View.INVISIBLE
+                    receiverName.visibility = View.GONE
+                }
+            } else {
+                binding.apply {
+                    receiverDate.visibility = View.VISIBLE
+                    profileImage.visibility = View.VISIBLE
+                    receiverName.visibility = View.VISIBLE
+                }
+            }
         }
     }
 
@@ -57,12 +76,6 @@ class ChatAdapter : ListAdapter<ChatMessage, RecyclerView.ViewHolder>(DiffCallba
             is Receiver -> VIEW_TYPE_RECEIVER
             else -> throw IllegalArgumentException("Invalid message type")
         }
-    }
-
-    fun addMessages(messages: List<ChatMessage>) {
-        val currentList = currentList.toMutableList()
-        currentList.addAll(0, messages)
-        submitList(currentList)
     }
 
     companion object {
