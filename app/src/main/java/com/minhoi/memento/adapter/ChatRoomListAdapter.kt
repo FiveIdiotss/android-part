@@ -3,24 +3,28 @@ package com.minhoi.memento.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.minhoi.memento.data.dto.MemberDTO
 import com.minhoi.memento.data.dto.chat.ChatRoom
 import com.minhoi.memento.databinding.ChatroomListRowItemBinding
 import com.minhoi.memento.utils.setOnSingleClickListener
 
 class ChatRoomListAdapter(private val onClickListener: (ChatRoom) -> Unit) : RecyclerView.Adapter<ChatRoomListAdapter.ViewHolder>() {
-    private val chats = mutableListOf<ChatRoom>()
+    private val chats = mutableListOf<Pair<ChatRoom, MemberDTO>>()
 
     inner class ViewHolder(private val binding: ChatroomListRowItemBinding) : RecyclerView.ViewHolder(binding.root) {
         init {
             binding.root.setOnSingleClickListener {
-                onClickListener(chats[bindingAdapterPosition])
+                onClickListener(chats[bindingAdapterPosition].first)
             }
         }
 
-        fun bind(item: ChatRoom) {
-            binding.chatRoom = item
+        fun bind(item: Pair<ChatRoom, MemberDTO>) {
+            binding.apply {
+                chatRoom = item.first
+                member = item.second
+                executePendingBindings()
+            }
         }
-
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -34,7 +38,7 @@ class ChatRoomListAdapter(private val onClickListener: (ChatRoom) -> Unit) : Rec
         holder.bind(chats[position])
     }
 
-    fun setList(chats: List<ChatRoom>) {
+    fun setList(chats: List<Pair<ChatRoom, MemberDTO>>) {
         this.chats.clear()
         this.chats.addAll(chats)
         notifyDataSetChanged()
