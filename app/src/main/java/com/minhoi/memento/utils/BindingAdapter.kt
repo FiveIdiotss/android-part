@@ -1,8 +1,13 @@
 package com.minhoi.memento.utils
 
+import android.graphics.drawable.Drawable
 import android.widget.CalendarView
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.request.RequestOptions
 import com.minhoi.memento.ui.board.BoardViewModel
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -32,6 +37,24 @@ object BindingAdapter {
             } else {
                 view.text = date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
             }
+        }
+    }
+
+    /**
+     * 프로필 이미지를 불러오는 동안은 placeholder를 보여주고, 성공적으로 불러왔으면 imageView에 표시하는 함수
+     */
+    @BindingAdapter("app:imageUrl", "app:placeholder")
+    @JvmStatic fun loadImage(imageView: ImageView, url: String?, placeholder: Drawable) {
+        if (url != null) {
+            Glide.with(imageView.context)
+                .load(url)
+                .placeholder(placeholder)
+                .error(placeholder)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .apply(RequestOptions().fitCenter())
+                .into(imageView)
+        } else {
+            imageView.setImageDrawable(placeholder)
         }
     }
 }
