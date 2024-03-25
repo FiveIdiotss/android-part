@@ -4,22 +4,22 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.minhoi.memento.data.dto.BoardContentDto
-import com.minhoi.memento.databinding.PreviewBoardRowItemBinding
+import com.minhoi.memento.databinding.BoardRowItemBinding
 import com.minhoi.memento.utils.setOnSingleClickListener
 
 class BoardPreviewAdapter(private val onClickListener: (BoardContentDto) -> Unit) : RecyclerView.Adapter<BoardPreviewAdapter.ViewHolder>() {
 
     private val boardContents = mutableListOf<BoardContentDto>()
-    inner class ViewHolder(private val binding: PreviewBoardRowItemBinding) :
+    inner class ViewHolder(private val binding: BoardRowItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(item: BoardContentDto) {
-            binding.boardContent = item
+            binding.board = item
             binding.root.setOnSingleClickListener { onClickListener(item) }
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val binding = PreviewBoardRowItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = BoardRowItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ViewHolder(binding)
     }
 
