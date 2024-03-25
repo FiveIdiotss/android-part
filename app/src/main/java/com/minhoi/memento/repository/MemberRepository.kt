@@ -10,6 +10,7 @@ import com.minhoi.memento.data.network.service.MemberService
 import com.minhoi.memento.utils.safeFlow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import okhttp3.MultipartBody
 
 class MemberRepository {
 
@@ -39,4 +40,11 @@ class MemberRepository {
 
     suspend fun rejectApply(applyId: Long) = matchingService.rejectApply(applyId)
 
+    suspend fun uploadProfileImage(image: MultipartBody.Part) = safeFlow {
+        memberService.uploadProfileImage(image)
+    }
+
+    suspend fun setDefaultProfileImage() = safeFlow {
+        memberService.setDefaultProfileImage()
+    }
 }
