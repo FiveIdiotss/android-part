@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import okhttp3.MultipartBody
 
 class MypageViewModel : ViewModel() {
 
@@ -44,8 +45,10 @@ class MypageViewModel : ViewModel() {
     private val _matchedMentoringList = MutableLiveData<List<MentoringMatchInfo>>()
     val matchedMentoringList: LiveData<List<MentoringMatchInfo>> = _matchedMentoringList
 
+    private val _imageUploadState = MutableStateFlow<UiState<Boolean>>(UiState.Empty)
+    val imageUploadState: StateFlow<UiState<Boolean>> = _imageUploadState.asStateFlow()
 
-    suspend fun getMemberInfo(memberId: Long): MemberDTO? {
+    suspend fun getOtherMemberInfo(memberId: Long): MemberDTO? {
         val response = memberRepository.getMemberInfo(memberId)
         return if (response.isSuccessful) {
             Log.d("memberInfo", "getMemberInfo: ${response.body()} ")
@@ -87,13 +90,13 @@ class MypageViewModel : ViewModel() {
         viewModelScope.launch {
             member.let { member ->
                 memberRepository.getReceivedList(member.id)
-                .catch { e ->
-                    Log.d("ReceivedList", "getReceivedListFailed: ${e.message}")
-                }
-                .collectLatest {
-                    _receivedList.value = it
-                    Log.d("ReceivedList", "getReceivedListSuccess: $it")
-                }
+                    .catch { e ->
+                        Log.d("ReceivedList", "getReceivedListFailed: ${e.message}")
+                    }
+                    .collectLatest {
+                        _receivedList.value = it
+                        Log.d("ReceivedList", "getReceivedListSuccess: $it")
+                    }
             }
         }
     }
@@ -103,7 +106,7 @@ class MypageViewModel : ViewModel() {
             _acceptState.update { UiState.Loading }
             val response = memberRepository.acceptApply(applyId)
             if (response.isSuccessful) {
-                _acceptState.update { UiState.Success(true)}
+                _acceptState.update { UiState.Success(true) }
             } else {
                 _acceptState.update { UiState.Error(null) }
             }
@@ -115,13 +118,12 @@ class MypageViewModel : ViewModel() {
         viewModelScope.launch {
             val response = memberRepository.rejectApply(applyId)
             if (response.isSuccessful) {
-                _rejectState.update { UiState.Success(true)  }
-            }
-            else {
+                _rejectState.update { UiState.Success(true) }
+            } else {
                 _rejectState.update { UiState.Error(null) }
-                }
             }
         }
+    }
 
     private suspend fun getApplyState() {
         val response = memberRepository.getMatchedMentoringInfo(member.id)
@@ -151,5 +153,38 @@ class MypageViewModel : ViewModel() {
 
     fun selectApplyContent(applyContent: MentoringApplyDto) {
         _applyContent.value = applyContent
+    }
+
+    fun getMemberInfo() = member
+
+    fun uploadProfileImage(imagePart: MultipartBody.Part) {
+        viewModelScope.launch {
+            _imageUploadState.value = UiState.Loading
+            memberRepository.uploadProfileImage(imagePart).collectLatest {
+                it.handleResponse(
+                    onSuccess = {
+                        _imageUploadState.value = UiState.Success(true)
+                    },
+                    onError = {
+                        _imageUploadState.value = UiState.Error(Throwable(it))
+                    }
+                )
+            }
+        }
+    }
+
+    fun setDefaultProfileImage() {
+        viewModelScope.launch {
+            memberRepository.setDefaultProfileImage().collectLatest {
+                it.handleResponse(
+                    onSuccess = {
+                        _imageUploadState.value = UiState.Success(true)
+                    },
+                    onError = {
+                        _imageUploadState.value = UiState.Error(Throwable(it))
+                    }
+                )
+            }
+        }
     }
 }
