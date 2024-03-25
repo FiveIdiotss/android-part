@@ -10,5 +10,8 @@ data class ChatRoom(
     @SerializedName("receiverName")
     val receiverName: String,
     @SerializedName("latestMessageDTO")
-    val latestMessage: LatestMessageDto
+    val latestMessage: LatestMessageDto,
+    val receiverImageUrl: String,
+    val boardTitle: String,
+    val startTime: String
 )
