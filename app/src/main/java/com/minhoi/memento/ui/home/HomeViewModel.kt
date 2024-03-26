@@ -24,7 +24,6 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
 
 class HomeViewModel : ViewModel() {
     private val boardRepository = BoardRepository()
@@ -36,7 +35,7 @@ class HomeViewModel : ViewModel() {
     private val _menteeBoardContents = MutableLiveData<List<BoardContentDto>>()
     val menteeBoardContent: LiveData<List<BoardContentDto>> = _menteeBoardContents
 
-    private val _chatRooms = MutableStateFlow<UiState<List<Pair<ChatRoom, MemberDTO>>>>(UiState.Loading)
+    private val _chatRooms = MutableStateFlow<UiState<List<Pair<ChatRoom, MemberDTO>>>>(UiState.Empty)
     val chatRooms: StateFlow<UiState<List<Pair<ChatRoom, MemberDTO>>>> = _chatRooms.asStateFlow()
 
     init {
@@ -61,6 +60,7 @@ class HomeViewModel : ViewModel() {
     fun getChatRooms() {
         val chatRoomsWithMember = mutableListOf<Pair<ChatRoom, MemberDTO>>()
         viewModelScope.launch {
+            _chatRooms.update { UiState.Loading }
             chatRepository.getChatRooms(member.id).collectLatest { result ->
                 result.handleResponse(
                     onSuccess = { chatRooms ->
