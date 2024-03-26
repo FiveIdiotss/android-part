@@ -35,7 +35,7 @@ object BindingAdapter {
             if (LocalDateTime.parse(date).toLocalDate().isEqual(today)) {
                 view.text = parseLocalDateTime(date.toString()).substring(0, 8)
             } else {
-                view.text = date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+                view.text = date.format(DateTimeFormatter.ofPattern("yyyy-mm-dd")).substring(0,10)
             }
         }
     }
