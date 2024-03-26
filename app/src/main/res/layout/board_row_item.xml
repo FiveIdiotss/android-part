@@ -29,11 +29,12 @@
                 app:layout_constraintTop_toTopOf="parent"/>
 
             <de.hdodenhof.circleimageview.CircleImageView
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:padding="5dp"
-                android:layout_margin="10dp"
-                android:background="@color/white"
+                android:id="@+id/bookmarkBtn"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_margin="8dp"
+                android:padding="3dp"
+                app:civ_circle_background_color="@color/white"
                 android:src="@drawable/heart_empty"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />

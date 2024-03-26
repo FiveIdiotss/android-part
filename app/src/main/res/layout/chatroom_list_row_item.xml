@@ -37,10 +37,10 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/textView16"
+                android:id="@+id/startDateTime"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="@{chatRoom.startTime}"
+                android:text="@{chatRoom.startDate + ` ` + chatRoom.startTime.substring(0,5) + ` 상담 예정`}"
                 android:textColor="#999999"
                 android:textSize="15sp"
                 app:layout_constraintStart_toStartOf="@+id/mentoringName"
@@ -55,8 +55,8 @@
                 android:text="@{chatRoom.latestMessage.content}"
                 android:textColor="@color/black"
                 android:textSize="15sp"
-                app:layout_constraintStart_toStartOf="@+id/textView16"
-                app:layout_constraintTop_toBottomOf="@+id/textView16" />
+                app:layout_constraintStart_toStartOf="@+id/startDateTime"
+                app:layout_constraintTop_toBottomOf="@+id/startDateTime" />
 
             <View
                 android:id="@+id/view"
