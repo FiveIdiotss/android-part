@@ -2,6 +2,7 @@ package com.minhoi.memento.data.network.service
 
 import com.minhoi.memento.data.dto.LoginRequest
 import com.minhoi.memento.data.dto.LoginResponse
+import com.minhoi.memento.data.dto.TokenDto
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -16,6 +17,6 @@ interface AuthService {
 
 
     @GET("api/refresh")
-    suspend fun getAccessToken(@Header("Authorization") refreshToken: String): Response<String>
+    suspend fun getAccessToken(@Header("Authorization") token: String): Response<TokenDto>
 
 }
