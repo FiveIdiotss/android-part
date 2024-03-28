@@ -5,41 +5,138 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp">
+
+        <ImageView
+            android:id="@+id/imageView3"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginStart="110dp"
+            android:src="@drawable/apply"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/textView15"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="멘토링 신청 내용"
-            android:textSize="18dp"
+            android:text="멘토링 신청서"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/applyContent"
+            android:id="@+id/textView25"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="content"
-            android:textSize="16dp"
-            android:layout_marginTop="20dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="10dp"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:text="멘토 정보"
+            app:layout_constraintStart_toStartOf="@+id/mentorInfoLayout"
             app:layout_constraintTop_toBottomOf="@+id/textView15" />
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/goToBoardContentBtn"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/mentorInfoLayout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:text="신청 글 바로가기"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="20dp"
+            android:background="@color/app_theme"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/applyContent" />
+            app:layout_constraintTop_toBottomOf="@id/textView25">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/mentorProfileImage"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_margin="8dp"
+                android:src="@drawable/defaultprofile"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/mentorName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="5dp"
+                android:gravity="center"
+                android:text="멘토 이름"
+                android:textColor="@color/black"
+                app:layout_constraintStart_toEndOf="@+id/mentorProfileImage"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/mentorSchoolInfo"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:gravity="center"
+                android:text="서경대학교 | 컴퓨터공학과"
+                android:textColor="@color/black"
+                app:layout_constraintStart_toEndOf="@+id/mentorProfileImage"
+                app:layout_constraintTop_toBottomOf="@+id/mentorName" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <TextView
+            android:id="@+id/textView26"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="멘토링 신청 글"
+            android:textSize="15sp"
+            android:textColor="@color/black"
+            app:layout_constraintStart_toStartOf="@+id/mentorInfoLayout"
+            app:layout_constraintTop_toBottomOf="@+id/mentorInfoLayout" />
+
+        <include
+            android:id="@+id/applyContentLayout"
+            layout="@layout/board_row_item"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView26" />
+
+        <TextView
+            android:id="@+id/textView27"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="신청 내용"
+            android:textSize="15sp"
+            android:textColor="@color/black"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="15dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/applyContentLayout" />
+
+        <TextView
+            android:id="@+id/applyContent"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/round_corner_black_color"
+            android:padding="8dp"
+            android:text="content"
+            android:textColor="@color/black"
+            android:textStyle=""
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/textView27"
+            app:layout_constraintTop_toBottomOf="@id/textView27" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
