@@ -61,6 +61,9 @@ class ChatViewModel : ViewModel() {
 
     fun connectToWebSocket(roomId: Long) {
         val url = "ws://menteetor.site:8080/ws"
+        if (stomp != null) {
+            return
+        }
         stomp = StompClient(client, intervalMillis).apply {
             this@apply.url = url
         }

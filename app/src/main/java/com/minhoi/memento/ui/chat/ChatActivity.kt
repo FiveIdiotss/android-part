@@ -90,6 +90,11 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
     채팅 목록을 전달받아, 이전 메세지와 비교하여 날짜가 다르거나 사용자가 다르면 ChatMessage의 showDate를 true로 설정
      */
     private fun setShowProfileAndDate(messages: List<ChatMessage>): List<ChatMessage> {
+        // 메세지 비어있을경우 NullPointerException 방지
+        if (messages.isEmpty()) {
+            return emptyList()
+        }
+
         // 처음 메세지 불러올 경우 lastMessage가 null이므로, 먼저 lastMessage 설정
         if (lastMessage == null) {
             lastMessage = messages[0]
