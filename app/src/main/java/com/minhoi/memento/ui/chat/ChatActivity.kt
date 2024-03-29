@@ -1,7 +1,14 @@
 package com.minhoi.memento.ui.chat
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.util.Base64
 import android.util.Log
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -19,6 +26,7 @@ import com.minhoi.memento.utils.showLoading
 import com.minhoi.memento.utils.showToast
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import java.io.ByteArrayOutputStream
 
 class ChatActivity : BaseActivity<ActivityChatBinding>() {
     private val TAG = ChatActivity::class.java.simpleName
@@ -31,6 +39,8 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
     private var hasNextPage: Boolean = true
     private var isFirstLoad = true
     private var lastMessage: ChatMessage? = null
+
+    private val permissions = arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
 
     override fun initView() {
         receiverId = intent.getLongExtra("receiverId", -1L)
@@ -52,6 +62,22 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
             layoutManager =
                 LinearLayoutManager(this@ChatActivity, LinearLayoutManager.VERTICAL, false)
             addOnScrollListener(chatScrollListener)
+        }
+
+        binding.imageSelectBtn.setOnSingleClickListener {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.READ_EXTERNAL_STORAGE
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                ActivityCompat.requestPermissions(
+                    this,
+                    permissions,
+                    PERMISSION_CODE
+                )
+            } else {
+                pickImageFromGallery()
+            }
         }
 
         /**
@@ -77,6 +103,24 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
         observeChatMessages()
         observeHasNextPage()
         observePageLoadingState()
+    }
+
+    private val pickImageContract =
+        registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+            uri?.let {
+                val inputStream = contentResolver.openInputStream(uri)
+
+                val byteArrayOutputStream = ByteArrayOutputStream()
+                inputStream?.copyTo(byteArrayOutputStream)
+                val bytes = byteArrayOutputStream.toByteArray()
+
+                val base64String = Base64.encodeToString(bytes, Base64.DEFAULT)
+                viewModel.setImage("data:image/jpeg;base64,$base64String")
+            }
+        }
+
+    private fun pickImageFromGallery() {
+        pickImageContract.launch("image/*")
     }
 
     private fun observeChatMessages() {
@@ -215,5 +259,6 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
 
     companion object {
         private const val LOAD_ERROR_MESSAGE = "채팅방을 불러오는데 실패했습니다. 다시 시도해주세요."
+        private const val PERMISSION_CODE = 1001
     }
 }
