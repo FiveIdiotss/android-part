@@ -115,9 +115,8 @@ class ChatViewModel : ViewModel() {
             val senderName = json.getString("senderName")
             val content = json.getString("content")
             val date = json.getString("localDateTime")
-
-            val messageObject = MessageDto(senderId, content, date, senderName)
-
+            val image: String? = json.getString("image")
+            val messageObject = MessageDto(senderId, content, date, senderName, image)
             tempMessages.addLast(getSenderOrReceiver(messageObject))
             _messages.value = tempMessages
 
