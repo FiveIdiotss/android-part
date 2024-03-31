@@ -13,5 +13,7 @@ data class ChatRoom(
     val latestMessage: LatestMessageDto,
     val receiverImageUrl: String,
     val boardTitle: String,
+    @SerializedName("date")
+    val startDate: String,
     val startTime: String
 )
