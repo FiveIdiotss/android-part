@@ -143,6 +143,22 @@ class ChatViewModel : ViewModel() {
         }
     }
 
+    fun sendImage(image: String, roomId: Long) {
+        val jsonObject = JSONObject().apply {
+            put("content", null)
+            put("senderId", member.id)
+            put("chatRoomId", roomId)
+            put("senderName", member.name)
+            put("image", image)
+        }
+        val body = jsonObject.toString()
+        viewModelScope.launch (Dispatchers.IO) {
+            stomp!!.send("/pub/hello", body).subscribe {
+                Log.d(TAG, "sendMessage: $it")
+            }
+        }
+    }
+
     fun disconnect() {
         stompConnection?.dispose()
     }
@@ -193,10 +209,10 @@ class ChatViewModel : ViewModel() {
     private fun getSenderOrReceiver(chatMessage: MessageDto): ChatMessage {
         return when (chatMessage.senderId) {
             member.id -> {
-                Sender(chatMessage.senderId, chatMessage.senderName, chatMessage.content, parseLocalDateTime(chatMessage.date))
+                Sender(chatMessage.senderId, chatMessage.senderName, chatMessage.content, parseLocalDateTime(chatMessage.date), chatMessage.image)
             }
             else -> {
-                Receiver(chatMessage.senderId, chatMessage.senderName, chatMessage.content, parseLocalDateTime(chatMessage.date))
+                Receiver(chatMessage.senderId, chatMessage.senderName, chatMessage.content, parseLocalDateTime(chatMessage.date),chatMessage.image)
             }
         }
     }

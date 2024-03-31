@@ -115,7 +115,7 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
                 val bytes = byteArrayOutputStream.toByteArray()
 
                 val base64String = Base64.encodeToString(bytes, Base64.DEFAULT)
-                viewModel.setImage("data:image/jpeg;base64,$base64String")
+                viewModel.sendImage("data:image/jpeg;base64,$base64String", roomId)
             }
         }
 
