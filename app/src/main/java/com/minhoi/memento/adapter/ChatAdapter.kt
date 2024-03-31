@@ -17,6 +17,13 @@ class ChatAdapter : ListAdapter<ChatMessage, RecyclerView.ViewHolder>(DiffCallba
     inner class SenderViewHolder(private val binding: SenderMessageRowItemBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item: Sender) {
             binding.senderData = item
+            if (item.image == "null" || item.image == null) {
+                binding.senderImageView.visibility = View.GONE
+                binding.senderMessage.visibility = View.VISIBLE
+            } else {
+                binding.senderImageView.visibility = View.VISIBLE
+                binding.senderMessage.visibility = View.GONE
+            }
             if (!item.showDate) {
                 binding.senderDate.visibility = View.GONE
             } else {
@@ -28,6 +35,13 @@ class ChatAdapter : ListAdapter<ChatMessage, RecyclerView.ViewHolder>(DiffCallba
     inner class ReceiverViewHolder(private val binding: ReceiverMessageRowItemBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item: Receiver) {
             binding.receiverData = item
+            if (item.image == "null" || item.image == null) {
+                binding.receiverImageView.visibility = View.GONE
+                binding.receiverMessage.visibility = View.VISIBLE
+            } else {
+                binding.receiverImageView.visibility = View.VISIBLE
+                binding.receiverMessage.visibility = View.GONE
+            }
             if (!item.showDate) {
                 binding.apply {
                     receiverDate.visibility = View.GONE
