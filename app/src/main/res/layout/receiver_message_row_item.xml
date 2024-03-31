@@ -13,34 +13,57 @@
         android:id="@+id/background"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="1dp">
+        android:layout_marginBottom="3dp">
 
         <ImageView
             android:id="@+id/profileImage"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
             android:src="@drawable/profile"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/receiverMessage"
+        <FrameLayout
+            android:id="@+id/messageFrameLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
-            android:autoLink="web"
-            android:background="@drawable/receiver_chat_item"
-            android:gravity="start|center_vertical"
-            android:linksClickable="true"
-            android:maxWidth="200dp"
-            android:padding="7dp"
-            android:text="@{receiverData.content}"
-            android:textColor="@color/black"
-            android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/profileImage" />
+            app:layout_constraintStart_toEndOf="@+id/profileImage"
+            app:layout_constraintTop_toBottomOf="@id/receiverName">
+
+            <TextView
+                android:id="@+id/receiverMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:autoLink="web"
+                android:background="@drawable/receiver_chat_item"
+                android:gravity="start|center_vertical"
+                android:linksClickable="true"
+                android:maxWidth="200dp"
+                android:padding="7dp"
+                android:text="@{receiverData.content}"
+                android:textColor="@color/black"
+                android:textSize="16sp" />
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="10dp">
+            <ImageView
+                android:id="@+id/receiverImageView"
+                android:layout_width="200dp"
+                android:layout_height="300dp"
+                android:scaleType="fitXY"
+                app:imageUrl="@{receiverData.image}"
+                app:placeholder="@{@drawable/loadingimage}"
+                android:visibility="gone"
+                android:layout_gravity="center" />
+            </androidx.cardview.widget.CardView>
+
+        </FrameLayout>
 
         <TextView
             android:id="@+id/receiverDate"
@@ -49,18 +72,17 @@
             android:layout_marginStart="3dp"
             android:text="@{receiverData.date.substring(0,8)}"
             android:textSize="12dp"
-            app:layout_constraintBottom_toBottomOf="@+id/receiverMessage"
-            app:layout_constraintStart_toEndOf="@+id/receiverMessage" />
+            app:layout_constraintBottom_toBottomOf="@+id/messageFrameLayout"
+            app:layout_constraintStart_toEndOf="@+id/messageFrameLayout" />
 
         <TextView
             android:id="@+id/receiverName"
             android:layout_width="wrap_content"
-            android:layout_height="18dp"
+            android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
             android:text="@{receiverData.name}"
             android:textColor="@color/black"
             android:textStyle="bold"
-            app:layout_constraintBottom_toTopOf="@+id/receiverMessage"
             app:layout_constraintStart_toEndOf="@+id/profileImage"
             app:layout_constraintTop_toTopOf="@+id/profileImage" />
 
