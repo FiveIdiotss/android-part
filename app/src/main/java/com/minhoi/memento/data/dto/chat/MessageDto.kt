@@ -6,5 +6,6 @@ data class MessageDto(
     val senderId: Long,
     val content: String,
     @SerializedName("localDateTime") val date: String,
-    val senderName: String
+    val senderName: String,
+    val image: String? = null
 )

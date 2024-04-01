@@ -12,5 +12,19 @@ data class MentoringApplyDto(
     @SerializedName("content")
     val content: String,
     @SerializedName("applyState")
-    val applyState: String
+    val applyState: String,
+    @SerializedName("memberId")
+    val memberId: Long,
+    @SerializedName("date")
+    val startDate: String,
+    @SerializedName("startTime")
+    val startTime: String,
+    @SerializedName("memberName")
+    val memberName: String,
+    @SerializedName("schoolName")
+    val schoolName: String,
+    @SerializedName("majorName")
+    val majorName: String,
+    @SerializedName("memberImageUrl")
+    val memberImageUrl: String
 )
