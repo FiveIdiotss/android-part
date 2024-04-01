@@ -2,9 +2,12 @@ package com.minhoi.memento.ui.chat
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Base64
 import android.util.Log
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.app.ActivityCompat
@@ -65,19 +68,7 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
         }
 
         binding.imageSelectBtn.setOnSingleClickListener {
-            if (ContextCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.READ_EXTERNAL_STORAGE
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                ActivityCompat.requestPermissions(
-                    this,
-                    permissions,
-                    PERMISSION_CODE
-                )
-            } else {
-                pickImageFromGallery()
-            }
+            pickImageFromGallery()
         }
 
         /**
@@ -106,10 +97,9 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
     }
 
     private val pickImageContract =
-        registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri: Uri? ->
             uri?.let {
                 val inputStream = contentResolver.openInputStream(uri)
-
                 val byteArrayOutputStream = ByteArrayOutputStream()
                 inputStream?.copyTo(byteArrayOutputStream)
                 val bytes = byteArrayOutputStream.toByteArray()
@@ -120,7 +110,7 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
         }
 
     private fun pickImageFromGallery() {
-        pickImageContract.launch("image/*")
+        pickImageContract.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
     }
 
     private fun observeChatMessages() {
