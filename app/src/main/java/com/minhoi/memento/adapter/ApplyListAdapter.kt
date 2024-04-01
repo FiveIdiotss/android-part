@@ -8,14 +8,22 @@ import com.minhoi.memento.databinding.ApplyListRowItemBinding
 import com.minhoi.memento.data.model.ApplyStatus
 import com.minhoi.memento.utils.setOnSingleClickListener
 
-class ApplyListAdapter(private val onClickListener: (MentoringApplyDto) -> Unit) : RecyclerView.Adapter<ApplyListAdapter.ViewHolder>() {
+class ApplyListAdapter(
+    private val onBoardClickListener: (Long) -> Unit,
+    private val onShowApplyContentListener: (MentoringApplyDto) -> Unit
+) : RecyclerView.Adapter<ApplyListAdapter.ViewHolder>() {
 
     private val applies = mutableListOf<Pair<MentoringApplyDto, ApplyStatus>>()
 
-    inner class ViewHolder(private val binding: ApplyListRowItemBinding) : RecyclerView.ViewHolder(binding.root) {
+    inner class ViewHolder(private val binding: ApplyListRowItemBinding) :
+        RecyclerView.ViewHolder(binding.root) {
         init {
+            binding.showApplyContent.setOnSingleClickListener {
+                onShowApplyContentListener(applies[bindingAdapterPosition].first)
+            }
+
             binding.root.setOnSingleClickListener {
-                onClickListener(applies[bindingAdapterPosition].first)
+                onBoardClickListener(applies[bindingAdapterPosition].first.boardId)
             }
         }
 

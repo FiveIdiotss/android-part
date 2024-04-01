@@ -9,6 +9,7 @@ import com.minhoi.memento.adapter.ApplyListAdapter
 import com.minhoi.memento.adapter.ReceivedListAdapter
 import com.minhoi.memento.base.BaseActivity
 import com.minhoi.memento.databinding.ActivityApplyListBinding
+import com.minhoi.memento.ui.board.BoardActivity
 import com.minhoi.memento.ui.mypage.received.ReceivedContentActivity
 
 class ApplyListActivity : BaseActivity<ActivityApplyListBinding>() {
@@ -27,15 +28,22 @@ class ApplyListActivity : BaseActivity<ActivityApplyListBinding>() {
             TYPE_APPLY -> {
                 viewModel.getApplyList()
                 binding.requestTypeTitle.text = APPLY_TITLE
-                applyListAdapter = ApplyListAdapter() {
-                    // onClickListener
-                    // 선택한 신청서 내용 ViewModel에 저장
-                    viewModel.selectApplyContent(it)
+                applyListAdapter = ApplyListAdapter(
+                    onBoardClickListener = {
+                        // onClickListener
+                        // 선택한 신청서 내용 Activity에 전달
+                        startActivity(Intent(this, BoardActivity::class.java).apply {
+                            putExtra("applyDto", it)
+                        })
+                    },
+                    onShowApplyContentListener = {
+                        // 선택한 신청서 내용 ViewModel에 저장
+                        viewModel.selectApplyContent(it)
 
-                    // show ApplyContentDialog
-                    val applyContentDialogFragment = ApplyContentDialogFragment()
-                    applyContentDialogFragment.show(supportFragmentManager, applyContentDialogFragment.tag)
-                }
+                        val applyContentDialogFragment = ApplyContentDialogFragment()
+                        applyContentDialogFragment.show(supportFragmentManager, applyContentDialogFragment.tag)
+                    }
+                )
                 observeApplyList()
             }
 
