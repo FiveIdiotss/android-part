@@ -31,27 +31,35 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/receiverName" />
 
+        <ImageView
+            android:id="@+id/imageSelectBtn"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="15dp"
+            android:src="@drawable/gallery"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/message" />
+
         <EditText
             android:id="@+id/message"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
+            android:layout_marginEnd="17dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginStart="15dp"
             android:background="@drawable/round_corner_gray_color"
             android:inputType="text"
             android:padding="4dp"
-            android:layout_marginBottom="10dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/sendBtn"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toEndOf="@+id/imageSelectBtn" />
 
         <ImageView
             android:id="@+id/sendBtn"
             android:layout_width="28dp"
             android:layout_height="28dp"
             android:src="@drawable/send"
-            android:layout_marginEnd="13dp"
+            android:layout_marginEnd="15dp"
             app:layout_constraintBottom_toBottomOf="@+id/message"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/message" />
