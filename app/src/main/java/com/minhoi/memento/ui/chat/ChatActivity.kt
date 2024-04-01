@@ -36,7 +36,9 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
     override val layoutResourceId: Int = R.layout.activity_chat
 
     private var receiverId = -1L
-    private val chatAdapter: ChatAdapter by lazy { ChatAdapter() }
+    private val chatAdapter: ChatAdapter by lazy { ChatAdapter() {
+        ChatImageViewerDialog.newInstance(it).show(supportFragmentManager, "imageDialog")
+    } }
     private val viewModel by viewModels<ChatViewModel>()
     private var roomId = -1L
     private var hasNextPage: Boolean = true

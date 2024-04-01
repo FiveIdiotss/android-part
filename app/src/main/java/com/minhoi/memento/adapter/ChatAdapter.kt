@@ -12,9 +12,16 @@ import com.minhoi.memento.data.dto.chat.Sender
 import com.minhoi.memento.databinding.ReceiverMessageRowItemBinding
 import com.minhoi.memento.databinding.SenderMessageRowItemBinding
 
-class ChatAdapter : ListAdapter<ChatMessage, RecyclerView.ViewHolder>(DiffCallback()) {
+class ChatAdapter(private val onImageClicked: (String) -> Unit) : ListAdapter<ChatMessage, RecyclerView.ViewHolder>(DiffCallback()) {
 
     inner class SenderViewHolder(private val binding: SenderMessageRowItemBinding) : RecyclerView.ViewHolder(binding.root) {
+        init {
+            binding.senderImageView.setOnClickListener {
+                val position = bindingAdapterPosition
+                val item = getItem(position) as Sender
+                onImageClicked(item.image!!)
+            }
+        }
         fun bind(item: Sender) {
             binding.senderData = item
             if (item.image == "null" || item.image == null) {
@@ -33,6 +40,13 @@ class ChatAdapter : ListAdapter<ChatMessage, RecyclerView.ViewHolder>(DiffCallba
     }
 
     inner class ReceiverViewHolder(private val binding: ReceiverMessageRowItemBinding) : RecyclerView.ViewHolder(binding.root) {
+        init {
+            binding.receiverImageView.setOnClickListener {
+                val position = bindingAdapterPosition
+                val item = getItem(position) as Receiver
+                onImageClicked(item.image!!)
+            }
+        }
         fun bind(item: Receiver) {
             binding.receiverData = item
             if (item.image == "null" || item.image == null) {
