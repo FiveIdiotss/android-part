@@ -31,8 +31,8 @@ class MypageViewModel : ViewModel() {
     private val _applyList = MutableLiveData<List<Pair<MentoringApplyDto, ApplyStatus>>>()
     val applyList: LiveData<List<Pair<MentoringApplyDto, ApplyStatus>>> = _applyList
 
-    private val _applyContent = MutableLiveData<MentoringApplyDto>()
-    val applyContent: LiveData<MentoringApplyDto> = _applyContent
+    private val _applyContent = MutableStateFlow<UiState<MentoringApplyDto>>(UiState.Empty)
+    val applyContent: StateFlow<UiState<MentoringApplyDto>> = _applyContent.asStateFlow()
 
     private val _receivedList = MutableLiveData<List<MentoringReceivedDto>>()
     val receivedList: LiveData<List<MentoringReceivedDto>> = _receivedList
@@ -86,6 +86,22 @@ class MypageViewModel : ViewModel() {
                     }
                     _applyList.value = applyListWithState
                 }
+            }
+        }
+    }
+
+    fun getApplyInfo(applyId: Long) {
+        viewModelScope.launch {
+            _applyContent.update { UiState.Loading }
+            memberRepository.getApplyInfo(applyId).collectLatest {
+                it.handleResponse(
+                    onSuccess = { applyInfo ->
+                        _applyContent.update { UiState.Success(applyInfo) }
+                    },
+                    onError = { errorMsg ->
+                        _applyContent.update { UiState.Error(Throwable(errorMsg)) }
+                    }
+                )
             }
         }
     }
@@ -153,10 +169,6 @@ class MypageViewModel : ViewModel() {
                 )
             }
         }
-    }
-
-    fun selectApplyContent(applyContent: MentoringApplyDto) {
-        _applyContent.value = applyContent
     }
 
     fun getMemberInfo() = member

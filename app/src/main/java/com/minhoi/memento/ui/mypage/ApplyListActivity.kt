@@ -37,8 +37,8 @@ class ApplyListActivity : BaseActivity<ActivityApplyListBinding>() {
                         })
                     },
                     onShowApplyContentListener = {
-                        // 선택한 신청서 내용 ViewModel에 저장
-                        viewModel.selectApplyContent(it)
+                        // 지원서 보기 선택시 선택한 신청서 정보 가져오기
+                        viewModel.getApplyInfo(it.applyId)
 
                         val applyContentDialogFragment = ApplyContentDialogFragment()
                         applyContentDialogFragment.show(supportFragmentManager, applyContentDialogFragment.tag)

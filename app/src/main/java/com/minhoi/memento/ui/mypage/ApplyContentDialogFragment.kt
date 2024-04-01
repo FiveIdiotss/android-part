@@ -1,16 +1,22 @@
 package com.minhoi.memento.ui.mypage
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.minhoi.memento.databinding.ApplyContentDialogBinding
-import com.minhoi.memento.ui.board.BoardActivity
+import com.minhoi.memento.ui.UiState
 import com.minhoi.memento.utils.dialogFragmentResize
-import com.minhoi.memento.utils.setOnSingleClickListener
+import com.minhoi.memento.utils.hideLoading
+import com.minhoi.memento.utils.showLoading
+import com.minhoi.memento.utils.showToast
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 class ApplyContentDialogFragment: DialogFragment() {
 
@@ -32,23 +38,29 @@ class ApplyContentDialogFragment: DialogFragment() {
 
     fun initDialog() {
         observeApplyContent()
-
-        binding.goToBoardContentBtn.setOnSingleClickListener {
-            goToBoard()
-            dismiss()
-        }
     }
 
     private fun observeApplyContent() {
-        viewModel.applyContent.observe(viewLifecycleOwner) {
-            binding.applyContent.text = it.content
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.applyContent.collectLatest {
+                    when (it) {
+                        is UiState.Empty -> {}
+                        is UiState.Loading -> {
+                            parentFragmentManager.showLoading()
+                        }
+                        is UiState.Success -> {
+                            parentFragmentManager.hideLoading()
+                            binding.applyContent = it.data
+                        }
+                        is UiState.Error -> {
+                            parentFragmentManager.hideLoading()
+                            requireContext().showToast(it.error?.message.toString())
+                        }
+                    }
+                }
+            }
         }
-    }
-
-    private fun goToBoard() {
-        startActivity(Intent(requireContext(), BoardActivity::class.java).apply {
-            putExtra("boardId", viewModel.applyContent.value?.boardId)
-        })
     }
 
     override fun onResume() {
