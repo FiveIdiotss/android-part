@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flow
@@ -65,21 +66,17 @@ class HomeViewModel : ViewModel() {
                 result.handleResponse(
                     onSuccess = { chatRooms ->
                         launch {
-                            try {
-                                // flatMapConcat을 사용하여 순차적으로 멤버 정보를 가져오고 temp 리스트에 추가
-                                chatRooms.asFlow().flatMapConcat { chatRoom ->
-                                    getMemberInfoAsFlow(chatRoom.receiverId).map { member ->
-                                        chatRoom to member
-                                    }
-                                }.collect { pair ->
-                                    chatRoomsWithMember.add(pair)
+                            // flatMapConcat을 사용하여 순차적으로 멤버 정보를 가져오고 temp 리스트에 추가
+                            chatRooms.asFlow().flatMapConcat { chatRoom ->
+                                getMemberInfoAsFlow(chatRoom.receiverId).map { member ->
+                                    chatRoom to member
                                 }
-                                // 모든 멤버 정보가 temp 리스트에 추가된 후 UI 상태 업데이트 (flatMapConcat 사용 시 순차적으로 실행)
-                                _chatRooms.update { UiState.Success(chatRoomsWithMember) }
-                                Log.d("HomeViewModel", "getChatRooms: $chatRoomsWithMember")
-                            } catch (e: Exception) {
-                                _chatRooms.update { UiState.Error(e) }
                             }
+                                .catch { e -> _chatRooms.update { UiState.Error(e) } }
+                                .collect { pair -> chatRoomsWithMember.add(pair) }
+                            // 모든 멤버 정보가 temp 리스트에 추가된 후 UI 상태 업데이트 (flatMapConcat 사용 시 순차적으로 실행)
+                            _chatRooms.update { UiState.Success(chatRoomsWithMember) }
+                            Log.d("HomeViewModel", "getChatRooms: $chatRoomsWithMember")
                         }
                     },
                     onError = { error ->
