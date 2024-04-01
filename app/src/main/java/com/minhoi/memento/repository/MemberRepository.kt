@@ -47,4 +47,8 @@ class MemberRepository {
     suspend fun setDefaultProfileImage() = safeFlow {
         memberService.setDefaultProfileImage()
     }
+
+    suspend fun getMemberBoards(memberId: Long) = safeFlow {
+        memberService.getMemberBoards(memberId)
+    }
 }

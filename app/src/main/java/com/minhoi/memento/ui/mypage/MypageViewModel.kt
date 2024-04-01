@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.minhoi.memento.MentoApplication
+import com.minhoi.memento.data.dto.BoardContentDto
 import com.minhoi.memento.data.dto.MemberDTO
 import com.minhoi.memento.data.dto.MentoringApplyDto
 import com.minhoi.memento.data.dto.MentoringMatchInfo
@@ -47,6 +48,9 @@ class MypageViewModel : ViewModel() {
 
     private val _imageUploadState = MutableStateFlow<UiState<Boolean>>(UiState.Empty)
     val imageUploadState: StateFlow<UiState<Boolean>> = _imageUploadState.asStateFlow()
+
+    private val _memberBoards = MutableStateFlow<UiState<List<BoardContentDto>>>(UiState.Empty)
+    val memberBoards: StateFlow<UiState<List<BoardContentDto>>> = _memberBoards.asStateFlow()
 
     suspend fun getOtherMemberInfo(memberId: Long): MemberDTO? {
         val response = memberRepository.getMemberInfo(memberId)
@@ -184,6 +188,24 @@ class MypageViewModel : ViewModel() {
                         _imageUploadState.value = UiState.Error(Throwable(it))
                     }
                 )
+            }
+        }
+    }
+
+    fun getMemberBoards() {
+        viewModelScope.launch {
+            _memberBoards.update { UiState.Loading }
+            member.let { member ->
+                memberRepository.getMemberBoards(member.id).collectLatest {
+                    it.handleResponse(
+                        onSuccess = { boards ->
+                            _memberBoards.update { UiState.Success(boards) }
+                        },
+                        onError = { errorMsg ->
+                            _memberBoards.update { UiState.Error(Throwable(errorMsg)) }
+                        }
+                    )
+                }
             }
         }
     }

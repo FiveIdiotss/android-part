@@ -19,4 +19,7 @@ interface MemberService {
 
     @POST("api/member/defaultImage")
     suspend fun setDefaultProfileImage(): Response<String>
+
+    @GET("api/memberBoards/{memberId}")
+    suspend fun getMemberBoards(@Path("memberId") memberId: Long): Response<List<BoardContentDto>>
 }
