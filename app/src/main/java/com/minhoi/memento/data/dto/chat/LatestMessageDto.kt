@@ -6,6 +6,8 @@ data class LatestMessageDto(
     @SerializedName("content")
     val content: String,
     @SerializedName("localDateTime")
-    val localDateTime: String
+    val localDateTime: String,
+    @SerializedName("isText")
+    val isText: Boolean
 )
 
