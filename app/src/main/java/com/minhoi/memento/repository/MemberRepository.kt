@@ -23,6 +23,9 @@ class MemberRepository {
 
     suspend fun getApplyList(memberId: Long) = matchingService.getMyApply(memberId, "SEND")
 
+    suspend fun getApplyInfo(applyId: Long) = safeFlow {
+        memberService.getApplyInfo(applyId)
+    }
     suspend fun getReceivedList(memberId: Long): Flow<List<MentoringReceivedDto>> = flow {
         val response = matchingService.getReceived(memberId, "RECEIVE")
         if (response.isSuccessful) {

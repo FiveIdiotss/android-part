@@ -1,6 +1,8 @@
 package com.minhoi.memento.data.network.service
 
 import com.minhoi.memento.data.dto.MemberDTO
+import com.minhoi.memento.data.dto.MentoringApplyDto
+import com.minhoi.memento.data.model.BoardType
 import okhttp3.MultipartBody
 import retrofit2.Response
 import retrofit2.http.GET
@@ -22,4 +24,7 @@ interface MemberService {
 
     @GET("api/memberBoards/{memberId}")
     suspend fun getMemberBoards(@Path("memberId") memberId: Long): Response<List<BoardContentDto>>
+
+    @GET("api/apply/{applyId}")
+    suspend fun getApplyInfo(@Path("applyId") applyId: Long): Response<MentoringApplyDto>
 }
