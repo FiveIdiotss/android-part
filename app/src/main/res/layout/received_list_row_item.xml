@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="recievedDto"
+            type="com.minhoi.memento.data.dto.MentoringReceivedDto" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/boardTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@{recievedDto.boardTitle}"
+            android:textSize="17dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/applicantName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@{recievedDto.applyMemberName}"
+            android:layout_marginTop="5dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/boardTitle" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="님의 신청입니다"
+            app:layout_constraintStart_toEndOf="@+id/applicantName"
+            app:layout_constraintTop_toTopOf="@+id/applicantName" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

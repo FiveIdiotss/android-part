@@ -4,8 +4,20 @@
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
     </style>
+
     <style name="Circle" parent="">
         <item name="cornerSize">50%</item>
     </style>
     <style name="Theme.Memento" parent="Base.Theme.Memento" />
+
+    <style name="AppBottomSheetDialogTheme" parent="Theme.Design.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/AppModalStyle</item>
+    </style>
+
+    <style name="AppModalStyle"
+        parent="Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@drawable/white_round_top_border_15</item>
+    </style>
+
+
 </resources>
