@@ -1,13 +1,17 @@
-package com.minhoi.memento.data.network
+package com.minhoi.memento.data.network.service
 
+import com.minhoi.memento.data.dto.CreateMemberRequest
+import com.minhoi.memento.data.dto.EmailVerificationRequest
 import com.minhoi.memento.data.dto.MajorDto
 import com.minhoi.memento.data.dto.SchoolDto
+import com.minhoi.memento.data.dto.VerifyCodeRequest
 import retrofit2.Response
+import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.Path
 
-interface APIService {
-
+interface JoinService {
     @GET("/api/schools")
     suspend fun getSchools(): Response<List<SchoolDto>>
 
@@ -18,13 +22,8 @@ interface APIService {
 
     @POST("/api/member/signUp")
     suspend fun signUp(
-        @Body member: MemberDto
+        @Body member: CreateMemberRequest
     ): Response<String>
-
-    @POST("api/member/signIn")
-    suspend fun signIn(
-        @Body loginRequest: LoginRequest
-    ): Response<LoginResponse>
 
     @POST("login/email")
     suspend fun getVerificationCode(
@@ -36,8 +35,4 @@ interface APIService {
         @Body verifyCodeRequest: VerifyCodeRequest
     ): Response<String>
 
-    @POST("api/v1/clear")
-    suspend fun clear(
-        @Body clearDto: ClearDto
-    ): Response<String>
 }

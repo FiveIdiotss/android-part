@@ -25,5 +25,7 @@ data class BoardContentDto(
     val content: String,
 
     @SerializedName("memberId")
-    val memberId: Long
+    val memberId: Long,
+
+    var isBookmarked: Boolean = false
 )

@@ -17,4 +17,6 @@ data class MemberDTO(
     val schoolName: String,
     @SerializedName("majorName")
     val majorName: String,
+    @SerializedName("memberImageUrl")
+    val profileImageUrl: String
     )

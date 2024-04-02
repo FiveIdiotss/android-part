@@ -22,9 +22,10 @@ abstract class BaseFragment<T: ViewDataBinding> : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
         binding.lifecycleOwner = this@BaseFragment
         initView()
-        super.onViewCreated(view, savedInstanceState)
     }
 
     abstract fun initView()
@@ -32,9 +33,5 @@ abstract class BaseFragment<T: ViewDataBinding> : Fragment() {
     override fun onDestroyView() {
         binding.unbind()
         super.onDestroyView()
-    }
-
-    protected inline fun bind(block: T.() -> Unit) {
-        binding.apply(block)
     }
 }
