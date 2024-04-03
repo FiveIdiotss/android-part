@@ -7,6 +7,7 @@ import com.minhoi.memento.data.dto.MentoringApplyRequest
 import com.minhoi.memento.data.model.BoardType
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
@@ -31,4 +32,9 @@ interface BoardService {
     @POST("api/board/{boardId}")
     suspend fun applyMentoring(@Path("boardId") boardId: Long, @Body applyContent: MentoringApplyRequest): Response<String>
 
+    @POST("api/board/favorite/{boardId}")
+    suspend fun bookmarkBoard(@Path("boardId") boardId: Long): Response<String>
+
+    @DELETE("api/board/favorite/{boardId}")
+    suspend fun unBookmarkBoard(@Path("boardId") boardId: Long): Response<String>
 }
