@@ -12,6 +12,14 @@ fun View.setOnSingleClickListener(onSingleClick: (View) -> Unit) {
     setOnClickListener(singleClickListener)
 }
 
+fun Context.showToast(message: String, duration: Int = Toast.LENGTH_SHORT) {
+    Toast.makeText(this, message, duration).show()
+}
+
+fun IntRange.overlaps(other: IntRange): Boolean {
+    return other.first in this
+}
+
 // DialogFragment 크기 조절
 fun Context.dialogFragmentResize(dialogFragment: DialogFragment, width: Float, height: Float) {
 
