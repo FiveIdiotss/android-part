@@ -65,7 +65,7 @@ class ApplyContentDialogFragment: DialogFragment() {
 
     override fun onResume() {
         super.onResume()
-        context?.dialogFragmentResize(this@ApplyContentDialogFragment, 0.75f, 0.75f)
+        context?.dialogFragmentResize(this@ApplyContentDialogFragment, 0.8f, 0.8f)
     }
 
     override fun onDestroyView() {

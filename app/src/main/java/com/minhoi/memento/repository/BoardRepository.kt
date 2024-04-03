@@ -8,6 +8,7 @@ import com.minhoi.memento.data.dto.MentoringApplyRequest
 import com.minhoi.memento.data.network.RetrofitClient
 import com.minhoi.memento.data.model.BoardType
 import com.minhoi.memento.data.network.service.BoardService
+import com.minhoi.memento.utils.safeFlow
 import kotlinx.coroutines.flow.Flow
 
 class BoardRepository {
@@ -28,4 +29,11 @@ class BoardRepository {
 
     suspend fun applyMentoring(boardId: Long, applyRequest: MentoringApplyRequest) = loggedInRetrofitClient.applyMentoring(boardId, applyRequest)
 
+    suspend fun executeBookmark(boardId: Long) = safeFlow {
+        loggedInRetrofitClient.bookmarkBoard(boardId)
+    }
+
+    suspend fun executeUnBookmark(boardId: Long) = safeFlow {
+        loggedInRetrofitClient.unBookmarkBoard(boardId)
+    }
 }
