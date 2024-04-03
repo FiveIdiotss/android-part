@@ -67,13 +67,4 @@ class ChatListFragment : BaseFragment<FragmentChatListBinding>() {
             }
         }
     }
-
-    private fun showLoading() {
-        progressDialog.show(requireActivity().supportFragmentManager, "progress")
-    }
-
-    private fun hideLoading() {
-        progressDialog.dismiss()
-    }
-
 }

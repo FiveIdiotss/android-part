@@ -1,5 +1,6 @@
 package com.minhoi.memento.data.network.service
 
+import com.minhoi.memento.data.dto.BoardContentDto
 import com.minhoi.memento.data.dto.MemberDTO
 import com.minhoi.memento.data.dto.MentoringApplyDto
 import com.minhoi.memento.data.model.BoardType
@@ -10,6 +11,7 @@ import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface MemberService {
     @GET("api/member/{memberId}")
@@ -21,6 +23,9 @@ interface MemberService {
 
     @POST("api/member/defaultImage")
     suspend fun setDefaultProfileImage(): Response<String>
+
+    @GET("api/boards/favorites")
+    suspend fun getBookmarkBoards(@Query("boardType") boardType: BoardType): Response<List<BoardContentDto>>
 
     @GET("api/memberBoards/{memberId}")
     suspend fun getMemberBoards(@Path("memberId") memberId: Long): Response<List<BoardContentDto>>

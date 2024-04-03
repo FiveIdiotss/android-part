@@ -11,7 +11,35 @@
         android:label="HomeFragment"
         tools:layout="@layout/fragment_home">
         <action
-            android:id="@+id/action_homeFragment_to_tempFragment2"
-            app:destination="@id/tempFragment2" />
+            android:id="@+id/action_homeFragment_to_mypageFragment"
+            app:destination="@id/mypageFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_chatListFragment"
+            app:destination="@id/chatListFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_chatListFragment2"
+            app:destination="@id/chatListFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/mypageFragment"
+        android:name="com.minhoi.memento.ui.mypage.MypageFragment"
+        android:label="MypageFragment" >
+        <action
+            android:id="@+id/action_mypageFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+        <action
+            android:id="@+id/action_mypageFragment_to_chatListFragment"
+            app:destination="@id/chatListFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/chatListFragment"
+        android:name="com.minhoi.memento.ui.chat.ChatListFragment"
+        android:label="ChatListFragment" >
+        <action
+            android:id="@+id/action_chatListFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+        <action
+            android:id="@+id/action_chatListFragment_to_mypageFragment"
+            app:destination="@id/mypageFragment" />
     </fragment>
 </navigation>

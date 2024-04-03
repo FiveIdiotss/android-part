@@ -24,7 +24,8 @@ class MyMentoringActivity : BaseActivity<ActivityMyMentoringBinding>() {
         MatchedMentoringAdapter {
             // 채팅 버튼 클릭시 상대방의 id를 ChatActivity로 전달
             startActivity(Intent(this, ChatActivity::class.java).apply {
-                putExtra("receiverId", it)
+                putExtra("receiverId", it.menteeMemberId)
+                putExtra("receiverName", it.menteeMemberName)
             })
         }
     }
@@ -46,7 +47,7 @@ class MyMentoringActivity : BaseActivity<ActivityMyMentoringBinding>() {
             lifecycleScope.launch {
                 val deferredList = matchedMentoringList.map { mentoringMatchInfo ->
                     async {
-                        val member = viewModel.getMemberInfo(mentoringMatchInfo.menteeMemberId)
+                        val member = viewModel.getOtherMemberInfo(mentoringMatchInfo.menteeMemberId)
                         mentoringMatchInfo to member
                     }
                 }

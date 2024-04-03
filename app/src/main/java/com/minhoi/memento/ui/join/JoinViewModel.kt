@@ -35,8 +35,7 @@ class JoinViewModel : ViewModel() {
     private var _school = MutableLiveData<String>()
     val school: LiveData<String> = _school
 
-    private var _year = MutableLiveData<String>()
-    val year: LiveData<String> = _year
+    var year = MutableLiveData<String>()
 
     private var _majorId = MutableLiveData<Int>()
     val majorId: LiveData<Int> = _majorId

@@ -8,7 +8,7 @@ import com.minhoi.memento.data.dto.MentoringMatchInfo
 import com.minhoi.memento.databinding.MatchedMentoringRowItemBinding
 import com.minhoi.memento.utils.setOnSingleClickListener
 
-class MatchedMentoringAdapter(private val onChatClickListener: (Long) -> Unit) : RecyclerView.Adapter<MatchedMentoringAdapter.ViewHolder>()   {
+class MatchedMentoringAdapter(private val onChatClickListener: (MentoringMatchInfo) -> Unit) : RecyclerView.Adapter<MatchedMentoringAdapter.ViewHolder>()   {
 
     private val matchedMentoringList = mutableListOf<Pair<MentoringMatchInfo, MemberDTO>>()
 
@@ -16,7 +16,7 @@ class MatchedMentoringAdapter(private val onChatClickListener: (Long) -> Unit) :
         // 채팅 버튼 클릭시 상대방의 id를 ChatActivity로 전달
         init {
             binding.chatBtn.setOnSingleClickListener {
-                onChatClickListener(matchedMentoringList[bindingAdapterPosition].first.menteeMemberId)
+                onChatClickListener(matchedMentoringList[bindingAdapterPosition].first)
             }
         }
 

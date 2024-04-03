@@ -3,6 +3,7 @@ package com.minhoi.memento.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.minhoi.memento.data.dto.BoardContentDto
 import com.minhoi.memento.data.dto.MentoringApplyDto
 import com.minhoi.memento.databinding.ApplyListRowItemBinding
 import com.minhoi.memento.data.model.ApplyStatus
@@ -28,7 +29,17 @@ class ApplyListAdapter(
         }
 
         fun bind(item: Pair<MentoringApplyDto, ApplyStatus>) {
-            binding.applyTitle.text = item.first.boardTitle
+            binding.board = BoardContentDto(
+                    item.first.boardId,
+                    item.first.memberName,
+                    item.first.boardTitle,
+                    item.first.schoolName,
+                    item.first.majorName,
+                0,
+                " ",
+                item.first.memberId
+            )
+
             when (item.second) {
                 ApplyStatus.ACCEPTANCE_PENDING -> {
                     binding.applyStatus.text = "승인 대기중"

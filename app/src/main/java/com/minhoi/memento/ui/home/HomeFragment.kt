@@ -25,7 +25,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                 putExtra("boardId", it.boardId)
             })
         }
-        binding.toMenteeBoard.setOnSingleClickListener {
+
+        binding.toMentorBoard.setOnSingleClickListener {
             startActivity(Intent(requireContext(), BoardListActivity::class.java))
         }
 
