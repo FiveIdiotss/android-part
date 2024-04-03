@@ -1,5 +1,6 @@
 package com.minhoi.memento.repository
 
+import com.minhoi.memento.data.dto.BoardContentDto
 import com.minhoi.memento.data.dto.MentoringMatchInfo
 import com.minhoi.memento.data.dto.MentoringReceivedDto
 import com.minhoi.memento.data.network.RetrofitClient
@@ -49,6 +50,15 @@ class MemberRepository {
 
     suspend fun setDefaultProfileImage() = safeFlow {
         memberService.setDefaultProfileImage()
+    }
+
+    suspend fun getBookmarkBoards(): Flow<ApiResult<List<BoardContentDto>>> = flow {
+        val response = memberService.getBookmarkBoards(BoardType.MENTEE)
+        if (response.isSuccessful) {
+            emit(ApiResult.Success(response.body() ?: throw Exception("BookmarkBoards is null")))
+        } else {
+            emit(ApiResult.Error(message = response.message()))
+        }
     }
 
     suspend fun getMemberBoards(memberId: Long) = safeFlow {
