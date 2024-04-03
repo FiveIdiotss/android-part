@@ -9,13 +9,24 @@ import com.minhoi.memento.data.dto.BoardContentDto
 import com.minhoi.memento.databinding.BoardRowItemBinding
 import com.minhoi.memento.utils.setOnSingleClickListener
 
-class BoardAdapter(private val onItemClickListener: (BoardContentDto) -> Unit) :
+class BoardAdapter(
+    private val onItemClickListener: (BoardContentDto) -> Unit,
+    private val onBookmarkClickListener: (BoardContentDto) -> Unit
+) :
     PagingDataAdapter<BoardContentDto, BoardAdapter.BoardViewHolder>(BoardContentDtoDiffCallback()) {
 
     inner class BoardViewHolder(private val binding: BoardRowItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(item: BoardContentDto) {
             binding.board = item
+            when (item.isBookmarked) {
+                true -> binding.bookmarkBtn.setImageResource(com.minhoi.memento.R.drawable.heart_filled)
+                false -> binding.bookmarkBtn.setImageResource(com.minhoi.memento.R.drawable.heart_empty)
+            }
+            binding.bookmarkBtn.setOnSingleClickListener {
+                onBookmarkClickListener(item)
+
+            }
             binding.root.setOnSingleClickListener {
                 onItemClickListener(item)
             }
@@ -43,6 +54,14 @@ class BoardAdapter(private val onItemClickListener: (BoardContentDto) -> Unit) :
             newItem: BoardContentDto
         ): Boolean {
             return oldItem == newItem
+        }
+    }
+
+    fun modify(id: Long) {
+        val currentList = snapshot().toMutableList()
+        val index = currentList.indexOfFirst { it?.boardId == id }
+        if (index != -1) {
+            currentList[index]?.isBookmarked = !currentList[index]?.isBookmarked!!
         }
     }
 }

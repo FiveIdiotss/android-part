@@ -36,6 +36,12 @@ class BoardViewModel() : ViewModel() {
     private val _isAvailableDay = MutableLiveData<Boolean>()
     val isAvailableDay: LiveData<Boolean> = _isAvailableDay
 
+    private val _bookmarkState = MutableStateFlow<UiState<Long>>(UiState.Empty)
+    val bookmarkState: StateFlow<UiState<Long>> = _bookmarkState.asStateFlow()
+
+    private val _unBookmarkState = MutableStateFlow<UiState<Boolean>>(UiState.Empty)
+    val unBookmarkState: StateFlow<UiState<Boolean>> = _unBookmarkState.asStateFlow()
+
     private var selectedDate: String = ""
     private var selectedTime: String = ""
 
@@ -100,6 +106,42 @@ class BoardViewModel() : ViewModel() {
             else {
                 // 실패 처리
                 Log.d("APPLYMENTORING", "applyMentoring: 실패 ${response.code()}")
+            }
+        }
+    }
+
+    fun executeBookmark(boardId: Long, isBookmarked: Boolean) {
+        viewModelScope.launch {
+            Log.d("executeBookmark", "executeBookmark: Started $boardId + $isBookmarked")
+            _bookmarkState.update { UiState.Loading }
+            if (!isBookmarked) {
+                boardRepository.executeBookmark(boardId).collectLatest {
+                    it.handleResponse(
+                        onSuccess = {
+                            _bookmarkState.update { UiState.Success(boardId) }
+                            Log.d("BOOKMARK", "bookmark: 성공")
+                        },
+                        onError = {
+                            _bookmarkState.update { UiState.Error(Throwable(it.toString()))}
+                            Log.d("BOOKMARK", "bookmark: 실패")
+
+                        }
+                    )
+                }
+            }
+            else {
+                boardRepository.executeUnBookmark(boardId).collectLatest {
+                    it.handleResponse(
+                        onSuccess = {
+                            _unBookmarkState.update { UiState.Success(false) }
+                            Log.d("BOOKMARK", "unbookmark: 성공")
+                        },
+                        onError = {
+                            _unBookmarkState.update { UiState.Error(Throwable(it.toString()))}
+                            Log.d("BOOKMARK", "bookmark: 실패")
+                        }
+                    )
+                }
             }
         }
     }
