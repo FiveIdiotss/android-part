@@ -52,12 +52,18 @@ fun <T> safeFlow(apiFunc: suspend () -> Response<T>): Flow<ApiResult<T>> = flow 
         if (response.isSuccessful) {
             val body = response.body() ?: throw NullPointerException("Response body is null")
             emit(ApiResult.Success(body))
+        } else {
+            throw HttpException(response)
         }
     } catch (e: NullPointerException) {
-        emit(ApiResult.Empty)
+        emit(ApiResult.Error(e, e.message))
     } catch (e: HttpException) {
-        emit(ApiResult.Error(e))
-    } catch (e: Exception) {
+        emit(ApiResult.Error(e, e.message))
+    }
+    catch (e: SocketTimeoutException) {
+        emit(ApiResult.Error(e, "네트워크 오류가 발생했습니다. 다시 시도해 주세요."))
+    }
+    catch (e: Exception) {
         emit(ApiResult.Error(e, e.message))
     }
 }
