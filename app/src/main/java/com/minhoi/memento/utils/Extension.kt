@@ -1,11 +1,58 @@
 package com.minhoi.memento.utils
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Point
 import android.os.Build
 import android.view.View
 import android.view.WindowManager
+import android.widget.NumberPicker
+import android.widget.TimePicker
+import android.widget.Toast
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.FragmentManager
+import com.minhoi.memento.data.network.ApiResult
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import retrofit2.HttpException
+import retrofit2.Response
+import java.net.SocketTimeoutException
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.Locale
+
+const val DEFAULT_INTERVAL = 5
+const val MINUTES_MIN = 0
+const val MINUTES_MAX = 60
+
+@SuppressLint("PrivateApi")
+fun TimePicker.setTimeInterval(
+    timeInterval: Int = DEFAULT_INTERVAL
+) {
+    try {
+        val classForId = Class.forName("com.android.internal.R\$id")
+        val fieldId = classForId.getField("minute").getInt(null)
+
+        (this.findViewById(fieldId) as NumberPicker).apply {
+            minValue = MINUTES_MIN
+            maxValue = MINUTES_MAX / timeInterval - 1
+            displayedValues = getDisplayedValue(timeInterval)
+            wrapSelectorWheel = false
+        }
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
+}
+
+private fun getDisplayedValue(
+    timeInterval: Int = DEFAULT_INTERVAL
+): Array<String> {
+    val minutesArray = ArrayList<String>()
+    for (i in 0 until MINUTES_MAX step timeInterval) {
+        minutesArray.add(String.format("%02d", i))
+    }
+    return minutesArray.toArray(arrayOf(""))
+}
 
 fun View.setOnSingleClickListener(onSingleClick: (View) -> Unit) {
     val singleClickListener = OnSingleClickListener { onSingleClick(it) }
