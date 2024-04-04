@@ -12,8 +12,9 @@ import com.minhoi.memento.data.dto.MentoringReceivedDto
 import com.minhoi.memento.databinding.ActivityReceivedContentBinding
 import com.minhoi.memento.ui.UiState
 import com.minhoi.memento.ui.mypage.MypageViewModel
-import com.minhoi.memento.utils.ProgressDialog
+import com.minhoi.memento.utils.hideLoading
 import com.minhoi.memento.utils.setOnSingleClickListener
+import com.minhoi.memento.utils.showLoading
 import com.minhoi.memento.utils.showToast
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -21,7 +22,6 @@ import kotlinx.coroutines.launch
 class ReceivedContentActivity : BaseActivity<ActivityReceivedContentBinding>() {
     override val layoutResourceId: Int = R.layout.activity_received_content
     private val viewModel: MypageViewModel by viewModels()
-    private var progressDialog: ProgressDialog? = null
 
     override fun initView() {
         val intent = intent
@@ -32,7 +32,12 @@ class ReceivedContentActivity : BaseActivity<ActivityReceivedContentBinding>() {
             intent.getParcelableExtra("receivedDto") as? MentoringReceivedDto
         }
 
-        binding.receivedDto = receivedContent
+        if (receivedContent != null) {
+            binding.receivedDto = receivedContent
+            viewModel.getApplyInfo(receivedContent.applyId)
+        } else {
+            showToast("일시적인 오류가 발생하였습니다. 다시 시도해주세요")
+        }
 
         // 신청서 상태에 따라 버튼 노출
         when (receivedContent?.applyState) {
@@ -58,6 +63,7 @@ class ReceivedContentActivity : BaseActivity<ActivityReceivedContentBinding>() {
 
         observeAcceptState()
         observeRejectState()
+        observeApplyContent()
     }
 
     private fun observeAcceptState() {
@@ -80,6 +86,29 @@ class ReceivedContentActivity : BaseActivity<ActivityReceivedContentBinding>() {
         }
     }
 
+    private fun observeApplyContent() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.applyContent.collectLatest {
+                    when (it) {
+                        is UiState.Empty -> {}
+                        is UiState.Loading -> {
+                            supportFragmentManager.showLoading()
+                        }
+                        is UiState.Success -> {
+                            supportFragmentManager.hideLoading()
+                            binding.applyInfo = it.data
+                        }
+                        is UiState.Error -> {
+                            supportFragmentManager.hideLoading()
+                            showToast(it.error?.message.toString())
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     private fun branchState(state: UiState<Boolean>) {
         when (state) {
             // do nothing
@@ -87,17 +116,14 @@ class ReceivedContentActivity : BaseActivity<ActivityReceivedContentBinding>() {
 
             is UiState.Success -> {
                 showToast("수락 완료")
-                progressDialog?.dismiss()
+                supportFragmentManager.hideLoading()
                 finish()
             }
-            // show progressbar
             is UiState.Loading -> {
-                progressDialog = ProgressDialog().apply {
-                    show(supportFragmentManager, tag)
-                }
+                supportFragmentManager.showLoading()
             }
             is UiState.Error -> {
-                progressDialog?.dismiss()
+                supportFragmentManager.hideLoading()
                 showToast("일시적인 오류가 발생하였습니다. 다시 시도해주세요")
                 finish()
             }
