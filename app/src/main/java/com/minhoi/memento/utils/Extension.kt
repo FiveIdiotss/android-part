@@ -13,7 +13,10 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import com.minhoi.memento.data.network.ApiResult
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import retrofit2.HttpException
 import retrofit2.Response
 import java.net.SocketTimeoutException
@@ -121,6 +124,15 @@ fun <T> safeFlow(apiFunc: suspend () -> Response<T>): Flow<ApiResult<T>> = flow 
     catch (e: Exception) {
         emit(ApiResult.Error(e, e.message))
     }
+}
+
+/*
+    * List를 생산하는 Flow에서 ApiResult가 Success일 경우 List를, 그 이외인 경우 null을 반환하는 함수(UiState에 반영하지 않고 사용할 때)
+ */
+suspend fun <T> Flow<ApiResult<List<T>>>.extractSuccess(): List<T>? {
+    return this.filter { it is ApiResult.Success }
+        .map { (it as ApiResult.Success).value }
+        .firstOrNull()
 }
 
 fun parseLocalDateTime(localDateTimeString: String): String {
