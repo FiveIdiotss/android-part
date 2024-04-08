@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-        <import type="android.view.View"/>
+        <import type="android.view.View" />
+
         <variable
             name="viewModel"
             type="com.minhoi.memento.ui.mypage.MypageViewModel" />
@@ -19,40 +20,46 @@
             android:id="@+id/requestTypeTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:gravity="center"
             android:layout_marginTop="10dp"
+            android:gravity="center"
             android:text="멘토링 신청 내역"
-            android:textSize="17dp"
             android:textColor="@color/black"
+            android:textSize="17dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <FrameLayout
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/applyListRv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="15dp" />
+
+        <LinearLayout
+            android:id="@+id/emptyApplyListLayout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/requestTypeTitle">
+            app:layout_constraintTop_toTopOf="parent">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/applyListRv"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_margin="15dp"/>
+            <ImageView
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_gravity="center"
+                android:src="@drawable/empty" />
 
             <TextView
                 android:id="@+id/emptyApplyList"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:gravity="center"
                 android:text="멘토링 신청 내역이 없습니다"
-                android:textSize="18dp"
-                android:visibility="gone"
-                android:layout_gravity="center"/>
-
-        </FrameLayout>
+                android:textSize="18dp"/>
+        </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
