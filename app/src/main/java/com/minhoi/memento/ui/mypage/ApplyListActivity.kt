@@ -60,13 +60,21 @@ class ApplyListActivity : BaseActivity<ActivityApplyListBinding>() {
             TYPE_RECEIVE -> {
                 viewModel.getBoardsWithReceivedMentoring()
                 binding.requestTypeTitle.text = RECEIVE_TITLE
-                receivedListAdapter = ReceivedListAdapter() {
-                    // onClickListener
-                    // 선택한 신청서 내용 Activity에 전달
-                    startActivity(Intent(this, ReceivedContentActivity::class.java).apply {
-                        putExtra("receivedDto", it)
-                    })
-                }
+                receivedListAdapter = ReceivedListAdapter(
+                    onBoardClickListener = {
+                        // 해당 글 id 전달
+                        startActivity(Intent(this, BoardActivity::class.java).apply {
+                            putExtra("boardId", it)
+                        })
+                    },
+                    onReceivedItemClickListener = {
+                        // 선택한 신청서 내용 Activity에 전달
+                        startActivity(Intent(this, ReceivedContentActivity::class.java).apply {
+                            Log.d("BoardActivity", "initView: $it")
+                            putExtra("receivedDto", it)
+                        })
+                    }
+                )
                 observeReceivedList()
             }
         }
@@ -85,9 +93,9 @@ class ApplyListActivity : BaseActivity<ActivityApplyListBinding>() {
     private fun observeApplyList() {
         viewModel.applyList.observe(this) {
             if (it.isNullOrEmpty()) {
-                binding.emptyApplyList.visibility = View.VISIBLE
+                binding.emptyApplyListLayout.visibility = View.VISIBLE
             } else {
-                binding.emptyApplyList.visibility = View.GONE
+                binding.emptyApplyListLayout.visibility = View.GONE
                 applyListAdapter.setList(it)
             }
         }
@@ -105,7 +113,12 @@ class ApplyListActivity : BaseActivity<ActivityApplyListBinding>() {
 
                         is UiState.Success -> {
                             supportFragmentManager.hideLoading()
-                            receivedListAdapter.setLists(it.data)
+                            if (it.data.isEmpty()) {
+                                binding.emptyApplyListLayout.visibility = View.VISIBLE
+                            } else {
+                                binding.emptyApplyListLayout.visibility = View.GONE
+                                receivedListAdapter.setList(it.data)
+                            }
                             Log.d("ApplyListActivity", "observeReceivedList: ${it.data}")
                         }
 
