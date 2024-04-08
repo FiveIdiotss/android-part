@@ -32,12 +32,13 @@
             bind:board="@{board}" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/receivedListLayout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/receivedBoardLayout">
+            app:layout_constraintTop_toBottomOf="@+id/applyListWithBoardRv">
 
 
             <TextView
@@ -52,6 +53,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
+                android:id="@+id/scrollBtn"
                 android:layout_width="25dp"
                 android:layout_height="25dp"
                 android:layout_margin="10dp"
@@ -60,5 +62,13 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/applyListWithBoardRv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/receivedBoardLayout" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
