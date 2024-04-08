@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.minhoi.memento.MentoApplication
 import com.minhoi.memento.data.dto.BoardContentDto
+import com.minhoi.memento.data.dto.BoardContentForReceived
 import com.minhoi.memento.data.dto.MemberDTO
 import com.minhoi.memento.data.dto.MentoringApplyDto
 import com.minhoi.memento.data.dto.MentoringMatchInfo
@@ -14,10 +15,10 @@ import com.minhoi.memento.data.dto.MentoringReceivedDto
 import com.minhoi.memento.repository.MemberRepository
 import com.minhoi.memento.ui.UiState
 import com.minhoi.memento.data.model.ApplyStatus
+import com.minhoi.memento.utils.extractSuccess
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -34,8 +35,9 @@ class MypageViewModel : ViewModel() {
     private val _applyContent = MutableStateFlow<UiState<MentoringApplyDto>>(UiState.Empty)
     val applyContent: StateFlow<UiState<MentoringApplyDto>> = _applyContent.asStateFlow()
 
-    private val _receivedList = MutableLiveData<List<MentoringReceivedDto>>()
-    val receivedList: LiveData<List<MentoringReceivedDto>> = _receivedList
+    private val _boardsWithReceivedMentoring = MutableStateFlow<UiState<List<Map<BoardContentForReceived, List<MentoringReceivedDto>>>>>(UiState.Empty)
+    val boardsWithReceivedMentoring: StateFlow<UiState<List<Map<BoardContentForReceived, List<MentoringReceivedDto>>>>> =
+        _boardsWithReceivedMentoring.asStateFlow()
 
     private val _acceptState = MutableStateFlow<UiState<Boolean>>(UiState.Empty)
     val acceptState: StateFlow<UiState<Boolean>> = _acceptState.asStateFlow()
@@ -102,21 +104,6 @@ class MypageViewModel : ViewModel() {
                         _applyContent.update { UiState.Error(Throwable(errorMsg)) }
                     }
                 )
-            }
-        }
-    }
-
-    fun getReceivedList() {
-        viewModelScope.launch {
-            member.let { member ->
-                memberRepository.getReceivedList(member.id)
-                    .catch { e ->
-                        Log.d("ReceivedList", "getReceivedListFailed: ${e.message}")
-                    }
-                    .collectLatest {
-                        _receivedList.value = it
-                        Log.d("ReceivedList", "getReceivedListSuccess: $it")
-                    }
             }
         }
     }
@@ -219,6 +206,42 @@ class MypageViewModel : ViewModel() {
                     )
                 }
             }
+        }
+    }
+
+    fun getBoardsWithReceivedMentoring() {
+        viewModelScope.launch {
+            // loading
+            _boardsWithReceivedMentoring.update { UiState.Loading }
+            val memberBoards = memberRepository.getMemberBoards(member.id).extractSuccess().map {
+                Log.d("MypageVIewmodel", "memberBoards = $it")
+                BoardContentForReceived(
+                    it.boardId,
+                    it.memberName,
+                    it.title,
+                    it.school,
+                    it.major,
+                    it.year,
+                    it.introduction,
+                    it.target,
+                    it.content,
+                    it.memberId,
+                    it.isBookmarked,
+                    false
+                )
+            }
+            val receivedList = memberRepository.getReceivedList(member.id).extractSuccess()
+            if (memberBoards == null || receivedList == null) {
+                _boardsWithReceivedMentoring.update { UiState.Error(Throwable()) }
+                return@launch
+            }
+            val boardsWithMentoringReceived =
+                mutableListOf<Map<BoardContentForReceived, List<MentoringReceivedDto>>>()
+            memberBoards.forEach {
+                val receivedContent = receivedList.filter { received -> received.boardId == it.boardId }
+                boardsWithMentoringReceived.add(mapOf(it to receivedContent))
+            }
+            _boardsWithReceivedMentoring.update { UiState.Success(boardsWithMentoringReceived) }
         }
     }
 }
