@@ -3,6 +3,7 @@ package com.minhoi.memento.repository
 import com.minhoi.memento.data.dto.BoardContentDto
 import com.minhoi.memento.data.dto.MentoringMatchInfo
 import com.minhoi.memento.data.dto.MentoringReceivedDto
+import com.minhoi.memento.data.model.ApplyStatus
 import com.minhoi.memento.data.network.RetrofitClient
 import com.minhoi.memento.data.model.BoardType
 import com.minhoi.memento.data.network.ApiResult
@@ -27,13 +28,8 @@ class MemberRepository {
     suspend fun getApplyInfo(applyId: Long) = safeFlow {
         memberService.getApplyInfo(applyId)
     }
-    suspend fun getReceivedList(memberId: Long): Flow<List<MentoringReceivedDto>> = flow {
-        val response = matchingService.getReceived(memberId, "RECEIVE")
-        if (response.isSuccessful) {
-            emit(response.body() ?: throw Exception("ReceivedList is null"))
-        } else {
-            throw Exception("Network error: ${response.code()}")
-        }
+    suspend fun getReceivedList(memberId: Long) = safeFlow {
+        matchingService.getReceived(memberId, "RECEIVE")
     }
 
     suspend fun getMatchedMentoringInfo(memberId: Long): Flow<ApiResult<List<MentoringMatchInfo>>> = safeFlow {
@@ -62,6 +58,6 @@ class MemberRepository {
     }
 
     suspend fun getMemberBoards(memberId: Long) = safeFlow {
-        memberService.getMemberBoards(memberId)
+        memberService.getMemberBoards(memberId, BoardType.MENTEE)
     }
 }
