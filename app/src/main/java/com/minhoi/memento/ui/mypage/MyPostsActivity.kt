@@ -1,6 +1,8 @@
 package com.minhoi.memento.ui.mypage
 
 import android.content.Intent
+import android.util.Log
+import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -34,11 +36,17 @@ class MyPostsActivity : BaseActivity<ActivityMyPostsBinding>() {
 
     override fun initView() {
         viewModel.getMemberBoards()
-
+        binding.toolbar.apply {
+            setTitle("내가 작성한 게시글")
+        }
+        setSupportActionBar(binding.toolbar)
+        supportActionBar?.apply {
+            setDisplayHomeAsUpEnabled(true)
+            setDisplayShowTitleEnabled(false)
+        }
         binding.myPostsRv.apply {
             adapter = myPostsAdapter
             layoutManager = LinearLayoutManager(this@MyPostsActivity, LinearLayoutManager.VERTICAL, false)
-            setHasFixedSize(true)
         }
 
         lifecycleScope.launch {
@@ -61,5 +69,14 @@ class MyPostsActivity : BaseActivity<ActivityMyPostsBinding>() {
                 }
             }
         }
+    }
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> {
+                finish()
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 }

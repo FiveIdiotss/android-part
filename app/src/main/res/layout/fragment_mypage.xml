@@ -131,7 +131,7 @@
             app:layout_constraintTop_toBottomOf="@+id/myMentorBtn" />
 
         <TextView
-            android:id="@+id/textView21"
+            android:id="@+id/myPostsBtn"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
@@ -149,7 +149,7 @@
             android:textSize="18dp"
             android:layout_marginTop="25dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView21" />
+            app:layout_constraintTop_toBottomOf="@+id/myPostsBtn" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

@@ -2,6 +2,7 @@ package com.minhoi.memento.ui.mypage
 
 import android.content.Intent
 import android.util.Log
+import android.view.MenuItem
 import android.view.View
 import androidx.activity.viewModels
 import androidx.lifecycle.Lifecycle
@@ -33,11 +34,15 @@ class ApplyListActivity : BaseActivity<ActivityApplyListBinding>() {
         val intent = intent
         // apply or receive
         requestType = intent.getStringExtra("requestType")!!
-
+        setSupportActionBar(binding.toolbar)
+        supportActionBar?.apply {
+            setDisplayShowTitleEnabled(false)
+            setDisplayHomeAsUpEnabled(true)
+        }
         when (requestType) {
             TYPE_APPLY -> {
+                binding.toolbarText.text = APPLY_TITLE
                 viewModel.getApplyList()
-                binding.requestTypeTitle.text = APPLY_TITLE
                 applyListAdapter = ApplyListAdapter(
                     onBoardClickListener = {
                         // onClickListener
@@ -58,8 +63,8 @@ class ApplyListActivity : BaseActivity<ActivityApplyListBinding>() {
             }
 
             TYPE_RECEIVE -> {
+                binding.toolbarText.text = RECEIVE_TITLE
                 viewModel.getBoardsWithReceivedMentoring()
-                binding.requestTypeTitle.text = RECEIVE_TITLE
                 receivedListAdapter = ReceivedListAdapter(
                     onBoardClickListener = {
                         // 해당 글 id 전달
@@ -79,7 +84,6 @@ class ApplyListActivity : BaseActivity<ActivityApplyListBinding>() {
             }
         }
 
-
         binding.applyListRv.apply {
             when(requestType) {
                 TYPE_APPLY -> adapter = applyListAdapter
@@ -88,6 +92,16 @@ class ApplyListActivity : BaseActivity<ActivityApplyListBinding>() {
             layoutManager = LinearLayoutManager(this@ApplyListActivity, LinearLayoutManager.VERTICAL, false)
         }
 
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> {
+                finish()
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     private fun observeApplyList() {

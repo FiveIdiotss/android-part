@@ -36,8 +36,7 @@ class MyPostsAdapter(
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        holder as ViewHolder
-        holder.bind(getItem(position))
+        (holder as ViewHolder).bind(getItem(position))
     }
 
     class DiffCallback : DiffUtil.ItemCallback<BoardContentDto>() {

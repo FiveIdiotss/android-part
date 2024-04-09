@@ -36,6 +36,9 @@ class MypageFragment : BaseFragment<FragmentMypageBinding>() {
             myMentorBtn.setOnSingleClickListener {
                 startActivity(Intent(requireContext(), MyMentoringActivity::class.java))
             }
+            myPostsBtn.setOnSingleClickListener {
+                startActivity(Intent(requireContext(), MyPostsActivity::class.java))
+            }
         }
     }
 

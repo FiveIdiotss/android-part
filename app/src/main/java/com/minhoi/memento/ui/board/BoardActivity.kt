@@ -1,5 +1,7 @@
 package com.minhoi.memento.ui.board
 
+import android.content.Intent
+import android.view.MenuItem
 import androidx.activity.viewModels
 import com.minhoi.memento.R
 import com.minhoi.memento.base.BaseActivity
@@ -13,12 +15,29 @@ class BoardActivity : BaseActivity<ActivityBoardBinding>() {
     override fun initView() {
         val boardId = intent.getLongExtra("boardId", -1L)
         getBoardContent(boardId)
+        setSupportActionBar(binding.toolbar)
+        supportActionBar?.apply {
+            setDisplayHomeAsUpEnabled(true)
+            setDisplayShowTitleEnabled(false)
+        }
 
         binding.mentorApplyBtn.setOnSingleClickListener {
             // 멘토링 신청 Dialog Show
-            val bottomSheetDialog = MentoringApplyBottomSheetDialog()
-            bottomSheetDialog.show(supportFragmentManager, bottomSheetDialog.tag)
+//            val bottomSheetDialog = MentoringApplyBottomSheetDialog()
+//            bottomSheetDialog.show(supportFragmentManager, bottomSheetDialog.tag)
+            startActivity(Intent(this, ApplyMentoringActivity::class.java))
         }
+        observeBoardContent()
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> {
+                finish()
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     private fun getBoardContent(boardId: Long) {
@@ -28,6 +47,12 @@ class BoardActivity : BaseActivity<ActivityBoardBinding>() {
         else {
             // 오류 처리
             finish()
+        }
+    }
+
+    private fun observeBoardContent() {
+        viewModel.post.observe(this) {
+            binding.boardContent = it.boardDTO
         }
     }
 }
