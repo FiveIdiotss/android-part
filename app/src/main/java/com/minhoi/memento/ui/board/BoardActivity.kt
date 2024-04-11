@@ -51,8 +51,25 @@ class BoardActivity : BaseActivity<ActivityBoardBinding>() {
     }
 
     private fun observeBoardContent() {
-        viewModel.post.observe(this) {
-            binding.boardContent = it.boardDTO
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.boardContent.collectLatest {
+                    when (it) {
+                        is UiState.Empty -> {}
+                        is UiState.Loading -> {
+                            supportFragmentManager.showLoading()
+                        }
+                        is UiState.Success -> {
+                            supportFragmentManager.hideLoading()
+                            binding.boardContent = it.data
+                        }
+                        is UiState.Error -> {
+                            supportFragmentManager.hideLoading()
+                            showToast(it.error!!.message!!)
+                        }
+                    }
+                }
+            }
         }
     }
 }
