@@ -16,6 +16,7 @@ import com.minhoi.memento.data.model.DayOfWeek
 import com.minhoi.memento.data.network.ApiResult
 import com.minhoi.memento.repository.MemberRepository
 import com.minhoi.memento.ui.UiState
+import com.minhoi.memento.utils.extractSuccess
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -31,6 +32,9 @@ class BoardViewModel() : ViewModel() {
     private val _post = MutableLiveData<BoardContentResponse>()
     val post: LiveData<BoardContentResponse> = _post
 
+    private val _boardContent = MutableStateFlow<UiState<BoardContentDto>>(UiState.Loading)
+    val boardContent: StateFlow<UiState<BoardContentDto>> = _boardContent.asStateFlow()
+
     private val _boardList = MutableStateFlow<UiState<PagingData<BoardContentDto>>>(UiState.Empty)
     val boardList: StateFlow<UiState<PagingData<BoardContentDto>>> = _boardList.asStateFlow()
     private val _isAvailableDay = MutableLiveData<Boolean>()
@@ -42,11 +46,15 @@ class BoardViewModel() : ViewModel() {
     private val _unBookmarkState = MutableStateFlow<UiState<Boolean>>(UiState.Empty)
     val unBookmarkState: StateFlow<UiState<Boolean>> = _unBookmarkState.asStateFlow()
 
+    private val _boardBookmarkState = MutableLiveData<Boolean>()
+    val boardBookmarkState: LiveData<Boolean> = _boardBookmarkState
+
     private var selectedDate: String = ""
     private var selectedTime: String = ""
 
     init {
         _isAvailableDay.value = false
+        _boardBookmarkState.value = false
         getBoardStream()
     }
 
@@ -77,9 +85,23 @@ class BoardViewModel() : ViewModel() {
 
     fun getBoardContent(boardId: Long) {
         viewModelScope.launch {
-            val response = boardRepository.getBoardContent(boardId)
-            if (response.isSuccessful) {
-                _post.value = response.body()
+            val bookmarkBoards = memberRepository.getBookmarkBoards().extractSuccess()
+            boardRepository.getBoardContent(boardId).collectLatest {
+                it.handleResponse(
+                    onSuccess = { response ->
+                        _post.value = response
+                        val isBookmarked = bookmarkBoards.any { bookmarkBoard ->
+                            bookmarkBoard.boardId == response.boardDTO.boardId
+                        }
+                        _boardBookmarkState.value = isBookmarked
+                        // bookmarkState 업데이트
+                        val boardContent = response.boardDTO.copy(isBookmarked = isBookmarked)
+                        _boardContent.update { UiState.Success(boardContent) }
+                    },
+                    onError = { errorMsg ->
+                        _boardContent.update { UiState.Error(Throwable(errorMsg))}
+                    }
+                )
             }
         }
     }
@@ -119,6 +141,7 @@ class BoardViewModel() : ViewModel() {
                     it.handleResponse(
                         onSuccess = {
                             _bookmarkState.update { UiState.Success(boardId) }
+                            _boardBookmarkState.value = !_boardBookmarkState.value!!
                             Log.d("BOOKMARK", "bookmark: 성공")
                         },
                         onError = {
@@ -134,6 +157,7 @@ class BoardViewModel() : ViewModel() {
                     it.handleResponse(
                         onSuccess = {
                             _unBookmarkState.update { UiState.Success(false) }
+                            _boardBookmarkState.value = !_boardBookmarkState.value!!
                             Log.d("BOOKMARK", "unbookmark: 성공")
                         },
                         onError = {
