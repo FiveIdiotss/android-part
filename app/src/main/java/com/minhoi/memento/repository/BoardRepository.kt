@@ -25,7 +25,9 @@ class BoardRepository {
         ).flow
     }
 
-    suspend fun getBoardContent(boardId: Long) = retrofitClient.getBoardContent(boardId)
+    suspend fun getBoardContent(boardId: Long) = safeFlow {
+        retrofitClient.getBoardContent(boardId)
+    }
 
     suspend fun applyMentoring(boardId: Long, applyRequest: MentoringApplyRequest) = loggedInRetrofitClient.applyMentoring(boardId, applyRequest)
 
