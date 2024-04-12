@@ -4,4 +4,4 @@
     <item android:state_checked="true" android:color="#6554BD" />
     <!-- 클릭하지 않은 경우 -->
     <item android:state_checked="false" android:color="@color/black" />
-</selector><?xml version="1.0" encoding="utf-8"?>
+</selector>
