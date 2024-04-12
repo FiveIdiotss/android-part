@@ -1,10 +1,13 @@
 package com.minhoi.memento.ui.board
 
 import android.content.Intent
+import android.graphics.Color
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
+import androidx.core.widget.NestedScrollView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -26,6 +29,7 @@ class BoardActivity : BaseActivity<ActivityBoardBinding>() {
 
     override fun initView() {
         boardId = intent.getLongExtra("boardId", -1L)
+        binding.viewModel = viewModel
         getBoardContent(boardId)
         setSupportActionBar(binding.toolbar)
         supportActionBar?.apply {
@@ -39,6 +43,7 @@ class BoardActivity : BaseActivity<ActivityBoardBinding>() {
 //            bottomSheetDialog.show(supportFragmentManager, bottomSheetDialog.tag)
             startActivity(Intent(this, ApplyMentoringActivity::class.java))
         }
+        initScrollViewListener()
         observeBoardContent()
         observeBookmarkState()
     }
@@ -93,6 +98,37 @@ class BoardActivity : BaseActivity<ActivityBoardBinding>() {
             }
         }
     }
+    private fun initScrollViewListener() {
+        binding.boardScrollView.setOnScrollChangeListener(NestedScrollView.OnScrollChangeListener { v, _, scrollY, _, _ ->
+            val scrollBounds = IntArray(2)
+            v.getLocationOnScreen(scrollBounds)
+            val scrollViewTop = scrollBounds[1]
+            val scrollViewBottom = scrollViewTop + v.height
+
+            binding.boardImage.getLocationOnScreen(scrollBounds)
+            val imageViewTop = scrollBounds[1]
+            val imageViewBottom = imageViewTop + binding.boardImage.height
+
+            if (imageViewBottom > scrollViewTop && imageViewTop < scrollViewBottom) {
+                // ImageView가 ScrollView 내에 보이는 경우
+                val visiblePart = Math.min(imageViewBottom, scrollViewBottom) - Math.max(imageViewTop, scrollViewTop)
+                val totalHeight = imageViewBottom - imageViewTop
+                val percentageVisible = visiblePart.toFloat() / totalHeight.toFloat()
+                val alpha = (percentageVisible * 255).toInt().coerceIn(0, 255)
+                binding.toolbar.setBackgroundColor(Color.argb(alpha, 255, 255, 255))
+            } else if (imageViewTop >= scrollViewBottom) {
+                // ImageView가 아직 ScrollView 내에 보이지 않는 경우 (아래에 위치)
+                binding.toolbar.setBackgroundColor(Color.TRANSPARENT)
+            } else if (scrollY < imageViewTop - scrollViewTop) {
+                // 사용자가 최상단으로 스크롤 했을 때 (ImageView 위로)
+                binding.toolbar.setBackgroundColor(Color.TRANSPARENT)
+            } else {
+                // ImageView가 ScrollView를 넘어간 경우
+                binding.toolbar.setBackgroundColor(Color.WHITE)
+            }
+        })
+    }
+
     private fun observeBookmarkState() {
         viewModel.boardBookmarkState.observe(this) { state ->
             if (state) {
