@@ -54,7 +54,6 @@ class BoardViewModel() : ViewModel() {
 
     init {
         _isAvailableDay.value = false
-        _boardBookmarkState.value = false
         getBoardStream()
     }
 
@@ -114,8 +113,12 @@ class BoardViewModel() : ViewModel() {
         val selectedDay = DayOfWeek.getDayOfWeek(year, month, day)
         selectedDate = LocalDate.of(year, month+1, day).toString()
         selectedTime = ""
-        _isAvailableDay.value = post.value?.availableDays!!.contains(selectedDay)
+        val isAvailable = post.value?.availableDays?.contains(selectedDay) ?: false
+        _isAvailableDay.value = isAvailable
     }
+
+    fun getSelectedTime() = selectedTime
+    fun getSelectedDate() = selectedDate
 
     fun applyMentoring() {
         viewModelScope.launch {
