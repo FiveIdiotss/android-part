@@ -25,9 +25,17 @@ class ApplyMentoringActivity : BaseActivity<ActivityApplyMentoringBinding>() {
         viewModel.getBoardContent(boardId)
     }
 
+    override fun onSupportNavigateUp(): Boolean {
+        if (supportFragmentManager.popBackStackImmediate()) {
+            return true
+        }
+        finish()
+        return super.onSupportNavigateUp()
+    }
+
     /*
-        NavHostFragment와 toolbar를 연결하는 함수 (모든 Fragment에 뒤로가기 버튼 구성)
-     */
+       NavHostFragment와 toolbar를 연결하는 함수 (모든 Fragment에 뒤로가기 버튼 구성)
+    */
     private fun setUpNavController() {
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.apply_nav_host_fragment) as NavHostFragment
