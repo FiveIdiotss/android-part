@@ -13,16 +13,16 @@ import java.time.format.DateTimeFormatter
 
 class ApplySelectDateFragment : BaseFragment<FragmentApplySelectDateBinding>() {
     override val layoutResourceId: Int = R.layout.fragment_apply_select_date
-    private val viewModel = ViewModelProvider(requireActivity())[BoardViewModel::class.java]
-
+    private lateinit var viewModel: BoardViewModel
     private lateinit var timeTableAdapter: SelectTimeTableAdapter
+
     override fun initView() {
+        viewModel = ViewModelProvider(requireActivity())[BoardViewModel::class.java]
         binding.viewModel = viewModel
         timeTableAdapter = SelectTimeTableAdapter {
             // onSelectListener
             viewModel.setSelectedTime(it)
         }
-
 
         binding.timeTableRv.apply {
             adapter = timeTableAdapter

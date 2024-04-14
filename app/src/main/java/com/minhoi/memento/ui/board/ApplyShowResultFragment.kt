@@ -12,9 +12,9 @@ import com.minhoi.memento.databinding.FragmentApplyShowResultBinding
 
 class ApplyShowResultFragment : BaseFragment<FragmentApplyShowResultBinding>() {
     override val layoutResourceId: Int = R.layout.fragment_apply_show_result
-    private val viewModel = ViewModelProvider(requireActivity())[BoardViewModel::class.java]
+    private lateinit var viewModel: BoardViewModel
 
     override fun initView() {
-
+        viewModel = ViewModelProvider(requireActivity())[BoardViewModel::class.java]
     }
 }
