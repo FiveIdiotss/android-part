@@ -38,9 +38,7 @@ class BoardActivity : BaseActivity<ActivityBoardBinding>() {
         }
 
         binding.mentorApplyBtn.setOnSingleClickListener {
-            // 멘토링 신청 Dialog Show
-            val bottomSheetDialog = MentoringApplyBottomSheetDialog()
-//            bottomSheetDialog.show(supportFragmentManager, bottomSheetDialog.tag)
+            // 멘토링 신청 Activity로 전환
             startActivity(Intent(this, ApplyMentoringActivity::class.java).apply {
                 putExtra("boardId", viewModel.post.value?.boardDTO?.boardId)
             })
