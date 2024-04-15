@@ -4,8 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/applyMentoringLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        tools:context=".ui.board.ApplyMentoringActivity">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/applyToolbar"

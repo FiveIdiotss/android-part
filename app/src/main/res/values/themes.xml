@@ -3,6 +3,7 @@
     <style name="Base.Theme.Memento" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="actionBarSize">@dimen/default_action_bar_size</item>
     </style>
 
     <style name="Circle" parent="">
@@ -18,6 +19,5 @@
         parent="Widget.Design.BottomSheet.Modal">
         <item name="android:background">@drawable/white_round_top_border_15</item>
     </style>
-
 
 </resources>
