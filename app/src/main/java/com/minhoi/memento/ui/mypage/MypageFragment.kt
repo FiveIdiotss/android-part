@@ -39,6 +39,9 @@ class MypageFragment : BaseFragment<FragmentMypageBinding>() {
             myPostsBtn.setOnSingleClickListener {
                 startActivity(Intent(requireContext(), MyPostsActivity::class.java))
             }
+            bookmarkBoardsBtn.setOnSingleClickListener {
+                startActivity(Intent(requireContext(), BookmarkBoardListActivity::class.java))
+            }
         }
     }
 
