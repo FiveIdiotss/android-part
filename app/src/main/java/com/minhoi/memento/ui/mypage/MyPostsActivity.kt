@@ -1,12 +1,8 @@
 package com.minhoi.memento.ui.mypage
 
 import android.content.Intent
-import android.util.Log
 import android.view.MenuItem
 import androidx.activity.viewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.minhoi.memento.R
 import com.minhoi.memento.adapter.MyPostsAdapter
@@ -23,16 +19,21 @@ import kotlinx.coroutines.launch
 class MyPostsActivity : BaseActivity<ActivityMyPostsBinding>() {
     override val layoutResourceId: Int = R.layout.activity_my_posts
     private val viewModel by viewModels<MypageViewModel>()
-    private val myPostsAdapter: MyPostsAdapter by lazy { MyPostsAdapter(
-        onBookmarkClickListener = {
-
-        },
-        onItemClickListener = {
-            startActivity(Intent(this, BoardActivity::class.java).apply {
-                putExtra("boardId", it)
-            })
-        },
-    ) }
+    private val myPostsAdapter: MyPostsAdapter by lazy {
+        MyPostsAdapter(
+            onItemClickListener = {
+                startActivity(Intent(this, BoardActivity::class.java).apply {
+                    putExtra("boardId", it)
+                })
+            },
+            onBookmarkClickListener = { boardContent, position ->
+                viewModel.executeBookmarkInList(boardContent.boardId, boardContent.isBookmarked)
+                val s = myPostsAdapter.currentList.toMutableList()
+                s.set(position, boardContent.copy(isBookmarked = !boardContent.isBookmarked))
+                myPostsAdapter.submitList(s)
+            }
+        )
+    }
 
     override fun initView() {
         viewModel.getMemberBoards()
@@ -70,6 +71,7 @@ class MyPostsActivity : BaseActivity<ActivityMyPostsBinding>() {
             }
         }
     }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
