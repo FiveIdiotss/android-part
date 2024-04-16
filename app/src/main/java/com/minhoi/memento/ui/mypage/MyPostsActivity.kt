@@ -13,8 +13,6 @@ import com.minhoi.memento.ui.board.BoardActivity
 import com.minhoi.memento.utils.hideLoading
 import com.minhoi.memento.utils.showLoading
 import com.minhoi.memento.utils.showToast
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 
 class MyPostsActivity : BaseActivity<ActivityMyPostsBinding>() {
     override val layoutResourceId: Int = R.layout.activity_my_posts
@@ -37,38 +35,38 @@ class MyPostsActivity : BaseActivity<ActivityMyPostsBinding>() {
 
     override fun initView() {
         viewModel.getMemberBoards()
-        binding.toolbar.apply {
-            setTitle("내가 작성한 게시글")
-        }
-        setSupportActionBar(binding.toolbar)
-        supportActionBar?.apply {
-            setDisplayHomeAsUpEnabled(true)
-            setDisplayShowTitleEnabled(false)
-        }
+        setUpToolbar()
+
         binding.myPostsRv.apply {
             adapter = myPostsAdapter
             layoutManager = LinearLayoutManager(this@MyPostsActivity, LinearLayoutManager.VERTICAL, false)
         }
 
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.memberBoards.collectLatest { state ->
-                    when (state) {
-                        UiState.Empty -> {}
-                        is UiState.Loading -> {
-                            supportFragmentManager.showLoading()
-                        }
-                        is UiState.Success -> {
-                            supportFragmentManager.hideLoading()
-                            myPostsAdapter.submitList(state.data)
-                        }
-                        is UiState.Error -> {
-                            supportFragmentManager.hideLoading()
-                            showToast(state.error?.message.toString())
-                        }
-                    }
+        viewModel.memberBoards.observe(this) { state ->
+            when (state) {
+                is UiState.Empty -> {}
+                is UiState.Loading -> {
+                    supportFragmentManager.showLoading()
+                }
+
+                is UiState.Success -> {
+                    supportFragmentManager.hideLoading()
+                    myPostsAdapter.submitList(state.data)
+                }
+
+                is UiState.Error -> {
+                    supportFragmentManager.hideLoading()
+                    showToast(state.error?.message.toString())
                 }
             }
+        }
+    }
+
+    private fun setUpToolbar() {
+        setSupportActionBar(binding.toolbar)
+        supportActionBar?.apply {
+            setDisplayHomeAsUpEnabled(true)
+            setDisplayShowTitleEnabled(false)
         }
     }
 

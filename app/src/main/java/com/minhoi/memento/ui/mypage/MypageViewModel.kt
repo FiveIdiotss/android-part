@@ -52,7 +52,11 @@ class MypageViewModel : ViewModel() {
     val imageUploadState: StateFlow<UiState<Boolean>> = _imageUploadState.asStateFlow()
 
     private val _memberBoards = MutableStateFlow<UiState<List<BoardContentDto>>>(UiState.Empty)
-    val memberBoards: StateFlow<UiState<List<BoardContentDto>>> = _memberBoards.asStateFlow()
+    val memberBoards: LiveData<UiState<List<BoardContentDto>>> = _memberBoards.asLiveData()
+
+    private val _bookmarkBoards = MutableStateFlow<UiState<List<BoardContentDto>>>(UiState.Empty)
+    val bookmarkBoards: LiveData<UiState<List<BoardContentDto>>> = _bookmarkBoards.asLiveData()
+
 
     suspend fun getOtherMemberInfo(memberId: Long): MemberDTO? {
         val response = memberRepository.getMemberInfo(memberId)
