@@ -11,7 +11,7 @@ import com.minhoi.memento.utils.setOnSingleClickListener
 
 class MyPostsAdapter(
     private val onItemClickListener: (Long) -> Unit,
-    private val onBookmarkClickListener: (BoardContentDto) -> Unit
+    private val onBookmarkClickListener: (BoardContentDto, Int) -> Unit
 ) : ListAdapter<BoardContentDto, RecyclerView.ViewHolder>(DiffCallback()) {
 
     inner class ViewHolder(private val binding: BoardRowItemBinding) :
@@ -21,12 +21,16 @@ class MyPostsAdapter(
                 onItemClickListener(getItem(bindingAdapterPosition).boardId)
             }
             binding.bookmarkBtn.setOnSingleClickListener {
-                onBookmarkClickListener(getItem(bindingAdapterPosition))
+                onBookmarkClickListener(getItem(bindingAdapterPosition), bindingAdapterPosition)
             }
         }
 
         fun bind(item: BoardContentDto) {
             binding.board = item
+            when (item.isBookmarked) {
+                true -> binding.bookmarkBtn.setImageResource(com.minhoi.memento.R.drawable.heart_filled)
+                false -> binding.bookmarkBtn.setImageResource(com.minhoi.memento.R.drawable.heart_empty)
+            }
         }
     }
 
