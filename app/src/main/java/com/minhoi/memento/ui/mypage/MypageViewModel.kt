@@ -259,4 +259,43 @@ class MypageViewModel : ViewModel() {
             _boardsWithReceivedMentoring.update { UiState.Success(boardsWithMentoringReceived) }
         }
     }
+
+    fun getBookmarkBoards() {
+        viewModelScope.launch {
+            _bookmarkBoards.update { UiState.Loading }
+            memberRepository.getBookmarkBoards().collectLatest {
+                it.handleResponse(
+                    onSuccess = { bookmarkBoards ->
+                        bookmarkBoards.map {
+                            it.isBookmarked = true
+                        }
+                        _bookmarkBoards.update { UiState.Success(bookmarkBoards) }
+                    },
+                    onError = { errorMsg ->
+                        _bookmarkBoards.update { UiState.Error(Throwable(errorMsg)) }
+                    }
+                )
+            }
+        }
+    }
+
+    fun executeBookmarkInList(boardId: Long, bookmarkState: Boolean) {
+        viewModelScope.launch {
+            val s = when (bookmarkState) {
+                true -> boardRepository.executeUnBookmark(boardId)
+                false -> boardRepository.executeBookmark(boardId)
+            }
+            s.collectLatest {
+                it.handleResponse(
+                    onSuccess = {
+
+                    },
+                    onError = { errorMsg ->
+
+                    }
+                )
+            }
+        }
+    }
+
 }
