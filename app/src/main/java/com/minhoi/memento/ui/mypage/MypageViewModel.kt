@@ -198,11 +198,22 @@ class MypageViewModel : ViewModel() {
     fun getMemberBoards() {
         viewModelScope.launch {
             _memberBoards.update { UiState.Loading }
+            val bookmarkBoards = memberRepository.getBookmarkBoards().extractSuccess()
             member.let { member ->
                 memberRepository.getMemberBoards(member.id).collectLatest {
                     it.handleResponse(
+                        // 자신의 북마크 목록의 boardId와 내가 작성한 글의 boardId 비교하여 북마크 여부 확인
                         onSuccess = { boards ->
-                            _memberBoards.update { UiState.Success(boards) }
+                            val memberBoards = boards.map { boardContentDto ->
+                                if (bookmarkBoards.any { bookmarkBoard ->
+                                        bookmarkBoard.boardId == boardContentDto.boardId
+                                    }) {
+                                    boardContentDto.apply { isBookmarked = true }
+                                } else {
+                                    boardContentDto
+                                }
+                            }
+                            _memberBoards.update { UiState.Success(memberBoards) }
                         },
                         onError = { errorMsg ->
                             _memberBoards.update { UiState.Error(Throwable(errorMsg)) }
