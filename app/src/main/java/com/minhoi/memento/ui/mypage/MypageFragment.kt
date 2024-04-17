@@ -13,13 +13,9 @@ class MypageFragment : BaseFragment<FragmentMypageBinding>() {
     private val viewModel by viewModels<MypageViewModel>()
 
     override fun initView() {
-
-        val member = viewModel.getMemberInfo()
+        observeMemberInfo()
 
         binding.apply {
-            this.member = member
-            lifecycleOwner = this@MypageFragment
-
             applyListBtn.setOnSingleClickListener {
                 startActivity(Intent(requireContext(), ApplyListActivity::class.java).apply {
                     putExtra("requestType", "APPLY")
@@ -45,4 +41,14 @@ class MypageFragment : BaseFragment<FragmentMypageBinding>() {
         }
     }
 
+    private fun observeMemberInfo() {
+        viewModel.memberInfo.observe(viewLifecycleOwner) {
+            binding.member = it
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.getMemberInfo()
+    }
 }

@@ -57,6 +57,20 @@ class MypageViewModel : ViewModel() {
     private val _bookmarkBoards = MutableStateFlow<UiState<List<BoardContentDto>>>(UiState.Empty)
     val bookmarkBoards: LiveData<UiState<List<BoardContentDto>>> = _bookmarkBoards.asLiveData()
 
+    private val _memberInfo = MutableLiveData<MemberDTO>()
+    val memberInfo: LiveData<MemberDTO> = _memberInfo
+
+    init {
+        getMemberInfo()
+    }
+    fun getMemberInfo() {
+        viewModelScope.launch {
+            val response = memberRepository.getMemberInfo(member.id)
+            if (response.isSuccessful) {
+                _memberInfo.value = response.body()!!
+            }
+        }
+    }
 
     suspend fun getOtherMemberInfo(memberId: Long): MemberDTO? {
         val response = memberRepository.getMemberInfo(memberId)

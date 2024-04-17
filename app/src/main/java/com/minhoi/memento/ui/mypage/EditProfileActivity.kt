@@ -29,10 +29,7 @@ class EditProfileActivity : BaseActivity<ActivityEditProfileBinding>(),
     private var imageUri: Uri? = null
 
     override fun initView() {
-        binding.apply {
-            member = viewModel.getMemberInfo()
-            lifecycleOwner = this@EditProfileActivity
-        }
+        observeMemberInfo()
 
         binding.editImageBtn.setOnSingleClickListener {
             EditProfileImageBottomSheetDialog().show(supportFragmentManager, "editProfileImage")
@@ -80,6 +77,11 @@ class EditProfileActivity : BaseActivity<ActivityEditProfileBinding>(),
         }
     }
 
+    private fun observeMemberInfo() {
+        viewModel.memberInfo.observe(this) {
+            binding.member = it
+        }
+    }
     /*
     * 이미지 선택 후 BottomSheetDialogFragment를 닫고 선택한 이미지를 Activity로 전달받는 인터페이스
      */
