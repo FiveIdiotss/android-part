@@ -49,6 +49,9 @@ class BoardViewModel() : ViewModel() {
     private val _boardBookmarkState = MutableLiveData<Boolean>()
     val boardBookmarkState: LiveData<Boolean> = _boardBookmarkState
 
+    private val _applyState = MutableStateFlow<UiState<Boolean>>(UiState.Empty)
+    val applyState: StateFlow<UiState<Boolean>> = _applyState.asStateFlow()
+
     private var selectedDate: String = ""
     private var selectedTime: String = ""
 
@@ -122,15 +125,18 @@ class BoardViewModel() : ViewModel() {
 
     fun applyMentoring() {
         viewModelScope.launch {
-            val response = boardRepository.applyMentoring(_post.value!!.boardDTO.boardId,
-                MentoringApplyRequest("content", selectedDate!!, selectedTime))
-
-            if (response.isSuccessful) {
-                Log.d("APPLYMENTORING", "applyMentoring: 성공")
-            }
-            else {
-                // 실패 처리
-                Log.d("APPLYMENTORING", "applyMentoring: 실패 ${response.code()}")
+            boardRepository.applyMentoring(
+                _post.value!!.boardDTO.boardId,
+                MentoringApplyRequest("content", selectedDate, selectedTime)
+            ).collectLatest {
+                it.handleResponse(
+                    onSuccess = {
+                        _applyState.update { UiState.Success(true) }
+                    },
+                    onError = { errorMsg ->
+                        _applyState.update { UiState.Error(Throwable(errorMsg)) }
+                    }
+                )
             }
         }
     }
