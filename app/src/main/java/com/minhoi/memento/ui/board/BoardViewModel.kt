@@ -137,40 +137,22 @@ class BoardViewModel() : ViewModel() {
 
     fun executeBookmark(boardId: Long, isBookmarked: Boolean) {
         viewModelScope.launch {
-            Log.d("executeBookmark", "executeBookmark: Started $boardId + $isBookmarked")
             _bookmarkState.update { UiState.Loading }
-            if (!isBookmarked) {
-                boardRepository.executeBookmark(boardId).collectLatest {
-                    it.handleResponse(
-                        onSuccess = {
-                            _bookmarkState.update { UiState.Success(boardId) }
-                            _boardBookmarkState.value = !_boardBookmarkState.value!!
-                            Log.d("BOOKMARK", "bookmark: 성공")
-                        },
-                        onError = {
-                            _bookmarkState.update { UiState.Error(Throwable(it.toString()))}
-                            Log.d("BOOKMARK", "bookmark: 실패")
-
-                        }
-                    )
-                }
+            val s = when (isBookmarked) {
+                true -> boardRepository.executeUnBookmark(boardId)
+                false -> boardRepository.executeBookmark(boardId)
             }
-            else {
-                boardRepository.executeUnBookmark(boardId).collectLatest {
-                    it.handleResponse(
-                        onSuccess = {
-                            _unBookmarkState.update { UiState.Success(false) }
-                            _boardBookmarkState.value = !_boardBookmarkState.value!!
-                            Log.d("BOOKMARK", "unbookmark: 성공")
-                        },
-                        onError = {
-                            _unBookmarkState.update { UiState.Error(Throwable(it.toString()))}
-                            Log.d("BOOKMARK", "bookmark: 실패")
-                        }
-                    )
-                }
+            s.collectLatest {
+                it.handleResponse(
+                    onSuccess = {
+                        _bookmarkState.update { UiState.Success(boardId) }
+                        _boardBookmarkState.value = !_boardBookmarkState.value!!
+                    },
+                    onError = {
+                        _bookmarkState.update { UiState.Error(Throwable(it.toString())) }
+                    }
+                )
             }
         }
     }
-
 }
