@@ -52,7 +52,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:maxLines="1"
-                android:text="@{chatRoom.latestMessage.isText ? chatRoom.latestMessage.content : `사진을 보냈습니다`}"
+                android:text="@{chatRoom.latestMessage.hasImage ? `사진을 보냈습니다` : chatRoom.latestMessage.content}"
                 android:textColor="@color/black"
                 android:textSize="15sp"
                 app:layout_constraintStart_toStartOf="@+id/startDateTime"

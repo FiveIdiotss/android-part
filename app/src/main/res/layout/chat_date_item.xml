@@ -10,15 +10,16 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:padding="5dp">
 
         <TextView
             android:id="@+id/date"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@{ChatDate.date.substring(0,10)}"
-            android:textSize="18sp"
-            android:textColor="@color/black"
+            android:text="@{ChatDate.date.substring(0,13)}"
+            android:textSize="15sp"
+            android:textColor="#999999"
             android:gravity="center"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
