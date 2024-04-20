@@ -46,6 +46,7 @@ fun TimePicker.setTimeInterval(
             maxValue = MINUTES_MAX / timeInterval - 1
             displayedValues = getDisplayedValue(timeInterval)
             wrapSelectorWheel = false
+            setOnValueChangedListener(null)
         }
     } catch (e: Exception) {
         e.printStackTrace()
