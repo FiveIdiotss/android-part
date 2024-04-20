@@ -28,14 +28,19 @@ const val DEFAULT_INTERVAL = 5
 const val MINUTES_MIN = 0
 const val MINUTES_MAX = 60
 
-@SuppressLint("PrivateApi")
+@SuppressLint("PrivateApi", "DiscouragedApi")
 fun TimePicker.setTimeInterval(
     timeInterval: Int = DEFAULT_INTERVAL
 ) {
     try {
-        val classForId = Class.forName("com.android.internal.R\$id")
-        val fieldId = classForId.getField("minute").getInt(null)
-
+        val fieldId: Int = if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
+            // 안드로이드 10 이하 버전에서는 reflection을 사용
+            val classForId = Class.forName("com.android.internal.R\$id")
+            classForId.getField("minute").getInt(null)
+        } else {
+            // 안드로이드 11 이상 버전에서는 Resources.getSystem()을 사용
+            context.resources.getIdentifier("minute", "id", "android")
+        }
         (this.findViewById(fieldId) as NumberPicker).apply {
             minValue = MINUTES_MIN
             maxValue = MINUTES_MAX / timeInterval - 1
