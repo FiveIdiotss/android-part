@@ -14,20 +14,32 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             app:defaultNavHost="true"
-            app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
+            app:layout_constraintBottom_toTopOf="@+id/bottomNavigationIndicator"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:navGraph="@navigation/nav_main" />
 
+        <View
+            android:id="@+id/bottomNavigationIndicator"
+            android:layout_width="0dp"
+            android:layout_height="0.7dp"
+            android:background="#999999"
+            app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent" />
+
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottomNavigationView"
             android:layout_width="0dp"
-            android:layout_height="73dp"
+            android:layout_height="67dp"
+            android:background="@color/white"
+            app:itemActiveIndicatorStyle="@android:color/transparent"
             app:itemIconSize="24dp"
-            app:labelVisibilityMode="labeled"
-            app:itemTextColor="@drawable/bottom_navigation_color"
             app:itemIconTint="@drawable/bottom_navigation_color"
+            app:itemTextColor="@drawable/bottom_navigation_color"
+            app:labelVisibilityMode="labeled"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
