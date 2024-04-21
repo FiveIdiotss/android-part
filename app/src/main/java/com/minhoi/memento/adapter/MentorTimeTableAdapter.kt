@@ -7,13 +7,16 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.minhoi.memento.data.dto.TimeTableDto
 import com.minhoi.memento.databinding.TimetableRowItemBinding
+import com.minhoi.memento.utils.setOnSingleClickListener
 
 class MentorTimeTableAdapter(private val onDeleteClickListener: (Int) -> Unit) :
     ListAdapter<TimeTableDto, RecyclerView.ViewHolder>(DiffCallback()) {
     inner class TimeTableViewHolder(private val binding: TimetableRowItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
         init {
-            onDeleteClickListener(bindingAdapterPosition)
+            binding.deleteTimeTableButton.setOnSingleClickListener {
+                onDeleteClickListener(bindingAdapterPosition)
+            }
         }
 
         fun bind(item: TimeTableDto) {

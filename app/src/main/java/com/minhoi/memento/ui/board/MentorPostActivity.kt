@@ -39,6 +39,8 @@ class MentorPostActivity : BaseActivity<ActivityMentorPostBinding>() {
 
         mentorTimeTableAdapter = MentorTimeTableAdapter {
             // onDeleteClickListener
+            timetables.removeAt(it)
+            mentorTimeTableAdapter.submitList(timetables.toList())
         }
 
         binding.selectTimeTableLayout.setOnSingleClickListener {
@@ -67,7 +69,12 @@ class MentorPostActivity : BaseActivity<ActivityMentorPostBinding>() {
             }
 
             if (consultTime == 0) {
-                showToast("시간을 선택해주세요")
+                showToast("상담 시간을 선택해주세요")
+                return@setOnSingleClickListener
+            }
+
+            if (timetables.isEmpty()) {
+                showToast("상담 가능한 시간대를 추가해주세요")
                 return@setOnSingleClickListener
             }
 
@@ -119,7 +126,7 @@ class MentorPostActivity : BaseActivity<ActivityMentorPostBinding>() {
             when (checkedId) {
                 R.id.minutesRadioButton, R.id.hourRadioButton -> {
                     timetables.clear()
-                    mentorTimeTableAdapter.submitList(ArrayList(timetables))
+                    mentorTimeTableAdapter.submitList(timetables.toList())
                 }
             }
         }
