@@ -30,6 +30,11 @@ class StartEndTimePickerDialog(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        // 선택한 시간을 정수 범위로 변환
+        timetables.forEach {
+            times.add(IntRange(stringTimeToInt(it.startTime), stringTimeToInt(it.endTime)))
+        }
+
         binding.apply {
             startTimePicker.setIs24HourView(true)
             endTimePicker.setIs24HourView(true)
@@ -49,8 +54,8 @@ class StartEndTimePickerDialog(
                 binding.endTimePicker.minute * interval
             )
             val timeRange = IntRange(
-                binding.startTimePicker.hour + binding.startTimePicker.minute * interval,
-                binding.endTimePicker.hour + binding.endTimePicker.minute * interval
+                stringTimeToInt(startTime),
+                stringTimeToInt(endTime)
             )
             Log.d("RANGE", "onViewCreated: $timeRange")
 
@@ -89,8 +94,13 @@ class StartEndTimePickerDialog(
         }
     }
 
-    private fun addTime(timeRange: IntRange, startTime: String, endTime: String) {
-        times.add(timeRange)
+    private fun stringTimeToInt(time: String): Int {
+        val (hours, minutes) = time.split(":").map { it.toInt() }
+        Log.d(TAG, "stringTimeToInt: $hours $minutes")
+        return hours * 60 + minutes
+    }
+
+    private fun addTime(startTime: String, endTime: String) {
         onTimeSelected(TimeTableDto(startTime, endTime))
         dismiss()
     }
