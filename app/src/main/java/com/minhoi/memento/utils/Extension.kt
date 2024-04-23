@@ -73,7 +73,17 @@ fun Context.showToast(message: String, duration: Int = Toast.LENGTH_SHORT) {
 }
 
 fun IntRange.overlaps(other: IntRange): Boolean {
-    return other.first in this
+    return this.first < other.last && this.last > other.first
+}
+
+// List<IntRange>를 받고, 새로운 IntRange가 주어진 리스트 내의 범위와 중복되는지 확인하는 함수
+fun List<IntRange>.containsOverlap(newRange: IntRange): Boolean {
+    // 리스트 내부의 각 IntRange와 새로운 IntRange가 중복되는지 확인.
+    this.forEach {
+        if (it.overlaps(newRange))
+            return true
+    }
+    return false
 }
 
 // DialogFragment 크기 조절
