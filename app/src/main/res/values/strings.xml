@@ -8,4 +8,9 @@
     <string name="appbar_scrolling_view_behavior" translatable="false">
     com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior
     </string>
+    <string name="channel_chat">채팅 알림</string>
+    <string name="channel_chat_description">새로운 채팅 메시지를 알려줍니다.</string>
+    <string name="channel_post">게시글 알림</string>
+    <string name="channel_post_description">새로운 게시글이 있을 때 알려줍니다.</string>
+
 </resources>
