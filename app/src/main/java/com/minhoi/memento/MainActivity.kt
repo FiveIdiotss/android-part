@@ -1,25 +1,40 @@
 package com.minhoi.memento
 
-import android.content.Intent
+import android.util.Log
 import android.view.LayoutInflater
+import androidx.activity.viewModels
 import androidx.fragment.app.DialogFragment
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
+import com.google.android.gms.tasks.Task
 import com.google.android.material.bottomnavigation.BottomNavigationItemView
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView
+import com.google.firebase.messaging.FirebaseMessaging
 import com.minhoi.memento.base.BaseActivity
 import com.minhoi.memento.databinding.ActivityMainBinding
 import com.minhoi.memento.ui.board.MentorPostActivity
+import com.minhoi.memento.ui.home.HomeViewModel
 import com.minhoi.memento.ui.home.PostSelectBottomSheetDialog
 
 class MainActivity : BaseActivity<ActivityMainBinding>() {
     override val layoutResourceId: Int = R.layout.activity_main
+    private val viewModel by viewModels<HomeViewModel>()
 
     override fun initView() {
         setBottomNavigation()
-        startActivity(Intent(this, MentorPostActivity::class.java))
+
+        FirebaseMessaging.getInstance().token
+            .addOnCompleteListener { task: Task<String> ->
+                if (!task.isSuccessful) {
+                    Log.d("MainActivity", "initView: success")
+                    return@addOnCompleteListener
+                }
+                val token = task.result
+                viewModel.saveFCMToken(token)
+                Log.d("FCMLog", "Current token: $token")
+            }
     }
 
     private fun setBottomNavigation() {
