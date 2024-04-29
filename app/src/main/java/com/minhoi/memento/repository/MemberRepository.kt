@@ -2,13 +2,12 @@ package com.minhoi.memento.repository
 
 import com.minhoi.memento.data.dto.BoardContentDto
 import com.minhoi.memento.data.dto.MentoringMatchInfo
-import com.minhoi.memento.data.dto.MentoringReceivedDto
-import com.minhoi.memento.data.model.ApplyStatus
 import com.minhoi.memento.data.network.RetrofitClient
 import com.minhoi.memento.data.model.BoardType
 import com.minhoi.memento.data.network.ApiResult
 import com.minhoi.memento.data.network.service.MatchingService
 import com.minhoi.memento.data.network.service.MemberService
+import com.minhoi.memento.data.network.service.NotificationService
 import com.minhoi.memento.utils.safeFlow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -20,6 +19,7 @@ class MemberRepository {
         RetrofitClient.getLoggedInInstance().create(MatchingService::class.java)
 
     private val memberService = RetrofitClient.getLoggedInInstance().create(MemberService::class.java)
+    private val notificationService = RetrofitClient.getLoggedInInstance().create(NotificationService::class.java)
 
     suspend fun getMemberInfo(memberId: Long) = memberService.getMemberInfo(memberId)
 
@@ -32,8 +32,12 @@ class MemberRepository {
         matchingService.getReceived(memberId, "RECEIVE")
     }
 
-    suspend fun getMatchedMentoringInfo(memberId: Long): Flow<ApiResult<List<MentoringMatchInfo>>> = safeFlow {
+    suspend fun getMentorInfo(memberId: Long): Flow<ApiResult<List<MentoringMatchInfo>>> = safeFlow {
         matchingService.getMatchedMentoringInfo(memberId, BoardType.MENTEE)
+    }
+
+    suspend fun getMenteeInfo(memberId: Long): Flow<ApiResult<List<MentoringMatchInfo>>> = safeFlow {
+        matchingService.getMatchedMentoringInfo(memberId, BoardType.MENTOR)
     }
 
     suspend fun acceptApply(applyId: Long) = matchingService.acceptApply(applyId)
@@ -60,4 +64,7 @@ class MemberRepository {
     suspend fun getMemberBoards(memberId: Long) = safeFlow {
         memberService.getMemberBoards(memberId, BoardType.MENTEE)
     }
+
+    fun saveFCMToken(token: String) = notificationService.saveToken(token)
+
 }
