@@ -14,6 +14,7 @@ class MentoApplication : Application() {
     companion object {
         lateinit var prefs: TokenPrefs
         lateinit var memberPrefs: MemberPrefs
+        lateinit var notificationPermissionPrefs: NotificationPermissionPrefs
     }
 
     override fun onCreate() {
@@ -21,6 +22,7 @@ class MentoApplication : Application() {
 
         prefs = TokenPrefs(applicationContext)
         memberPrefs = MemberPrefs(applicationContext)
+        notificationPermissionPrefs = NotificationPermissionPrefs(applicationContext)
 
         FirebaseApp.initializeApp(this)
         addFCMChannel()
