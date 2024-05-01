@@ -82,6 +82,11 @@ class MementoFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     private fun sendChatNotification(notification: ChatNotification) {
+        // 사용자가 채팅 알림을 off 한 경우 리턴
+        if (!MentoApplication.notificationPermissionPrefs.getChatPermission()) {
+            return
+        }
+
         val person = Person.Builder().apply {
             setName(notification.senderName)
             convertUriToIconCompat(
