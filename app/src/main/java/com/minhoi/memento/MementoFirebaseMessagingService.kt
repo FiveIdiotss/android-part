@@ -20,6 +20,7 @@ import com.minhoi.memento.data.model.PostNotification
 import com.minhoi.memento.data.network.RetrofitClient
 import com.minhoi.memento.data.network.service.NotificationService
 import com.minhoi.memento.ui.chat.ChatActivity
+import okhttp3.internal.notify
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -47,7 +48,7 @@ class MementoFirebaseMessagingService : FirebaseMessagingService() {
             when (type) {
                 "chat" -> {
                     val notification = ChatNotification(
-                        message.data["chatRoomId"]!!.toLong(),
+                        message.data["senderId"]!!.toLong(),
                         message.data["senderName"]!!,
                         message.data["content"]!!,
                         message.data["imageUrl"]!!
@@ -83,7 +84,10 @@ class MementoFirebaseMessagingService : FirebaseMessagingService() {
     private fun sendChatNotification(notification: ChatNotification) {
         val person = Person.Builder().apply {
             setName(notification.senderName)
-            convertUriToIconCompat(notification.profileUri, this@MementoFirebaseMessagingService) { icon ->
+            convertUriToIconCompat(
+                notification.profileUri,
+                this@MementoFirebaseMessagingService
+            ) { icon ->
                 icon?.let {
                     setIcon(it)
                 }
@@ -93,13 +97,13 @@ class MementoFirebaseMessagingService : FirebaseMessagingService() {
         // NotificationCompat.MessagingStyle을 사용하여 채팅 스타일의 알림 생성
         val intent = Intent(this, ChatActivity::class.java).apply {
             putExtra("receiverName", notification.senderName)
-            putExtra("receiverId", notification.roomId)
+            putExtra("receiverId", notification.senderId)
         }
 
-        // roomId에 따라 pendingIntent 객체를 다르게 설정하기 위해 roomId를 requestCode로 사용
+        // roomId에 따라 pendingIntent 객체를 다르게 설정하기 위해 senderId를 requestCode로 사용
         val pendingIntent = PendingIntent.getActivity(
             this,
-            notification.roomId.toInt(),
+            notification.senderId.toInt(),
             intent,
             PendingIntent.FLAG_IMMUTABLE
         )
@@ -112,17 +116,35 @@ class MementoFirebaseMessagingService : FirebaseMessagingService() {
                     NotificationCompat.MessagingStyle(person)
                         .addMessage(notification.content, System.currentTimeMillis(), person)
                 )
+                setGroup(CHAT_GROUP)
             }
+
+        val summaryBuilder =
+            NotificationCompat.Builder(this, getString(R.string.channel_chat_id)).apply {
+                setSmallIcon(R.drawable.chat)
+                setAutoCancel(true)
+                setOnlyAlertOnce(true)
+                setGroup(CHAT_GROUP)
+                setGroupSummary(true)
+            }
+
         val notificationManager =
             getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.notify(notification.roomId.toInt(), notificationBuilder.build())
+        notificationManager.apply {
+            notify(System.currentTimeMillis().toInt(), notificationBuilder.build())
+            notify(0, summaryBuilder.build())
+        }
     }
 
     private fun sendPostNotification(notification: PostNotification) {
 
     }
 
-    private fun convertUriToIconCompat(uri: String, context: Context, callback: (iconCompat: IconCompat?) -> Unit) {
+    private fun convertUriToIconCompat(
+        uri: String,
+        context: Context,
+        callback: (iconCompat: IconCompat?) -> Unit,
+    ) {
         Glide.with(context)
             .asBitmap()
             .load(uri)
@@ -146,6 +168,7 @@ class MementoFirebaseMessagingService : FirebaseMessagingService() {
 
     companion object {
         private const val TAG = "FCM"
+        private const val CHAT_GROUP = "chat_group"
     }
 
 }
