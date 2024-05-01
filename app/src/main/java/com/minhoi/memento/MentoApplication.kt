@@ -32,15 +32,15 @@ class MentoApplication : Application() {
             getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         val chatChannel = NotificationChannel(
-            "CHAT_CHANNEL",
-            getString(R.string.channel_chat),
+            getString(R.string.channel_chat_id),
+            getString(R.string.channel_chat_name),
             NotificationManager.IMPORTANCE_HIGH
         ).apply {
             description = getString(R.string.channel_chat_description)
         }
         val postChannel = NotificationChannel(
-            "POST_CHANNEL",
-            getString(R.string.channel_post),
+            getString(R.string.channel_post_id),
+            getString(R.string.channel_post_name),
             NotificationManager.IMPORTANCE_HIGH
         ).apply {
             description = getString(R.string.channel_post_description)
