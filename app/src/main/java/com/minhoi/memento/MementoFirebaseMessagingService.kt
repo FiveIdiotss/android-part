@@ -1,7 +1,9 @@
 package com.minhoi.memento
 
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.util.Log
 import androidx.core.app.NotificationCompat
@@ -17,6 +19,7 @@ import com.minhoi.memento.data.model.ChatNotification
 import com.minhoi.memento.data.model.PostNotification
 import com.minhoi.memento.data.network.RetrofitClient
 import com.minhoi.memento.data.network.service.NotificationService
+import com.minhoi.memento.ui.chat.ChatActivity
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -44,10 +47,10 @@ class MementoFirebaseMessagingService : FirebaseMessagingService() {
             when (type) {
                 "chat" -> {
                     val notification = ChatNotification(
-                        message.data["roomId"]!!.toLong(),
+                        message.data["chatRoomId"]!!.toLong(),
                         message.data["senderName"]!!,
                         message.data["content"]!!,
-                        message.data["profileImageUrl"]!!
+                        message.data["imageUrl"]!!
                     )
                     sendChatNotification(notification)
                 }
@@ -88,14 +91,30 @@ class MementoFirebaseMessagingService : FirebaseMessagingService() {
         }.build()
 
         // NotificationCompat.MessagingStyle을 사용하여 채팅 스타일의 알림 생성
-
-        val notificationBuilder = NotificationCompat.Builder(this, getString(R.string.channel_chat)).apply {
-            setSmallIcon(R.drawable.chat)
-            setContentTitle("새로운 채팅 메시지")
-            setStyle(NotificationCompat.MessagingStyle(person)
-                .addMessage(notification.content, System.currentTimeMillis(), person))
+        val intent = Intent(this, ChatActivity::class.java).apply {
+            putExtra("receiverName", notification.senderName)
+            putExtra("receiverId", notification.roomId)
         }
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        // roomId에 따라 pendingIntent 객체를 다르게 설정하기 위해 roomId를 requestCode로 사용
+        val pendingIntent = PendingIntent.getActivity(
+            this,
+            notification.roomId.toInt(),
+            intent,
+            PendingIntent.FLAG_IMMUTABLE
+        )
+        val notificationBuilder =
+            NotificationCompat.Builder(this, getString(R.string.channel_chat_id)).apply {
+                setSmallIcon(R.drawable.chat)
+                setContentIntent(pendingIntent)
+                setContentTitle(notification.senderName)
+                setStyle(
+                    NotificationCompat.MessagingStyle(person)
+                        .addMessage(notification.content, System.currentTimeMillis(), person)
+                )
+            }
+        val notificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.notify(notification.roomId.toInt(), notificationBuilder.build())
     }
 
