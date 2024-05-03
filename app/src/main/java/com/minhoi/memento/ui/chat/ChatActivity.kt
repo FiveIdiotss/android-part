@@ -1,17 +1,12 @@
 package com.minhoi.memento.ui.chat
 
-import android.Manifest
-import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Base64
 import android.util.Log
+import android.view.MenuItem
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -20,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.minhoi.memento.R
 import com.minhoi.memento.adapter.ChatAdapter
 import com.minhoi.memento.base.BaseActivity
+import com.minhoi.memento.data.dto.chat.ChatDate
 import com.minhoi.memento.data.dto.chat.ChatMessage
 import com.minhoi.memento.databinding.ActivityChatBinding
 import com.minhoi.memento.ui.UiState
@@ -43,9 +39,6 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
     private var roomId = -1L
     private var hasNextPage: Boolean = true
     private var isFirstLoad = true
-    private var lastMessage: ChatMessage? = null
-
-    private val permissions = arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
 
     override fun initView() {
         receiverId = intent.getLongExtra("receiverId", -1L)
@@ -93,9 +86,27 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
             }
         })
 
+        setUpToolbar()
         observeChatMessages()
         observeHasNextPage()
         observePageLoadingState()
+    }
+
+    private fun setUpToolbar() {
+        setSupportActionBar(binding.chatToolbar)
+        supportActionBar?.apply {
+            setDisplayShowTitleEnabled(false)
+            setDisplayHomeAsUpEnabled(true)
+        }
+    }
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> {
+                finish()
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     private val pickImageContract =
@@ -117,8 +128,9 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
 
     private fun observeChatMessages() {
         viewModel.messages.observe(this) {
-            setShowProfileAndDate(it)
-            chatAdapter.submitList(it.toList())
+            val list = setShowProfileAndDate(it).toList()
+            Log.d(TAG, "observeChatMessages: $list")
+            chatAdapter.submitList(list)
         }
     }
 
@@ -126,33 +138,27 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
     채팅 목록을 전달받아, 이전 메세지와 비교하여 날짜가 다르거나 사용자가 다르면 ChatMessage의 showDate를 true로 설정
      */
     private fun setShowProfileAndDate(messages: List<ChatMessage>): List<ChatMessage> {
-        // 메세지 비어있을경우 NullPointerException 방지
-        if (messages.isEmpty()) {
-            return emptyList()
-        }
+        val resultMessages = mutableListOf<ChatMessage>()
+        if (messages.isEmpty()) return resultMessages
 
-        // 처음 메세지 불러올 경우 lastMessage가 null이므로, 먼저 lastMessage 설정
-        if (lastMessage == null) {
-            lastMessage = messages[0]
-        }
-        // 서버에서 무한 스크롤 방식으로 데이터를 가져오기 때문에, 제일 마지막으로 불러온 메세지 목록의 첫번째 메세지와 비교
-        if (lastMessage!!.date == messages[0].date && lastMessage!!.id == messages[0].id) {
-            messages[0].showDate = false
-        }
+        var lastMessage: ChatMessage? = null
 
-        for (i in 1 until messages.size) {
-            // 이전 메시지와 비교
-            val previousMessage = messages[i - 1]
-            val currentMessage = messages[i]
+        messages.forEachIndexed { index, currentMessage ->
+            if (index == 0 || lastMessage!!.date.substring(0, 13) != currentMessage.date.substring(0, 13)) {
+                val chatDate = ChatDate(currentMessage.id, currentMessage.name, currentMessage.content, currentMessage.date, currentMessage.image, true)
+                resultMessages.add(chatDate)
+            }
 
             // 이전 메시지와 현재 메시지가 같은 날짜인지 확인 (분 단위까지 비교)
-            val isSameDay = previousMessage.date.substring(0,8) == currentMessage.date.substring(0,8)
-            val isSameUser = previousMessage.id == currentMessage.id
+            val isSameDay = lastMessage?.date?.substring(14, 22) == currentMessage.date.substring(14, 22)
+            val isSameUser = lastMessage?.id == currentMessage.id
 
-            currentMessage.showDate = !isSameDay || !isSameUser
+            currentMessage.showMinute = !isSameDay || !isSameUser
+            resultMessages.add(currentMessage)
+
+            lastMessage = currentMessage
         }
-        lastMessage = messages.firstOrNull()
-        return messages
+        return resultMessages
     }
 
     private fun observePageLoadingState() {

@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.minhoi.memento.MentoApplication
 import com.minhoi.memento.data.dto.BoardContentDto
+import com.minhoi.memento.data.dto.BoardContentForReceived
 import com.minhoi.memento.data.dto.MemberDTO
 import com.minhoi.memento.data.dto.MentoringApplyDto
 import com.minhoi.memento.data.dto.MentoringMatchInfo
@@ -14,10 +15,10 @@ import com.minhoi.memento.data.dto.MentoringReceivedDto
 import com.minhoi.memento.repository.MemberRepository
 import com.minhoi.memento.ui.UiState
 import com.minhoi.memento.data.model.ApplyStatus
+import com.minhoi.memento.utils.extractSuccess
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -34,8 +35,9 @@ class MypageViewModel : ViewModel() {
     private val _applyContent = MutableStateFlow<UiState<MentoringApplyDto>>(UiState.Empty)
     val applyContent: StateFlow<UiState<MentoringApplyDto>> = _applyContent.asStateFlow()
 
-    private val _receivedList = MutableLiveData<List<MentoringReceivedDto>>()
-    val receivedList: LiveData<List<MentoringReceivedDto>> = _receivedList
+    private val _boardsWithReceivedMentoring = MutableStateFlow<UiState<List<Map<BoardContentForReceived, List<MentoringReceivedDto>>>>>(UiState.Empty)
+    val boardsWithReceivedMentoring: StateFlow<UiState<List<Map<BoardContentForReceived, List<MentoringReceivedDto>>>>> =
+        _boardsWithReceivedMentoring.asStateFlow()
 
     private val _acceptState = MutableStateFlow<UiState<Boolean>>(UiState.Empty)
     val acceptState: StateFlow<UiState<Boolean>> = _acceptState.asStateFlow()
@@ -50,7 +52,25 @@ class MypageViewModel : ViewModel() {
     val imageUploadState: StateFlow<UiState<Boolean>> = _imageUploadState.asStateFlow()
 
     private val _memberBoards = MutableStateFlow<UiState<List<BoardContentDto>>>(UiState.Empty)
-    val memberBoards: StateFlow<UiState<List<BoardContentDto>>> = _memberBoards.asStateFlow()
+    val memberBoards: LiveData<UiState<List<BoardContentDto>>> = _memberBoards.asLiveData()
+
+    private val _bookmarkBoards = MutableStateFlow<UiState<List<BoardContentDto>>>(UiState.Empty)
+    val bookmarkBoards: LiveData<UiState<List<BoardContentDto>>> = _bookmarkBoards.asLiveData()
+
+    private val _memberInfo = MutableLiveData<MemberDTO>()
+    val memberInfo: LiveData<MemberDTO> = _memberInfo
+
+    init {
+        getMemberInfo()
+    }
+    fun getMemberInfo() {
+        viewModelScope.launch {
+            val response = memberRepository.getMemberInfo(member.id)
+            if (response.isSuccessful) {
+                _memberInfo.value = response.body()!!
+            }
+        }
+    }
 
     suspend fun getOtherMemberInfo(memberId: Long): MemberDTO? {
         val response = memberRepository.getMemberInfo(memberId)
@@ -102,21 +122,6 @@ class MypageViewModel : ViewModel() {
                         _applyContent.update { UiState.Error(Throwable(errorMsg)) }
                     }
                 )
-            }
-        }
-    }
-
-    fun getReceivedList() {
-        viewModelScope.launch {
-            member.let { member ->
-                memberRepository.getReceivedList(member.id)
-                    .catch { e ->
-                        Log.d("ReceivedList", "getReceivedListFailed: ${e.message}")
-                    }
-                    .collectLatest {
-                        _receivedList.value = it
-                        Log.d("ReceivedList", "getReceivedListSuccess: $it")
-                    }
             }
         }
     }
@@ -207,11 +212,22 @@ class MypageViewModel : ViewModel() {
     fun getMemberBoards() {
         viewModelScope.launch {
             _memberBoards.update { UiState.Loading }
+            val bookmarkBoards = memberRepository.getBookmarkBoards().extractSuccess()
             member.let { member ->
                 memberRepository.getMemberBoards(member.id).collectLatest {
                     it.handleResponse(
+                        // 자신의 북마크 목록의 boardId와 내가 작성한 글의 boardId 비교하여 북마크 여부 확인
                         onSuccess = { boards ->
-                            _memberBoards.update { UiState.Success(boards) }
+                            val memberBoards = boards.map { boardContentDto ->
+                                if (bookmarkBoards.any { bookmarkBoard ->
+                                        bookmarkBoard.boardId == boardContentDto.boardId
+                                    }) {
+                                    boardContentDto.apply { isBookmarked = true }
+                                } else {
+                                    boardContentDto
+                                }
+                            }
+                            _memberBoards.update { UiState.Success(memberBoards) }
                         },
                         onError = { errorMsg ->
                             _memberBoards.update { UiState.Error(Throwable(errorMsg)) }
@@ -221,4 +237,79 @@ class MypageViewModel : ViewModel() {
             }
         }
     }
+
+    fun getBoardsWithReceivedMentoring() {
+        viewModelScope.launch {
+            // loading
+            _boardsWithReceivedMentoring.update { UiState.Loading }
+            val memberBoards = memberRepository.getMemberBoards(member.id).extractSuccess().map {
+                Log.d("MypageVIewmodel", "memberBoards = $it")
+                BoardContentForReceived(
+                    it.boardId,
+                    it.memberName,
+                    it.title,
+                    it.school,
+                    it.major,
+                    it.year,
+                    it.introduction,
+                    it.target,
+                    it.content,
+                    it.memberId,
+                    it.isBookmarked,
+                    false
+                )
+            }
+            val receivedList = memberRepository.getReceivedList(member.id).extractSuccess()
+            if (memberBoards == null || receivedList == null) {
+                _boardsWithReceivedMentoring.update { UiState.Error(Throwable()) }
+                return@launch
+            }
+            val boardsWithMentoringReceived =
+                mutableListOf<Map<BoardContentForReceived, List<MentoringReceivedDto>>>()
+            memberBoards.forEach {
+                val receivedContent = receivedList.filter { received -> received.boardId == it.boardId }
+                boardsWithMentoringReceived.add(mapOf(it to receivedContent))
+            }
+            _boardsWithReceivedMentoring.update { UiState.Success(boardsWithMentoringReceived) }
+        }
+    }
+
+    fun getBookmarkBoards() {
+        viewModelScope.launch {
+            _bookmarkBoards.update { UiState.Loading }
+            memberRepository.getBookmarkBoards().collectLatest {
+                it.handleResponse(
+                    onSuccess = { bookmarkBoards ->
+                        bookmarkBoards.map {
+                            it.isBookmarked = true
+                        }
+                        _bookmarkBoards.update { UiState.Success(bookmarkBoards) }
+                    },
+                    onError = { errorMsg ->
+                        _bookmarkBoards.update { UiState.Error(Throwable(errorMsg)) }
+                    }
+                )
+            }
+        }
+    }
+
+    fun executeBookmarkInList(boardId: Long, bookmarkState: Boolean) {
+        viewModelScope.launch {
+            val s = when (bookmarkState) {
+                true -> boardRepository.executeUnBookmark(boardId)
+                false -> boardRepository.executeBookmark(boardId)
+            }
+            s.collectLatest {
+                it.handleResponse(
+                    onSuccess = {
+
+                    },
+                    onError = { errorMsg ->
+
+                    }
+                )
+            }
+        }
+    }
+
 }

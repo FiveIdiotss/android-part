@@ -7,6 +7,7 @@ import com.minhoi.memento.data.dto.BoardContentDto
 import com.minhoi.memento.data.dto.MentoringApplyDto
 import com.minhoi.memento.databinding.ApplyListRowItemBinding
 import com.minhoi.memento.data.model.ApplyStatus
+import com.minhoi.memento.data.model.BoardType
 import com.minhoi.memento.utils.setOnSingleClickListener
 
 class ApplyListAdapter(
@@ -31,12 +32,15 @@ class ApplyListAdapter(
         fun bind(item: Pair<MentoringApplyDto, ApplyStatus>) {
             binding.board = BoardContentDto(
                     item.first.boardId,
+                    BoardType.MENTEE,
                     item.first.memberName,
                     item.first.boardTitle,
                     item.first.schoolName,
                     item.first.majorName,
                 0,
-                " ",
+                "",
+                "",
+                "",
                 item.first.memberId
             )
 

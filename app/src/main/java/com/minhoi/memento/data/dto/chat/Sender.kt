@@ -6,5 +6,5 @@ data class Sender(
     override val content: String?,
     override var date: String,
     override val image: String? = null,
-    override var showDate: Boolean = true
+    override var showMinute: Boolean = true,
 ) : ChatMessage

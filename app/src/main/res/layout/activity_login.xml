@@ -14,18 +14,32 @@
         android:layout_height="match_parent"
         tools:context=".ui.login.LoginActivity">
 
-
-        <include
-            android:id="@+id/include"
-            layout="@layout/intro_logo_layout"
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/loginToolbar"
+            android:layout_width="0dp"
+            android:layout_height="?actionBarSize"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/include"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="20dp"
+            android:text="로그인"
+            android:textSize="25sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/loginToolbar" />
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
             android:layout_marginTop="50dp"
+            android:orientation="vertical"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/include">
@@ -33,27 +47,25 @@
             <EditText
                 android:id="@+id/inputEmail"
                 android:layout_width="match_parent"
-                android:layout_height="65dp"
-                android:layout_marginLeft="18dp"
-                android:layout_marginRight="18dp"
+                android:layout_height="55dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
                 android:layout_marginBottom="40dp"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp"
-                android:background="@drawable/round_corner_purple_color"
+                android:background="@drawable/textview_gray_corner"
+                android:hint="Email"
                 android:onTextChanged="@{(s, start, before, count) -> viewModel.onEmailTextChanged(s)}"
-                android:hint="Email" />
+                android:padding="10dp" />
 
             <EditText
                 android:id="@+id/inputPassword"
                 android:layout_width="match_parent"
-                android:layout_height="65dp"
-                android:layout_marginRight="18dp"
-                android:layout_marginLeft="18dp"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp"
-                android:onTextChanged="@{(s, start, before, count) -> viewModel.onPasswordTextChanged(s)}"
+                android:layout_height="55dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:background="@drawable/textview_gray_corner"
                 android:hint="Password"
-                android:background="@drawable/round_corner_purple_color" />
+                android:onTextChanged="@{(s, start, before, count) -> viewModel.onPasswordTextChanged(s)}"
+                android:padding="10dp" />
         </LinearLayout>
 
         <androidx.appcompat.widget.AppCompatButton
@@ -63,10 +75,10 @@
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
             android:layout_marginBottom="70dp"
-            android:background="@drawable/radius_btn"
+            android:background="@drawable/round_corner_blue_filled"
             android:text="로그인"
-            android:textSize="16dp"
             android:textColor="#FFFFFF"
+            android:textSize="16dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />

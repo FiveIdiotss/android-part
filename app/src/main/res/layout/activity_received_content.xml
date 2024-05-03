@@ -7,6 +7,9 @@
         <variable
             name="receivedDto"
             type="com.minhoi.memento.data.dto.MentoringReceivedDto" />
+        <variable
+            name="applyInfo"
+            type="com.minhoi.memento.data.dto.MentoringApplyDto" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -32,80 +35,90 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="15dp"
-            android:text="신청자 :"
-            android:textSize="16dp"
+            android:text="멘티 프로필"
+            android:textColor="@color/black"
+            android:textSize="18sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView14" />
 
-        <TextView
-            android:id="@+id/applicantName"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/menteeProfileLayout"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:text="@{receivedDto.applyMemberName}"
-            android:textSize="16dp"
-            app:layout_constraintStart_toEndOf="@id/textViewApplicant"
-            app:layout_constraintTop_toTopOf="@id/textViewApplicant" />
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/viewMenteeProfileBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="30dp"
-            android:layout_marginStart="16dp"
-            android:text="프로필"
-            android:textSize="10dp"
-            app:layout_constraintStart_toEndOf="@+id/applicantName"
-            app:layout_constraintTop_toTopOf="@id/applicantName" />
-
-        <TextView
-            android:id="@+id/textViewMentor"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:text="멘토 :"
-            android:textSize="16dp"
+            android:layout_height="70dp"
+            android:layout_marginStart="15dp"
+            android:layout_marginEnd="15dp"
+            android:layout_marginTop="5dp"
+            android:background="#E3E2E2"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/textViewApplicant" />
+            app:layout_constraintTop_toBottomOf="@+id/textViewApplicant">
 
-        <TextView
-            android:id="@+id/mentorName"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:textSize="16dp"
-            app:layout_constraintStart_toEndOf="@id/textViewMentor"
-            app:layout_constraintTop_toTopOf="@id/textViewMentor" />
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/menteeImage"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginStart="10dp"
+                android:src="@drawable/defaultimage"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/menteeName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:text="@{applyInfo.memberName}"
+                android:textColor="@color/black"
+                android:textSize="17sp"
+                app:layout_constraintStart_toEndOf="@+id/menteeImage"
+                app:layout_constraintTop_toTopOf="@+id/menteeImage" />
+
+            <TextView
+                android:id="@+id/menteeSchoolInfo"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="5dp"
+                android:text="@{applyInfo.schoolName + ` | ` + applyInfo.majorName}"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                app:layout_constraintStart_toEndOf="@+id/menteeImage"
+                app:layout_constraintTop_toBottomOf="@+id/menteeName" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <TextView
             android:id="@+id/textViewConsultationDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="20dp"
             android:text="상담 일자 :"
-            android:textSize="16dp"
+            android:textSize="18sp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/mentorName" />
+            app:layout_constraintTop_toBottomOf="@id/menteeProfileLayout" />
 
         <TextView
             android:id="@+id/consultDate"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:text="@{receivedDto.date + ' ' + receivedDto.startTime}"
-            android:textSize="16dp"
-            app:layout_constraintStart_toEndOf="@id/textViewConsultationDate"
-            app:layout_constraintTop_toTopOf="@id/textViewConsultationDate" />
+            android:layout_height="18dp"
+            android:layout_marginTop="5dp"
+            android:text="@{applyInfo.startDate + ` ` + applyInfo.startTime + ` 상담 예정`}"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            app:layout_constraintStart_toStartOf="@+id/textViewConsultationDate"
+            app:layout_constraintTop_toBottomOf="@+id/textViewConsultationDate" />
 
         <TextView
             android:id="@+id/textViewConsultationContent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="20dp"
             android:text="상담 내용"
-            android:textSize="16dp"
+            android:textSize="18sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/consultDate" />
 
@@ -129,13 +142,15 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="16dp"
                 android:text="@{receivedDto.content}"
-                android:textSize="16dp" />
+                android:textSize="16sp"
+                android:textColor="@color/black"/>
 
         </LinearLayout>
 
         <FrameLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
@@ -147,32 +162,32 @@
                 android:layout_height="match_parent"
                 android:gravity="center"
                 android:text="이미 처리한 신청서입니다."
-                android:textSize="18dp"
-                android:textColor="@color/black"/>
+                android:textColor="@color/black"
+                android:textSize="18dp" />
 
             <LinearLayout
                 android:id="@+id/acceptOrDenyLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:weightSum="2"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
-                android:orientation="horizontal">
+                android:layout_marginStart="15dp"
+                android:layout_marginEnd="15dp"
+                android:orientation="horizontal"
+                android:weightSum="2">
 
                 <Button
                     android:id="@+id/acceptBtn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginEnd="15dp"
                     android:layout_weight="1"
-                    android:layout_marginEnd="10dp"
                     android:text="수락" />
 
                 <Button
                     android:id="@+id/rejectBtn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:layout_marginStart="10dp"
+                    android:layout_weight="1"
                     android:text="거절"
                     app:layout_constraintBottom_toBottomOf="parent" />
             </LinearLayout>

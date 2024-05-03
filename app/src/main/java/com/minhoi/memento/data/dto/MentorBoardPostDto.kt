@@ -7,6 +7,10 @@ import com.minhoi.memento.data.model.DayOfWeek
 data class MentorBoardPostDto (
     @SerializedName("title")
     val title: String,
+    @SerializedName("introduce")
+    val introduction: String,
+    @SerializedName("target")
+    val target: String,
     @SerializedName("content")
     val content: String,
     @SerializedName("consultTime")

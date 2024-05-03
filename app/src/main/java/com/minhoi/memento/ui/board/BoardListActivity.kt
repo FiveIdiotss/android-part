@@ -3,6 +3,7 @@ package com.minhoi.memento.ui.board
 import android.content.Intent
 import com.minhoi.memento.adapter.BoardAdapter
 import android.util.Log
+import android.view.MenuItem
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -39,6 +40,7 @@ class BoardListActivity : BaseActivity<ActivityBoardListBinding>() {
 
     override fun initView() {
         viewModel = ViewModelProvider(this)[BoardViewModel::class.java]
+        setUpToolbar()
 
         binding.apply {
             boardRv.adapter = boardAdapter.withLoadStateFooter(BoardLoadStateAdapter())
@@ -49,14 +51,17 @@ class BoardListActivity : BaseActivity<ActivityBoardListBinding>() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.boardList.collectLatest {
-                    Log.d("ENDLESS", "onCreate:${it.toString()} ")
                     when (it) {
                         is UiState.Empty -> {}
-                        is UiState.Loading -> {}
+                        is UiState.Loading -> {
+                            supportFragmentManager.showLoading()
+                        }
                         is UiState.Success -> {
+                            supportFragmentManager.hideLoading()
                             boardAdapter.submitData(it.data)
                         }
                         is UiState.Error -> {
+                            supportFragmentManager.hideLoading()
                             showToast("게시글을 불러오는데 실패했습니다.")
                         }
                     }
@@ -85,5 +90,22 @@ class BoardListActivity : BaseActivity<ActivityBoardListBinding>() {
                 }
             }
         }
+    }
+    private fun setUpToolbar() {
+        setSupportActionBar(binding.boardListToolbar)
+        supportActionBar?.apply {
+            setDisplayShowTitleEnabled(false)
+            setDisplayHomeAsUpEnabled(true)
+        }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> {
+                finish()
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 }

@@ -4,15 +4,18 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import android.util.Base64
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.minhoi.memento.databinding.FragmentEditProfileImageBottomSheetDialogBinding
 import com.minhoi.memento.utils.setOnSingleClickListener
+import java.io.ByteArrayOutputStream
 
 class EditProfileImageBottomSheetDialog : BottomSheetDialogFragment() {
 
@@ -33,19 +36,7 @@ class EditProfileImageBottomSheetDialog : BottomSheetDialogFragment() {
 
         binding.apply {
             selectPicture.setOnSingleClickListener {
-                if (ContextCompat.checkSelfPermission(
-                        requireContext(),
-                        Manifest.permission.READ_EXTERNAL_STORAGE
-                    ) != PackageManager.PERMISSION_GRANTED
-                ) {
-                    ActivityCompat.requestPermissions(
-                        requireActivity(),
-                        permissions,
-                        PERMISSION_CODE
-                    )
-                } else {
-                    pickImageFromGallery()
-                }
+                pickImageFromGallery()
             }
             setDefaultProfile.setOnSingleClickListener {
                 (activity as? PhotoPickerListener)?.onSetDefaultProfile()
@@ -58,13 +49,13 @@ class EditProfileImageBottomSheetDialog : BottomSheetDialogFragment() {
     }
 
     private val pickImageContract =
-        registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri: Uri? ->
             (activity as? PhotoPickerListener)?.onPhotoPicked(uri)
             dismiss()
         }
 
     private fun pickImageFromGallery() {
-        pickImageContract.launch("image/*")
+        pickImageContract.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
     }
 
     // 선택한 이미지의 URI를 Activity로 전달하기 위해 인터페이스 사용
