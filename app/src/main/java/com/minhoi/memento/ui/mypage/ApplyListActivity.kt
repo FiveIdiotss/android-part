@@ -1,16 +1,27 @@
 package com.minhoi.memento.ui.mypage
 
 import android.content.Intent
+import android.util.Log
+import android.view.MenuItem
 import android.view.View
 import androidx.activity.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.minhoi.memento.R
 import com.minhoi.memento.adapter.ApplyListAdapter
 import com.minhoi.memento.adapter.ReceivedListAdapter
 import com.minhoi.memento.base.BaseActivity
 import com.minhoi.memento.databinding.ActivityApplyListBinding
+import com.minhoi.memento.ui.UiState
 import com.minhoi.memento.ui.board.BoardActivity
 import com.minhoi.memento.ui.mypage.received.ReceivedContentActivity
+import com.minhoi.memento.utils.hideLoading
+import com.minhoi.memento.utils.showLoading
+import com.minhoi.memento.utils.showToast
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 class ApplyListActivity : BaseActivity<ActivityApplyListBinding>() {
     private val viewModel by viewModels<MypageViewModel>()
@@ -23,11 +34,15 @@ class ApplyListActivity : BaseActivity<ActivityApplyListBinding>() {
         val intent = intent
         // apply or receive
         requestType = intent.getStringExtra("requestType")!!
-
+        setSupportActionBar(binding.toolbar)
+        supportActionBar?.apply {
+            setDisplayShowTitleEnabled(false)
+            setDisplayHomeAsUpEnabled(true)
+        }
         when (requestType) {
             TYPE_APPLY -> {
+                binding.toolbarText.text = APPLY_TITLE
                 viewModel.getApplyList()
-                binding.requestTypeTitle.text = APPLY_TITLE
                 applyListAdapter = ApplyListAdapter(
                     onBoardClickListener = {
                         // onClickListener
@@ -48,19 +63,26 @@ class ApplyListActivity : BaseActivity<ActivityApplyListBinding>() {
             }
 
             TYPE_RECEIVE -> {
-                viewModel.getReceivedList()
-                binding.requestTypeTitle.text = RECEIVE_TITLE
-                receivedListAdapter = ReceivedListAdapter() {
-                    // onClickListener
-                    // 선택한 신청서 내용 Activity에 전달
-                    startActivity(Intent(this, ReceivedContentActivity::class.java).apply {
-                        putExtra("receivedDto", it)
-                    })
-                }
+                binding.toolbarText.text = RECEIVE_TITLE
+                viewModel.getBoardsWithReceivedMentoring()
+                receivedListAdapter = ReceivedListAdapter(
+                    onBoardClickListener = {
+                        // 해당 글 id 전달
+                        startActivity(Intent(this, BoardActivity::class.java).apply {
+                            putExtra("boardId", it)
+                        })
+                    },
+                    onReceivedItemClickListener = {
+                        // 선택한 신청서 내용 Activity에 전달
+                        startActivity(Intent(this, ReceivedContentActivity::class.java).apply {
+                            Log.d("BoardActivity", "initView: $it")
+                            putExtra("receivedDto", it)
+                        })
+                    }
+                )
                 observeReceivedList()
             }
         }
-
 
         binding.applyListRv.apply {
             when(requestType) {
@@ -72,24 +94,54 @@ class ApplyListActivity : BaseActivity<ActivityApplyListBinding>() {
 
     }
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> {
+                finish()
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
     private fun observeApplyList() {
         viewModel.applyList.observe(this) {
             if (it.isNullOrEmpty()) {
-                binding.emptyApplyList.visibility = View.VISIBLE
+                binding.emptyApplyListLayout.visibility = View.VISIBLE
             } else {
-                binding.emptyApplyList.visibility = View.GONE
+                binding.emptyApplyListLayout.visibility = View.GONE
                 applyListAdapter.setList(it)
             }
         }
     }
 
     private fun observeReceivedList() {
-        viewModel.receivedList.observe(this) {
-            if (it.isNullOrEmpty()) {
-                binding.emptyApplyList.visibility = View.VISIBLE
-            } else {
-                binding.emptyApplyList.visibility = View.GONE
-                receivedListAdapter.setList(it)
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.boardsWithReceivedMentoring.collectLatest {
+                    when (it) {
+                        is UiState.Empty -> {}
+                        is UiState.Loading -> {
+                            supportFragmentManager.showLoading()
+                        }
+
+                        is UiState.Success -> {
+                            supportFragmentManager.hideLoading()
+                            if (it.data.isEmpty()) {
+                                binding.emptyApplyListLayout.visibility = View.VISIBLE
+                            } else {
+                                binding.emptyApplyListLayout.visibility = View.GONE
+                                receivedListAdapter.setList(it.data)
+                            }
+                            Log.d("ApplyListActivity", "observeReceivedList: ${it.data}")
+                        }
+
+                        is UiState.Error -> {
+                            supportFragmentManager.hideLoading()
+                            showToast(it.error?.message.toString())
+                        }
+                    }
+                }
             }
         }
     }

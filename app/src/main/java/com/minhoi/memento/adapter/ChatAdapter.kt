@@ -6,9 +6,11 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.minhoi.memento.data.dto.chat.ChatDate
 import com.minhoi.memento.data.dto.chat.ChatMessage
 import com.minhoi.memento.data.dto.chat.Receiver
 import com.minhoi.memento.data.dto.chat.Sender
+import com.minhoi.memento.databinding.ChatDateItemBinding
 import com.minhoi.memento.databinding.ReceiverMessageRowItemBinding
 import com.minhoi.memento.databinding.SenderMessageRowItemBinding
 
@@ -31,7 +33,7 @@ class ChatAdapter(private val onImageClicked: (String) -> Unit) : ListAdapter<Ch
                 binding.senderImageView.visibility = View.VISIBLE
                 binding.senderMessage.visibility = View.GONE
             }
-            if (!item.showDate) {
+            if (!item.showMinute) {
                 binding.senderDate.visibility = View.GONE
             } else {
                 binding.senderDate.visibility = View.VISIBLE
@@ -56,7 +58,7 @@ class ChatAdapter(private val onImageClicked: (String) -> Unit) : ListAdapter<Ch
                 binding.receiverImageView.visibility = View.VISIBLE
                 binding.receiverMessage.visibility = View.GONE
             }
-            if (!item.showDate) {
+            if (!item.showMinute) {
                 binding.apply {
                     receiverDate.visibility = View.GONE
                     profileImage.visibility = View.INVISIBLE
@@ -69,6 +71,12 @@ class ChatAdapter(private val onImageClicked: (String) -> Unit) : ListAdapter<Ch
                     receiverName.visibility = View.VISIBLE
                 }
             }
+        }
+    }
+
+    inner class DateViewHolder(private val binding: ChatDateItemBinding) : RecyclerView.ViewHolder(binding.root) {
+        fun bind(item: ChatDate) {
+            binding.chatDate = item
         }
     }
 
@@ -85,6 +93,11 @@ class ChatAdapter(private val onImageClicked: (String) -> Unit) : ListAdapter<Ch
                 ReceiverViewHolder(binding)
             }
 
+            VIEW_TYPE_DATE -> {
+                val binding = ChatDateItemBinding.inflate(inflater, parent, false)
+                DateViewHolder(binding)
+            }
+
             else -> throw IllegalArgumentException("Invalid view type")
         }
     }
@@ -94,6 +107,7 @@ class ChatAdapter(private val onImageClicked: (String) -> Unit) : ListAdapter<Ch
         when (holder) {
             is SenderViewHolder -> holder.bind(item as Sender)
             is ReceiverViewHolder -> holder.bind(item as Receiver)
+            is DateViewHolder -> holder.bind(item as ChatDate)
         }
     }
 
@@ -102,6 +116,7 @@ class ChatAdapter(private val onImageClicked: (String) -> Unit) : ListAdapter<Ch
         return when (item) {
             is Sender -> VIEW_TYPE_SENDER
             is Receiver -> VIEW_TYPE_RECEIVER
+            is ChatDate -> VIEW_TYPE_DATE
             else -> throw IllegalArgumentException("Invalid message type")
         }
     }
@@ -109,6 +124,7 @@ class ChatAdapter(private val onImageClicked: (String) -> Unit) : ListAdapter<Ch
     companion object {
         private const val VIEW_TYPE_SENDER = 0
         private const val VIEW_TYPE_RECEIVER = 1
+        private const val VIEW_TYPE_DATE = 2
     }
 
     class DiffCallback : DiffUtil.ItemCallback<ChatMessage>() {

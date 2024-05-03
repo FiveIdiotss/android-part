@@ -31,11 +31,13 @@ object BindingAdapter {
     fun formatChatRoomDate(view: TextView, date: String?) {
         date?.let {
             val today = LocalDate.now()
+            val day = parseLocalDateTime(date.toString()).substring(0, 13)
+            val time = parseLocalDateTime(date.toString()).substring(14, 22)
 
             if (LocalDateTime.parse(date).toLocalDate().isEqual(today)) {
-                view.text = parseLocalDateTime(date.toString()).substring(0, 8)
+                view.text = time
             } else {
-                view.text = date.format(DateTimeFormatter.ofPattern("yyyy-mm-dd")).substring(0,10)
+                view.text = day
             }
         }
     }

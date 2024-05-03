@@ -86,7 +86,7 @@
             android:layout_height="wrap_content"
             android:text="멘토링 신청 내역"
             android:textColor="@color/black"
-            android:textSize="18dp"
+            android:textSize="19sp"
             android:layout_marginTop="15dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -99,7 +99,7 @@
             android:layout_marginTop="25dp"
             android:text="멘토링 신청 받은 내역"
             android:textColor="@color/black"
-            android:textSize="18dp"
+            android:textSize="19sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
@@ -112,7 +112,7 @@
             android:layout_marginTop="25dp"
             android:text="내 멘토/멘티"
             android:textColor="@color/black"
-            android:textSize="18dp"
+            android:textSize="19sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
@@ -131,25 +131,26 @@
             app:layout_constraintTop_toBottomOf="@+id/myMentorBtn" />
 
         <TextView
-            android:id="@+id/textView21"
+            android:id="@+id/myPostsBtn"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
             android:text="내가 쓴 게시글"
             android:textColor="@color/black"
-            android:textSize="18dp"
+            android:textSize="19sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView20" />
 
         <TextView
+            android:id="@+id/bookmarkBoardsBtn"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="찜한 게시글"
             android:textColor="@color/black"
-            android:textSize="18dp"
+            android:textSize="19sp"
             android:layout_marginTop="25dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView21" />
+            app:layout_constraintTop_toBottomOf="@+id/myPostsBtn" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

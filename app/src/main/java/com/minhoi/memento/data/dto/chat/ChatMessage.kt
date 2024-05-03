@@ -5,6 +5,6 @@ interface ChatMessage {
     val content: String?
     var date: String
     val name: String?
-    var showDate: Boolean
+    var showMinute: Boolean
     val image: String?
 }

@@ -15,6 +15,7 @@ class SelectTimeTableAdapter(private val onSelectListener: (String) -> Unit) : R
     inner class TimeTableViewHolder(private val binding: TimetableSelectItemBinding) : RecyclerView.ViewHolder(binding.root) {
         init {
             binding.root.setOnSingleClickListener {
+                onSelectListener(timeTable[bindingAdapterPosition])
                 when (selectedPosition) {
                     -1 -> setSingleSelection(bindingAdapterPosition)
                     else -> {
@@ -28,7 +29,6 @@ class SelectTimeTableAdapter(private val onSelectListener: (String) -> Unit) : R
 
         fun bind(item: String) {
             binding.startTime.text = item.substring(0,5)
-            onSelectListener(timeTable[bindingAdapterPosition])
         }
     }
 

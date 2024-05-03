@@ -13,7 +13,10 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import com.minhoi.memento.data.network.ApiResult
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import retrofit2.HttpException
 import retrofit2.Response
 import java.net.SocketTimeoutException
@@ -25,19 +28,25 @@ const val DEFAULT_INTERVAL = 5
 const val MINUTES_MIN = 0
 const val MINUTES_MAX = 60
 
-@SuppressLint("PrivateApi")
+@SuppressLint("PrivateApi", "DiscouragedApi")
 fun TimePicker.setTimeInterval(
     timeInterval: Int = DEFAULT_INTERVAL
 ) {
     try {
-        val classForId = Class.forName("com.android.internal.R\$id")
-        val fieldId = classForId.getField("minute").getInt(null)
-
+        val fieldId: Int = if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
+            // 안드로이드 10 이하 버전에서는 reflection을 사용
+            val classForId = Class.forName("com.android.internal.R\$id")
+            classForId.getField("minute").getInt(null)
+        } else {
+            // 안드로이드 11 이상 버전에서는 Resources.getSystem()을 사용
+            context.resources.getIdentifier("minute", "id", "android")
+        }
         (this.findViewById(fieldId) as NumberPicker).apply {
             minValue = MINUTES_MIN
             maxValue = MINUTES_MAX / timeInterval - 1
             displayedValues = getDisplayedValue(timeInterval)
             wrapSelectorWheel = false
+            setOnValueChangedListener(null)
         }
     } catch (e: Exception) {
         e.printStackTrace()
@@ -64,7 +73,17 @@ fun Context.showToast(message: String, duration: Int = Toast.LENGTH_SHORT) {
 }
 
 fun IntRange.overlaps(other: IntRange): Boolean {
-    return other.first in this
+    return this.first < other.last && this.last > other.first
+}
+
+// List<IntRange>를 받고, 새로운 IntRange가 주어진 리스트 내의 범위와 중복되는지 확인하는 함수
+fun List<IntRange>.containsOverlap(newRange: IntRange): Boolean {
+    // 리스트 내부의 각 IntRange와 새로운 IntRange가 중복되는지 확인.
+    this.forEach {
+        if (it.overlaps(newRange))
+            return true
+    }
+    return false
 }
 
 // DialogFragment 크기 조절
@@ -121,6 +140,15 @@ fun <T> safeFlow(apiFunc: suspend () -> Response<T>): Flow<ApiResult<T>> = flow 
     catch (e: Exception) {
         emit(ApiResult.Error(e, e.message))
     }
+}
+
+/*
+    * List를 생산하는 Flow에서 ApiResult가 Success일 경우 List를, 그 이외인 경우 null을 반환하는 함수(UiState에 반영하지 않고 사용할 때)
+ */
+suspend fun <T> Flow<ApiResult<List<T>>>.extractSuccess(): List<T>? {
+    return this.filter { it is ApiResult.Success }
+        .map { (it as ApiResult.Success).value }
+        .firstOrNull()
 }
 
 fun parseLocalDateTime(localDateTimeString: String): String {

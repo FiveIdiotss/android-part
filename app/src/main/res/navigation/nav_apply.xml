@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_apply"
+    app:startDestination="@id/applySelectDateFragment">
+
+    <fragment
+        android:id="@+id/applySelectDateFragment"
+        android:name="com.minhoi.memento.ui.board.ApplySelectDateFragment"
+        android:label="상담 시간 선택(1/2)">
+        <action
+            android:id="@+id/action_applySelectDateFragment_to_applyShowResultFragment"
+            app:destination="@id/applyShowResultFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/applyShowResultFragment"
+        android:name="com.minhoi.memento.ui.board.ApplyShowResultFragment"
+        android:label="신청 정보 확인(2/2)" >
+        <action
+            android:id="@+id/action_applyShowResultFragment_to_applySelectDateFragment"
+            app:destination="@id/applySelectDateFragment" />
+    </fragment>
+</navigation>
