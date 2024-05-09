@@ -8,41 +8,45 @@
         android:layout_height="match_parent"
         tools:context=".ui.mypage.MyMentoringActivity">
 
-        <TextView
-            android:id="@+id/textView17"
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/myMentoringToolbar"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:gravity="center"
-            android:text="내 멘토/멘티"
-            android:textColor="@color/black"
-            android:textSize="20sp"
+            android:layout_height="?actionBarSize"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent">
 
+            <TextView
+                android:id="@+id/toolbarText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="내 멘토/멘티"
+                android:textSize="18sp"
+                android:textColor="@color/black"
+                android:layout_gravity="center"/>
+
+        </androidx.appcompat.widget.Toolbar>
 
         <TextView
             android:id="@+id/textView38"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:layout_marginStart="10dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="10dp"
             android:text="내 멘토"
             android:textColor="@color/black"
             android:textSize="18sp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView17" />
+            app:layout_constraintTop_toBottomOf="@+id/myMentoringToolbar" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/myMenteeRv"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/textView37"
             app:layout_constraintTop_toBottomOf="@+id/textView37" />
 
 
@@ -51,7 +55,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="50dp"
-            android:layout_marginStart="10dp"
+            android:layout_marginStart="20dp"
             android:text="내 멘티"
             android:textColor="@color/black"
             android:textSize="18sp"
@@ -62,9 +66,9 @@
             android:id="@+id/myMentorRv"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/textView38"
             app:layout_constraintTop_toBottomOf="@+id/textView38" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
