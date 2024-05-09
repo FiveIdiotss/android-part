@@ -2,23 +2,39 @@ package com.minhoi.memento
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.viewpager2.widget.ViewPager2
+import com.minhoi.memento.adapter.IntroPagerAdapter
 import com.minhoi.memento.base.BaseActivity
 import com.minhoi.memento.databinding.ActivityIntroBinding
 import com.minhoi.memento.ui.join.JoinActivity
 import com.minhoi.memento.ui.login.LoginActivity
+import com.minhoi.memento.utils.setOnSingleClickListener
 
 class IntroActivity : BaseActivity<ActivityIntroBinding>() {
 
     override val layoutResourceId: Int = R.layout.activity_intro
+    private val pagerList = mutableListOf<String>()
+    private lateinit var introPagerAdapter: IntroPagerAdapter
 
     override fun initView() {
-        binding.apply {
-            toJoinBtn.setOnClickListener {
-                startActivity(Intent(this@IntroActivity, JoinActivity::class.java))
-            }
-            toLoginBtn.setOnClickListener {
-                startActivity(Intent(this@IntroActivity, LoginActivity::class.java))
-            }
+        pagerList.add("1")
+        pagerList.add("2")
+        pagerList.add("3")
+
+        introPagerAdapter = IntroPagerAdapter(pagerList)
+        setUpViewPager()
+
+        binding.startAppBtn.setOnSingleClickListener {
+            val introBottomSheetDialog = IntroBottomSheetDialog()
+            introBottomSheetDialog.show(supportFragmentManager, introBottomSheetDialog.tag)
+        }
+    }
+
+    private fun setUpViewPager() {
+        binding.introViewPager.apply {
+            adapter = introPagerAdapter
+            orientation = ViewPager2.ORIENTATION_HORIZONTAL
+            binding.introDotsIndicator.attachTo(this)
         }
     }
 }
