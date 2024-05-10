@@ -1,6 +1,7 @@
 package com.minhoi.memento.adapter
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.paging.LoadState
@@ -14,6 +15,8 @@ class BoardLoadStateAdapter : LoadStateAdapter<BoardLoadStateAdapter.ViewHolder>
     inner class ViewHolder(private val binding: ListItemFooterBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(loadState: LoadState) {
             binding.loadingProgressBar.isVisible = loadState is LoadState.Loading
+            binding.errorMessageTextView.isVisible = loadState is LoadState.Error
+            binding.retryButton.isVisible = loadState is LoadState.Error
         }
     }
 
