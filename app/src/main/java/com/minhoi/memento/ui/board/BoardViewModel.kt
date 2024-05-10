@@ -100,8 +100,8 @@ class BoardViewModel() : ViewModel() {
                         val boardContent = response.boardDTO.copy(isBookmarked = isBookmarked)
                         _boardContent.update { UiState.Success(boardContent) }
                     },
-                    onError = { errorMsg ->
-                        _boardContent.update { UiState.Error(Throwable(errorMsg))}
+                    onError = { error ->
+                        _boardContent.update { UiState.Error(error.exception) }
                     }
                 )
             }
@@ -133,8 +133,8 @@ class BoardViewModel() : ViewModel() {
                     onSuccess = {
                         _applyState.update { UiState.Success(true) }
                     },
-                    onError = { errorMsg ->
-                        _applyState.update { UiState.Error(Throwable(errorMsg)) }
+                    onError = { error ->
+                        _applyState.update { UiState.Error(error.exception) }
                     }
                 )
             }
@@ -154,8 +154,8 @@ class BoardViewModel() : ViewModel() {
                         _bookmarkState.update { UiState.Success(boardId) }
                         _boardBookmarkState.value = !_boardBookmarkState.value!!
                     },
-                    onError = {
-                        _bookmarkState.update { UiState.Error(Throwable(it.toString())) }
+                    onError = { error ->
+                        _bookmarkState.update { UiState.Error(error.exception) }
                     }
                 )
             }

@@ -170,7 +170,7 @@ class ChatViewModel : ViewModel() {
                         _chatRoomState.update { UiState.Success(room.id) }
                     },
                     onError = { error ->
-                        _chatRoomState.update { UiState.Error(Throwable(error)) }
+                        _chatRoomState.update { UiState.Error(error.exception) }
                     }
                 )
             }
@@ -196,7 +196,7 @@ class ChatViewModel : ViewModel() {
                         currentPage++
                     },
                     onError = { error ->
-                        _isPageLoading.value = UiState.Error(Throwable(error))
+                        _isPageLoading.value = UiState.Error(error.exception)
                         Log.d(TAG, "getMessagesError: $error")
                     }
                 )

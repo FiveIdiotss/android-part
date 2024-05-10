@@ -80,7 +80,7 @@ class HomeViewModel : ViewModel() {
                         }
                     },
                     onError = { error ->
-                        _chatRooms.update { UiState.Error(Throwable(error)) }
+                        _chatRooms.update { UiState.Error(error.exception) }
                     }
                 )
             }

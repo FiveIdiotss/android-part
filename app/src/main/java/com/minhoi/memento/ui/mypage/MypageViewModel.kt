@@ -123,8 +123,8 @@ class MypageViewModel : ViewModel() {
                     onSuccess = { applyInfo ->
                         _applyContent.update { UiState.Success(applyInfo) }
                     },
-                    onError = { errorMsg ->
-                        _applyContent.update { UiState.Error(Throwable(errorMsg)) }
+                    onError = { error ->
+                        _applyContent.update { UiState.Error(error.exception) }
                     }
                 )
             }
@@ -193,8 +193,8 @@ class MypageViewModel : ViewModel() {
                     onSuccess = {
                         _imageUploadState.value = UiState.Success(true)
                     },
-                    onError = {
-                        _imageUploadState.value = UiState.Error(Throwable(it))
+                    onError = { error ->
+                        _imageUploadState.value = UiState.Error(error.exception)
                     }
                 )
             }
@@ -208,8 +208,8 @@ class MypageViewModel : ViewModel() {
                     onSuccess = {
                         _imageUploadState.value = UiState.Success(true)
                     },
-                    onError = {
-                        _imageUploadState.value = UiState.Error(Throwable(it))
+                    onError = { error ->
+                        _imageUploadState.value = UiState.Error(error.exception)
                     }
                 )
             }
@@ -236,8 +236,8 @@ class MypageViewModel : ViewModel() {
                             }
                             _memberBoards.update { UiState.Success(memberBoards) }
                         },
-                        onError = { errorMsg ->
-                            _memberBoards.update { UiState.Error(Throwable(errorMsg)) }
+                        onError = { error ->
+                            _memberBoards.update { UiState.Error(error.exception) }
                         }
                     )
                 }
@@ -292,8 +292,8 @@ class MypageViewModel : ViewModel() {
                         }
                         _bookmarkBoards.update { UiState.Success(bookmarkBoards) }
                     },
-                    onError = { errorMsg ->
-                        _bookmarkBoards.update { UiState.Error(Throwable(errorMsg)) }
+                    onError = { error ->
+                        _bookmarkBoards.update { UiState.Error(error.exception) }
                     }
                 )
             }
