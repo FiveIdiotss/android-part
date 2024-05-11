@@ -7,9 +7,6 @@ data class BoardContentDto(
     @SerializedName("boardId")
     val boardId: Long,
 
-    @SerializedName("boardType")
-    val boardType: BoardType,
-
     @SerializedName("memberName")
     val memberName: String,
 

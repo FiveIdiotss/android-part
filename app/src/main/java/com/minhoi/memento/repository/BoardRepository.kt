@@ -16,7 +16,7 @@ class BoardRepository {
     private val retrofitClient = RetrofitClient.getInstance().create(BoardService::class.java)
     private val loggedInRetrofitClient = RetrofitClient.getLoggedInInstance().create(BoardService::class.java)
 
-    suspend fun getPreviewBoards() = retrofitClient.getAllMenteeBoards(BoardType.MENTEE, 1, 10)
+    suspend fun getPreviewBoards() = retrofitClient.getAllMenteeBoards(1, 10)
 
     fun getMenteeBoardsStream(pageSize: Int): Flow<PagingData<BoardContentDto>> {
         return Pager(

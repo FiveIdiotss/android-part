@@ -45,7 +45,6 @@ class ReceivedListAdapter(
             val boardContent = item.keys.first()
             binding.board = BoardContentDto(
                 boardContent.boardId,
-                BoardType.MENTEE,
                 boardContent.memberName,
                 boardContent.title,
                 boardContent.school,

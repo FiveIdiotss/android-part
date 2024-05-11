@@ -53,7 +53,7 @@ class MemberRepository {
     }
 
     suspend fun getBookmarkBoards(): Flow<ApiResult<List<BoardContentDto>>> = flow {
-        val response = memberService.getBookmarkBoards(BoardType.MENTEE)
+        val response = memberService.getBookmarkBoards()
         if (response.isSuccessful) {
             emit(ApiResult.Success(response.body() ?: throw Exception("BookmarkBoards is null")))
         } else {
@@ -62,7 +62,7 @@ class MemberRepository {
     }
 
     suspend fun getMemberBoards(memberId: Long) = safeFlow {
-        memberService.getMemberBoards(memberId, BoardType.MENTEE)
+        memberService.getMemberBoards(memberId)
     }
 
     fun saveFCMToken(token: String) = notificationService.saveToken(token)
