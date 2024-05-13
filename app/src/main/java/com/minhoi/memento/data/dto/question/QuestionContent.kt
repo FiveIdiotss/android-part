@@ -3,7 +3,7 @@ package com.minhoi.memento.data.dto.question
 import com.google.gson.annotations.SerializedName
 
 data class QuestionContent(
-    @SerializedName("subBoardId") val questionId: String,
+    @SerializedName("subBoardId") val questionId: Long,
     val title: String,
     val content: String,
     val year: String,

@@ -6,12 +6,13 @@
     <data>
         <variable
             name="questionData"
-            type="com.minhoi.memento.data.dto.question.QuestionResponse" />
+            type="com.minhoi.memento.data.dto.question.QuestionContent" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp">
 
         <TextView
             android:id="@+id/questionTitle"
@@ -19,7 +20,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:layout_marginTop="10dp"
-            android:text="title"
+            android:text="@{questionData.title}"
             android:textColor="@color/black"
             android:textSize="19sp"
             android:textStyle="bold"
@@ -32,7 +33,7 @@
             android:layout_width="0dp"
             android:layout_height="60dp"
             android:layout_marginTop="5dp"
-            android:text="content"
+            android:text="@{questionData.content}"
             android:textColor="@color/black"
             android:textSize="17sp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -45,7 +46,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
-            android:text="서경대학교 | 컴퓨터공학과"
+            android:text="@{questionData.schoolName + ` | ` + questionData.majorName}"
             android:textColor="#999999"
             android:textSize="15sp"
             app:layout_constraintEnd_toEndOf="parent"
