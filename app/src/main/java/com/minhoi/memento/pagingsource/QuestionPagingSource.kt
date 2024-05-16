@@ -1,13 +1,14 @@
-package com.minhoi.memento.repository
+package com.minhoi.memento.pagingsource
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.minhoi.memento.data.dto.question.QuestionContent
 import com.minhoi.memento.data.network.ApiResult
+import com.minhoi.memento.repository.question.QuestionRepositoryImpl
 import kotlinx.coroutines.flow.first
 
 class QuestionPagingSource(
-    private val questionRepository: QuestionRepository,
+    private val questionRepository: QuestionRepositoryImpl,
 ) : PagingSource<Int, QuestionContent>() {
 
     override fun getRefreshKey(state: PagingState<Int, QuestionContent>): Int? {
