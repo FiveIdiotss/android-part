@@ -14,11 +14,12 @@ import com.minhoi.memento.data.dto.MentoringApplyDto
 import com.minhoi.memento.data.dto.MentoringApplyListDto
 import com.minhoi.memento.data.dto.MentoringMatchInfo
 import com.minhoi.memento.data.dto.MentoringReceivedDto
-import com.minhoi.memento.repository.MemberRepository
 import com.minhoi.memento.ui.UiState
 import com.minhoi.memento.data.model.ApplyStatus
-import com.minhoi.memento.repository.BoardRepository
+import com.minhoi.memento.repository.board.BoardRepository
+import com.minhoi.memento.repository.member.MemberRepository
 import com.minhoi.memento.utils.extractSuccess
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -26,11 +27,14 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import okhttp3.MultipartBody
+import javax.inject.Inject
 
-class MypageViewModel : ViewModel() {
+@HiltViewModel
+class MypageViewModel @Inject constructor(
+    private val memberRepository: MemberRepository,
+    private val boardRepository: BoardRepository,
+) : ViewModel() {
 
-    private val memberRepository = MemberRepository()
-    private val boardRepository = BoardRepository()
     private var member = MentoApplication.memberPrefs.getMemberPrefs()
 
     private val _applyList = MutableLiveData<List<Pair<MentoringApplyListDto, ApplyStatus>>>()

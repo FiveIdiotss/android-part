@@ -15,9 +15,11 @@ import com.minhoi.memento.utils.dialogFragmentResize
 import com.minhoi.memento.utils.hideLoading
 import com.minhoi.memento.utils.showLoading
 import com.minhoi.memento.utils.showToast
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class ApplyContentDialogFragment: DialogFragment() {
 
     private var _binding: ApplyContentDialogBinding? = null

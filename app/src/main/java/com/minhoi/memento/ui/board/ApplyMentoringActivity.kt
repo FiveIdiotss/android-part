@@ -8,7 +8,9 @@ import androidx.navigation.ui.setupWithNavController
 import com.minhoi.memento.R
 import com.minhoi.memento.base.BaseActivity
 import com.minhoi.memento.databinding.ActivityApplyMentoringBinding
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class ApplyMentoringActivity : BaseActivity<ActivityApplyMentoringBinding>() {
 
     override val layoutResourceId: Int = R.layout.activity_apply_mentoring

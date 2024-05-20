@@ -6,7 +6,9 @@ import com.minhoi.memento.R
 import com.minhoi.memento.base.BaseFragment
 import com.minhoi.memento.databinding.FragmentMypageBinding
 import com.minhoi.memento.utils.setOnSingleClickListener
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MypageFragment : BaseFragment<FragmentMypageBinding>() {
 
     override val layoutResourceId: Int = R.layout.fragment_mypage
@@ -37,6 +39,9 @@ class MypageFragment : BaseFragment<FragmentMypageBinding>() {
             }
             bookmarkBoardsBtn.setOnSingleClickListener {
                 startActivity(Intent(requireContext(), BookmarkBoardListActivity::class.java))
+            }
+            notificationSettingBtn.setOnSingleClickListener {
+                startActivity(Intent(requireContext(), NotificationSettingActivity::class.java))
             }
         }
     }

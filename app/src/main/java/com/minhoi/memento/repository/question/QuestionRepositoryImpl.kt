@@ -7,8 +7,9 @@ import com.minhoi.memento.data.network.service.QuestionService
 import com.minhoi.memento.utils.safeFlow
 import javax.inject.Inject
 
-class QuestionRepositoryImpl @Inject constructor() : QuestionRepository{
-    private val questionService = RetrofitClient.getLoggedInInstance().create(QuestionService::class.java)
+class QuestionRepositoryImpl @Inject constructor(
+    private val questionService: QuestionService
+) : QuestionRepository{
 
     override fun getQuestions(page: Int, size: Int) = safeFlow {
         questionService.getQuestions(page, size)

@@ -13,9 +13,11 @@ import com.minhoi.memento.adapter.QuestionRowAdapter
 import com.minhoi.memento.base.BaseActivity
 import com.minhoi.memento.databinding.ActivityQuestionListBinding
 import com.minhoi.memento.utils.setOnSingleClickListener
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class QuestionListActivity : BaseActivity<ActivityQuestionListBinding>() {
     override val layoutResourceId: Int = R.layout.activity_question_list
     private val viewModel by viewModels<QuestionViewModel>()
@@ -43,7 +45,7 @@ class QuestionListActivity : BaseActivity<ActivityQuestionListBinding>() {
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.getQuestions().collectLatest {
+                viewModel.getQuestions(20).collectLatest {
                     questionRowAdapter.submitData(it)
                 }
             }

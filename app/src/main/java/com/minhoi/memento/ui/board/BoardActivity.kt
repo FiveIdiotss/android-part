@@ -14,9 +14,11 @@ import com.minhoi.memento.utils.hideLoading
 import com.minhoi.memento.utils.setOnSingleClickListener
 import com.minhoi.memento.utils.showLoading
 import com.minhoi.memento.utils.showToast
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class BoardActivity : BaseActivity<ActivityBoardBinding>() {
     private val viewModel by viewModels<BoardViewModel>()
     private var boardId: Long = -1

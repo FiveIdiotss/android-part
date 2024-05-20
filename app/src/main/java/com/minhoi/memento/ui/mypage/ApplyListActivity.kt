@@ -20,9 +20,11 @@ import com.minhoi.memento.ui.mypage.received.ReceivedContentActivity
 import com.minhoi.memento.utils.hideLoading
 import com.minhoi.memento.utils.showLoading
 import com.minhoi.memento.utils.showToast
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class ApplyListActivity : BaseActivity<ActivityApplyListBinding>() {
     private val viewModel by viewModels<MypageViewModel>()
     override val layoutResourceId: Int = R.layout.activity_apply_list

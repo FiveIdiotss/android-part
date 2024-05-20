@@ -12,9 +12,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.minhoi.memento.R
 import com.minhoi.memento.databinding.FragmentSchoolInfoBinding
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
-
+@AndroidEntryPoint
 class SchoolInfoFragment : Fragment(), YearPickerDialogFragment.YearPickerDialogListener {
     private val TAG = SchoolInfoFragment::class.simpleName
 

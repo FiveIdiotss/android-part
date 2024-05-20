@@ -12,9 +12,11 @@ import com.minhoi.memento.data.dto.chat.ChatMessage
 import com.minhoi.memento.data.dto.chat.MessageDto
 import com.minhoi.memento.data.dto.chat.Receiver
 import com.minhoi.memento.data.dto.chat.Sender
-import com.minhoi.memento.repository.ChatRepository
+import com.minhoi.memento.repository.chat.ChatRepository
+import com.minhoi.memento.repository.chat.ChatRepositoryImpl
 import com.minhoi.memento.ui.UiState
 import com.minhoi.memento.utils.parseLocalDateTime
+import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,10 +28,14 @@ import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import org.json.JSONObject
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
-class ChatViewModel : ViewModel() {
+@HiltViewModel
+class ChatViewModel @Inject constructor(
+    private val chatRepository: ChatRepository
+) : ViewModel() {
+
     private val TAG = ChatViewModel::class.java.simpleName
-    private val chatRepository = ChatRepository()
     private val member = MentoApplication.memberPrefs.getMemberPrefs()
     private var currentPage: Int = 1
     private val _hasNextPage = MutableLiveData<Boolean>(true)

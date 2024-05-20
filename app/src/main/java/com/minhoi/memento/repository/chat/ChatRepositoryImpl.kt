@@ -8,8 +8,9 @@ import com.minhoi.memento.data.network.service.ChatService
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class ChatRepositoryImpl @Inject constructor() : ChatRepository {
-    private val chatService = RetrofitClient.getLoggedInInstance().create(ChatService::class.java)
+class ChatRepositoryImpl @Inject constructor(
+    private val chatService: ChatService
+) : ChatRepository {
 
     override fun getChatRooms(memberId: Long): Flow<ApiResult<List<ChatRoom>>> = safeFlow {
         chatService.getChatRooms(memberId)

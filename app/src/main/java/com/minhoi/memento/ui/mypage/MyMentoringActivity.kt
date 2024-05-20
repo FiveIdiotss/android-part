@@ -18,9 +18,11 @@ import com.minhoi.memento.ui.chat.ChatActivity
 import com.minhoi.memento.utils.hideLoading
 import com.minhoi.memento.utils.showLoading
 import com.minhoi.memento.utils.showToast
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class MyMentoringActivity : BaseActivity<ActivityMyMentoringBinding>() {
     private val TAG = MyMentoringActivity::class.java.simpleName
     override val layoutResourceId: Int = R.layout.activity_my_mentoring

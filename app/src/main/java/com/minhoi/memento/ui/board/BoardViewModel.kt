@@ -1,6 +1,5 @@
 package com.minhoi.memento.ui.board
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -11,12 +10,14 @@ import androidx.paging.map
 import com.minhoi.memento.data.dto.BoardContentDto
 import com.minhoi.memento.data.dto.BoardContentResponse
 import com.minhoi.memento.data.dto.MentoringApplyRequest
-import com.minhoi.memento.repository.BoardRepository
 import com.minhoi.memento.data.model.DayOfWeek
 import com.minhoi.memento.data.network.ApiResult
-import com.minhoi.memento.repository.MemberRepository
+import com.minhoi.memento.repository.board.BoardRepository
+import com.minhoi.memento.repository.member.MemberRepository
+import com.minhoi.memento.repository.member.MemberRepositoryImpl
 import com.minhoi.memento.ui.UiState
 import com.minhoi.memento.utils.extractSuccess
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,10 +25,13 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import javax.inject.Inject
 
-class BoardViewModel() : ViewModel() {
-    private val boardRepository = BoardRepository()
-    private val memberRepository = MemberRepository()
+@HiltViewModel
+class BoardViewModel @Inject constructor(
+    private val boardRepository: BoardRepository,
+    private val memberRepository: MemberRepository,
+) : ViewModel() {
 
     private val _post = MutableLiveData<BoardContentResponse>()
     val post: LiveData<BoardContentResponse> = _post
@@ -114,7 +118,7 @@ class BoardViewModel() : ViewModel() {
 
     fun onDateSelected(year: Int, month: Int, day: Int) {
         val selectedDay = DayOfWeek.getDayOfWeek(year, month, day)
-        selectedDate = LocalDate.of(year, month+1, day).toString()
+        selectedDate = LocalDate.of(year, month + 1, day).toString()
         selectedTime = ""
         val isAvailable = post.value?.availableDays?.contains(selectedDay) ?: false
         _isAvailableDay.value = isAvailable

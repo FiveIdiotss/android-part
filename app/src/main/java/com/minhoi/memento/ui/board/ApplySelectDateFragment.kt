@@ -11,9 +11,11 @@ import com.minhoi.memento.data.dto.TimeTableDto
 import com.minhoi.memento.databinding.FragmentApplySelectDateBinding
 import com.minhoi.memento.utils.setOnSingleClickListener
 import com.minhoi.memento.utils.showToast
+import dagger.hilt.android.AndroidEntryPoint
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
+@AndroidEntryPoint
 class ApplySelectDateFragment : BaseFragment<FragmentApplySelectDateBinding>() {
     override val layoutResourceId: Int = R.layout.fragment_apply_select_date
     private lateinit var viewModel: BoardViewModel

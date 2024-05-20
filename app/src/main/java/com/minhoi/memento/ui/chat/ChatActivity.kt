@@ -23,10 +23,12 @@ import com.minhoi.memento.utils.hideLoading
 import com.minhoi.memento.utils.setOnSingleClickListener
 import com.minhoi.memento.utils.showLoading
 import com.minhoi.memento.utils.showToast
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
 
+@AndroidEntryPoint
 class ChatActivity : BaseActivity<ActivityChatBinding>() {
     private val TAG = ChatActivity::class.java.simpleName
     override val layoutResourceId: Int = R.layout.activity_chat

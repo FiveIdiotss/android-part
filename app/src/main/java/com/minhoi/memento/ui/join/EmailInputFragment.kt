@@ -10,13 +10,14 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.minhoi.memento.R
 import com.minhoi.memento.databinding.FragmentEmailVerifyBinding
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 private const val INVALID_EMAIL_FORMAT_TEXT = "이메일 형식이 아닙니다"
 private const val VALID_INPUT_TEXT = ""
-
+@AndroidEntryPoint
 class EmailInputFragment : Fragment() {
 
     private lateinit var binding: FragmentEmailVerifyBinding

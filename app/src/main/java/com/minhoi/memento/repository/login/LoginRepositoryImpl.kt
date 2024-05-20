@@ -7,11 +7,12 @@ import com.minhoi.memento.utils.safeFlow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
-class LoginRepositoryImpl @Inject constructor() : LoginRepository {
-    private val authService = RetrofitClient.getInstance().create(AuthService::class.java)
+class LoginRepositoryImpl @Inject constructor(
+    private val authService: AuthService
+) : LoginRepository {
 
     override fun signIn(loginRequest: LoginRequest) = flow {
-        val response = authService.signIn(loginRequest)
+        val response = RetrofitClient.getInstance().create(AuthService::class.java).signIn(loginRequest)
         if (response.isSuccessful) {
             emit(response)
         } else {

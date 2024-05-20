@@ -1,17 +1,14 @@
 package com.minhoi.memento.ui.join
 
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import com.minhoi.memento.R
 import com.minhoi.memento.databinding.FragmentProfileBinding
-import kotlinx.coroutines.launch
+import dagger.hilt.android.AndroidEntryPoint
 import java.util.regex.Pattern
 
 private const val MISMATCH_PASSWORD_TEXT = "비밀번호가 일치하지 않습니다"
@@ -20,6 +17,7 @@ private const val VALID_INPUT_TEXT = ""
 private const val PASSWORD_FORMAT =
     "^(?=.*[A-Za-z])(?=.*[0-9])(?=.*[$@$!%*#?&.])[A-Za-z[0-9]$@$!%*#?&.]{8,16}$"
 
+@AndroidEntryPoint
 class ProfileFragment : Fragment() {
 
     private lateinit var binding: FragmentProfileBinding

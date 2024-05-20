@@ -4,11 +4,11 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.minhoi.memento.data.dto.question.QuestionContent
 import com.minhoi.memento.data.network.ApiResult
-import com.minhoi.memento.repository.question.QuestionRepositoryImpl
+import com.minhoi.memento.repository.question.QuestionRepository
 import kotlinx.coroutines.flow.first
 
 class QuestionPagingSource(
-    private val questionRepository: QuestionRepositoryImpl,
+    private val questionRepository: QuestionRepository,
 ) : PagingSource<Int, QuestionContent>() {
 
     override fun getRefreshKey(state: PagingState<Int, QuestionContent>): Int? {
@@ -29,9 +29,11 @@ class QuestionPagingSource(
                     nextKey = if (page == loadData.value.pageInfo.totalPages) null else page + 1
                 )
             }
+
             is ApiResult.Error -> {
                 LoadResult.Error(loadData.exception!!)
             }
+
             else -> {
                 LoadResult.Error(Exception("오류"))
             }

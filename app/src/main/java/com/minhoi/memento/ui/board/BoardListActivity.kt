@@ -17,9 +17,11 @@ import com.minhoi.memento.ui.UiState
 import com.minhoi.memento.utils.hideLoading
 import com.minhoi.memento.utils.showLoading
 import com.minhoi.memento.utils.showToast
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class BoardListActivity : BaseActivity<ActivityBoardListBinding>() {
     override val layoutResourceId: Int = R.layout.activity_board_list
     private lateinit var viewModel: BoardViewModel

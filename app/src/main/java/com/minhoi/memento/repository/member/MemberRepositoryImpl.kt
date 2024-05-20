@@ -14,15 +14,11 @@ import kotlinx.coroutines.flow.flow
 import okhttp3.MultipartBody
 import javax.inject.Inject
 
-class MemberRepositoryImpl @Inject constructor() : MemberRepository {
-
-    private val matchingService =
-        RetrofitClient.getLoggedInInstance().create(MatchingService::class.java)
-
-    private val memberService =
-        RetrofitClient.getLoggedInInstance().create(MemberService::class.java)
-    private val notificationService =
-        RetrofitClient.getLoggedInInstance().create(NotificationService::class.java)
+class MemberRepositoryImpl @Inject constructor(
+    private val memberService: MemberService,
+    private val matchingService: MatchingService,
+    private val notificationService: NotificationService,
+) : MemberRepository {
 
     override suspend fun getMemberInfo(memberId: Long) = memberService.getMemberInfo(memberId)
 
