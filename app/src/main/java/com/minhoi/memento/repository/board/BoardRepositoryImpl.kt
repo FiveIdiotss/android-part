@@ -1,12 +1,9 @@
 package com.minhoi.memento.repository.board
 
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
-import com.minhoi.memento.data.dto.BoardContentDto
+import com.minhoi.memento.data.dto.BoardListResponse
 import com.minhoi.memento.data.dto.MentoringApplyRequest
+import com.minhoi.memento.data.network.ApiResult
 import com.minhoi.memento.data.network.service.BoardService
-import com.minhoi.memento.pagingsource.BoardPagingSource
 import com.minhoi.memento.utils.safeFlow
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
@@ -16,14 +13,23 @@ class BoardRepositoryImpl @Inject constructor(
 ) : BoardRepository {
 
     override fun getPreviewBoards() = safeFlow {
-        boardService.getAllMenteeBoards(1, 10)
+        boardService.getBoardContents(1, 10)
     }
 
-    override fun getMenteeBoardsStream(pageSize: Int): Flow<PagingData<BoardContentDto>> {
-        return Pager(
-            config = PagingConfig(enablePlaceholders = false, pageSize = pageSize),
-            pagingSourceFactory = { BoardPagingSource(boardService) }
-        ).flow
+    override fun getBoardContents(page: Int, size: Int) = safeFlow {
+        boardService.getBoardContents(page, size)
+    }
+
+    override fun getBoardContentsByCategory(
+        page: Int,
+        size: Int,
+        boardCategory: String,
+    ): Flow<ApiResult<BoardListResponse>> = safeFlow {
+        boardService.getFilterBoards(page, size, false, boardCategory)
+    }
+
+    override fun getBoardContentsBySchool(page: Int, size: Int) = safeFlow {
+        boardService.getFilterBoards(page, size, true, null)
     }
 
     override fun getBoardContent(boardId: Long) = safeFlow {

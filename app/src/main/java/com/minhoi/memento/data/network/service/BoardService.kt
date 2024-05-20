@@ -19,9 +19,17 @@ interface BoardService {
     ): Response<String>
 
     @GET("api/pageBoards")
-    suspend fun getAllMenteeBoards(
+    suspend fun getBoardContents(
         @Query("page") page: Int,
         @Query("size") size: Int
+    ): Response<BoardListResponse>
+
+    @GET("api/boards/filter")
+    suspend fun getFilterBoards(
+        @Query("page") page: Int,
+        @Query("size") size: Int,
+        @Query("schoolFilter") schoolFilter: Boolean,
+        @Query("boardCategory") category: String?
     ): Response<BoardListResponse>
 
     @GET("api/board/{boardId}")
