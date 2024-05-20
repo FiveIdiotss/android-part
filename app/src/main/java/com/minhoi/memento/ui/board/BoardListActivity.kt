@@ -33,10 +33,7 @@ class BoardListActivity : BaseActivity<ActivityBoardListBinding>() {
                 intent.putExtra("boardId", it.boardId)
                 startActivity(intent)
             },
-            onBookmarkClickListener = {
-                viewModel.executeBookmark(it.boardId, it.isBookmarked)
-                Log.d("BookMarkClick", "${it}:clicked!!!!! ")
-            }
+            onBookmarkClickListener = {}
         )
     }
 
