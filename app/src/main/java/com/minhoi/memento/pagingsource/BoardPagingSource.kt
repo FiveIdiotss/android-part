@@ -1,12 +1,18 @@
 package com.minhoi.memento.pagingsource
 
-import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.minhoi.memento.data.dto.BoardContentDto
-import com.minhoi.memento.data.network.service.BoardService
+import com.minhoi.memento.data.network.ApiResult
+import com.minhoi.memento.repository.board.BoardRepository
+import kotlinx.coroutines.flow.first
 
-class BoardPagingSource(private val api: BoardService) : PagingSource<Int, BoardContentDto>() {
+class BoardPagingSource(
+    private val boardRepository: BoardRepository,
+    private val schoolFilter: Boolean = false,
+    private val category: String?
+
+) : PagingSource<Int, BoardContentDto>() {
     override fun getRefreshKey(state: PagingState<Int, BoardContentDto>): Int? {
         return state.anchorPosition?.let { position ->
             state.closestPageToPosition(position)?.prevKey?.plus(1)
@@ -16,26 +22,24 @@ class BoardPagingSource(private val api: BoardService) : PagingSource<Int, Board
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, BoardContentDto> {
         val page = params.key ?: STARTING_KEY
-        return try {
-            val response = api.getAllMenteeBoards(page, params.loadSize)
-            val boardData = response.body()
-            if (response.isSuccessful) {
-                Log.d("ENDLESS", "load: ${response.body()?.content.toString()}")
+
+        val loadData = when {
+            schoolFilter -> boardRepository.getBoardContentsBySchool(page, params.loadSize).first()
+            category != null -> boardRepository.getBoardContentsByCategory(page, params.loadSize, category).first()
+            else -> boardRepository.getBoardContents(page, params.loadSize).first()
+        }
+
+        return when (loadData) {
+            is ApiResult.Success -> {
                 LoadResult.Page(
-                    data = boardData?.content ?: emptyList(),
+                    data = loadData.value.content,
                     prevKey = if (page == 1) null else page - 1,
-                    nextKey = if (boardData?.pageInfo?.totalPages == page) null else page + 1
-                )
-            } else {
-                Log.d("ENDLESS", "loadError: ${response.errorBody()} ")
-                LoadResult.Page(
-                    data = emptyList(),
-                    prevKey = null,
-                    nextKey = null
+                    nextKey = if (page == loadData.value.pageInfo.totalPages) null else page + 1
                 )
             }
-        } catch (e: Exception) {
-            return LoadResult.Error(e)
+
+            is ApiResult.Error -> LoadResult.Error(loadData.exception!!)
+            else -> LoadResult.Error(Exception("오류"))
         }
     }
 
