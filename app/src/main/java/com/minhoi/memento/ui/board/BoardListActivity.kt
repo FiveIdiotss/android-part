@@ -47,6 +47,21 @@ class BoardListActivity : BaseActivity<ActivityBoardListBinding>() {
                 LinearLayoutManager(this@BoardListActivity, LinearLayoutManager.VERTICAL, false)
         }
 
+        binding.filterCategoryBtn.setOnSingleClickListener {
+            SelectBoardCategoryBottomSheetDialog().apply {
+                selectCategory(object :
+                    SelectBoardCategoryBottomSheetDialog.OnCategorySelectedListener {
+                    override fun onCategorySelected(category: String) {
+                        binding.filterCategoryBtn.text = category
+                        when (category) {
+                            "모든 단과대" -> viewModel.setCategoryFilter(null)
+                            else -> viewModel.setCategoryFilter(category)
+                        }
+                    }
+                })
+            }.show(supportFragmentManager, "selectCategoryFragment")
+        }
+
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.boardList.collectLatest {
