@@ -5,7 +5,6 @@ import androidx.paging.PagingState
 import com.minhoi.memento.data.dto.BoardContentDto
 import com.minhoi.memento.data.network.ApiResult
 import com.minhoi.memento.repository.board.BoardRepository
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 
 class BoardPagingSource(
@@ -24,12 +23,14 @@ class BoardPagingSource(
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, BoardContentDto> {
         val page = params.key ?: STARTING_KEY
         val loadData = boardRepository.getFilterBoardContents(page, params.loadSize, category, schoolFilter).first()
+
         return when (loadData) {
+
             is ApiResult.Success -> {
                 LoadResult.Page(
                     data = loadData.value.content,
                     prevKey = if (page == 1) null else page - 1,
-                    nextKey = if (page == loadData.value.pageInfo.totalPages) null else page + 1
+                    nextKey = if (page == loadData.value.pageInfo.totalPages || loadData.value.pageInfo.totalPages == 0) null else page + 1
                 )
             }
 
