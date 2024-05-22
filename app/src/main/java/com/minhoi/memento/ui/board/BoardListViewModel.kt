@@ -10,7 +10,10 @@ import com.minhoi.memento.repository.board.BoardRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
@@ -22,11 +25,35 @@ class BoardListViewModel @Inject constructor(
 
     private val categoryQueryFlow = MutableStateFlow<String?>(null)
     private val schoolFilterFlow = MutableStateFlow<Boolean>(false)
+    private val _searchQueryFlow = MutableStateFlow<String?>(null)
+    val searchQueryFlow: StateFlow<String?> = _searchQueryFlow.asStateFlow()
 
     private val combineFilterFlow =
         combine(categoryQueryFlow, schoolFilterFlow) { category, school ->
             Pair(category, school)
         }
+
+    private val combineSearchAndFilterFlow =
+        combine(combineFilterFlow, searchQueryFlow.debounce(300)) { filter, search ->
+            Pair(filter,search)
+        }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun getFilterBoardBySearch() =
+        combineSearchAndFilterFlow.flatMapLatest { (filter, search) ->
+            Pager(
+                config = PagingConfig(pageSize = 20),
+                pagingSourceFactory = {
+                    BoardPagingSource(
+                        boardRepository,
+                        schoolFilter = filter.second,
+                        category = filter.first,
+                        searchQuery = search
+                    )
+                }
+            ).flow.cachedIn(viewModelScope)
+        }
+
 
     @OptIn(ExperimentalCoroutinesApi::class)
     fun getFilterBoardStream() =
@@ -37,7 +64,8 @@ class BoardListViewModel @Inject constructor(
                     BoardPagingSource(
                         boardRepository,
                         schoolFilter = school,
-                        category = category
+                        category = category,
+                        searchQuery = null
                     )
                 }
             ).flow.cachedIn(viewModelScope)
@@ -49,6 +77,10 @@ class BoardListViewModel @Inject constructor(
 
     fun setSchoolFilter(isChecked: Boolean) {
         schoolFilterFlow.update { isChecked }
+    }
+
+    fun setSearchQuery(query: String?) {
+        _searchQueryFlow.update { query }
     }
 
 }
