@@ -14,7 +14,7 @@ interface BoardRepository {
 
     fun getBoardContent(boardId: Long): Flow<ApiResult<BoardContentResponse>>
 
-    fun getBoardContentsByCategory(page: Int, size: Int, boardCategory: String): Flow<ApiResult<BoardListResponse>>
+    fun getFilterBoardContents(page: Int, size: Int, boardCategory: String?, schoolFilter: Boolean, searchQuery: String?): Flow<ApiResult<BoardListResponse>>
 
     fun getBoardContentsBySchool(page: Int, size: Int): Flow<ApiResult<BoardListResponse>>
 

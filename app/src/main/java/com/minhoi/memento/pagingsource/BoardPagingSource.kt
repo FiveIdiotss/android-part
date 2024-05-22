@@ -10,7 +10,8 @@ import kotlinx.coroutines.flow.first
 class BoardPagingSource(
     private val boardRepository: BoardRepository,
     private val schoolFilter: Boolean = false,
-    private val category: String?
+    private val category: String?,
+    private val searchQuery: String?
 
 ) : PagingSource<Int, BoardContentDto>() {
     override fun getRefreshKey(state: PagingState<Int, BoardContentDto>): Int? {
@@ -22,7 +23,7 @@ class BoardPagingSource(
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, BoardContentDto> {
         val page = params.key ?: STARTING_KEY
-        val loadData = boardRepository.getFilterBoardContents(page, params.loadSize, category, schoolFilter).first()
+        val loadData = boardRepository.getFilterBoardContents(page, params.loadSize, category, schoolFilter, searchQuery).first()
 
         return when (loadData) {
 

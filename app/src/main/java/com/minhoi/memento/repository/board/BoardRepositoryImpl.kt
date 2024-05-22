@@ -20,16 +20,18 @@ class BoardRepositoryImpl @Inject constructor(
         boardService.getBoardContents(page, size)
     }
 
-    override fun getBoardContentsByCategory(
+    override fun getFilterBoardContents(
         page: Int,
         size: Int,
-        boardCategory: String,
+        boardCategory: String?,
+        schoolFilter: Boolean,
+        searchQuery: String?
     ): Flow<ApiResult<BoardListResponse>> = safeFlow {
-        boardService.getFilterBoards(page, size, false, boardCategory)
+        boardService.getFilterBoards(page, size, schoolFilter, boardCategory, searchQuery)
     }
 
     override fun getBoardContentsBySchool(page: Int, size: Int) = safeFlow {
-        boardService.getFilterBoards(page, size, true, null)
+        boardService.getFilterBoards(page, size, true, null, null)
     }
 
     override fun getBoardContent(boardId: Long) = safeFlow {

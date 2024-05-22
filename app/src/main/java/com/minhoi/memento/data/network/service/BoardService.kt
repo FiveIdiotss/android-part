@@ -29,7 +29,8 @@ interface BoardService {
         @Query("page") page: Int,
         @Query("size") size: Int,
         @Query("schoolFilter") schoolFilter: Boolean,
-        @Query("boardCategory") category: String?
+        @Query("boardCategory") category: String?,
+        @Query("keyWord") searchQuery: String?
     ): Response<BoardListResponse>
 
     @GET("api/board/{boardId}")
