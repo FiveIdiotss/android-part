@@ -1,10 +1,12 @@
 package com.minhoi.memento.ui.board
 
 import android.content.Intent
+import android.view.Menu
 import com.minhoi.memento.adapter.BoardAdapter
 import android.view.MenuItem
 import android.view.View
 import androidx.activity.viewModels
+import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -18,6 +20,7 @@ import com.minhoi.memento.databinding.ActivityBoardListBinding
 import com.minhoi.memento.utils.setOnSingleClickListener
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -90,9 +93,19 @@ class BoardListActivity : BaseActivity<ActivityBoardListBinding>() {
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.getFilterBoardStream().collectLatest {
-                    boardAdapter.submitData(it)
-                }
+                viewModel.searchQueryFlow
+                    .flatMapLatest { query ->
+                        if (query.isNullOrBlank()) {
+                            // 검색어가 없는 경우 기본 데이터 스트림 구독
+                            viewModel.getFilterBoardStream()
+                        } else {
+                            // 검색어가 있는 경우 검색 데이터 스트림 구독
+                            viewModel.getFilterBoardBySearch()
+                        }
+                    }
+                    .collectLatest { pagingData ->
+                        boardAdapter.submitData(pagingData)
+                    }
             }
         }
     }
@@ -105,10 +118,33 @@ class BoardListActivity : BaseActivity<ActivityBoardListBinding>() {
         }
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.boardlist_toolbar_menu, menu)
+        val searchItem = menu?.findItem(R.id.action_search)
+        val searchView = searchItem?.actionView as? SearchView
+
+        searchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                // 입력 필드의 텍스트가 변경될 때마다 호출
+                viewModel.setSearchQuery(newText)
+                return true
+            }
+        })
+
+        return super.onCreateOptionsMenu(menu)
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
                 finish()
+                return true
+            }
+            R.id.action_search -> {
                 return true
             }
         }
