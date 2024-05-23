@@ -3,10 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
+
         <variable
             name="senderData"
             type="com.minhoi.memento.data.dto.chat.Sender" />
-        <import type="android.view.View"/>
+
+        <import type="android.view.View" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -25,42 +27,25 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <TextView
-                android:id="@+id/senderMessage"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:autoLink="web"
-                android:linksClickable="true"
-                android:padding="8dp"
-                android:text="@{senderData.content}"
-                android:textSize="16sp"
-                android:textColor="@color/white"
-                android:maxWidth="200dp"
-                android:background="@drawable/sender_chat_item" />
-
-            <androidx.cardview.widget.CardView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:cardCornerRadius="10dp">
-                <ImageView
-                    android:id="@+id/senderImageView"
-                    android:layout_width="200dp"
-                    android:layout_height="300dp"
-                    android:visibility="gone"
-                    android:scaleType="fitXY"
-                    android:layout_gravity="center"/>
-            </androidx.cardview.widget.CardView>
+                android:id="@+id/senderFile"
+                android:layout_width="200dp"
+                android:layout_height="50dp"
+                android:layout_gravity="center"
+                android:background="@drawable/textview_gray_corner"
+                android:text="@{senderData.fileUrl}" />
 
         </FrameLayout>
+
         <TextView
             android:id="@+id/senderDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{senderData.date.substring(14,22)}"
             android:layout_marginEnd="3dp"
+            android:text="@{senderData.date.substring(14,22)}"
             android:textSize="12dp"
             android:visibility="@{senderData.showMinute ? View.VISIBLE : View.GONE}"
             app:layout_constraintBottom_toBottomOf="@+id/messageFrameLayout"
-            app:layout_constraintEnd_toStartOf="@+id/messageFrameLayout"/>
+            app:layout_constraintEnd_toStartOf="@+id/messageFrameLayout" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
