@@ -33,7 +33,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ChatViewModel @Inject constructor(
-    private val chatRepository: ChatRepository
+    private val chatRepository: ChatRepository,
+    private val fileManager: FileManager
 ) : ViewModel() {
 
     private val TAG = ChatViewModel::class.java.simpleName
@@ -56,6 +57,9 @@ class ChatViewModel @Inject constructor(
 
     private val _isPageLoading = MutableStateFlow<UiState<Boolean>>(UiState.Empty)
     val isPageLoading: StateFlow<UiState<Boolean>> = _isPageLoading.asStateFlow()
+
+    private val _saveImageState = MutableStateFlow<UiState<Boolean>>(UiState.Empty)
+    val saveImageState: StateFlow<UiState<Boolean>> = _saveImageState.asStateFlow()
 
     private val intervalMillis = 5000L
     private var stomp: StompClient? = null
@@ -223,6 +227,17 @@ class ChatViewModel @Inject constructor(
             }
             else -> {
                 Receiver(chatMessage.senderName, chatMessage.content, parseLocalDateTime(chatMessage.date), chatMessage.fileType, chatMessage.fileURL, chatMessage.senderId)
+            }
+        }
+    }
+
+    fun saveImageToGallery(imageUrl: String) {
+        viewModelScope.launch {
+            _saveImageState.update { UiState.Loading }
+            val result = fileManager.saveImageToGallery(imageUrl)
+            when (result) {
+                is SaveFileResult.Success -> _saveImageState.update { UiState.Success(true) }
+                is SaveFileResult.Failure -> _saveImageState.update { UiState.Error(result.error) }
             }
         }
     }
