@@ -1,7 +1,6 @@
 package com.minhoi.memento.adapter
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -10,34 +9,20 @@ import com.minhoi.memento.data.dto.chat.ChatDate
 import com.minhoi.memento.data.dto.chat.ChatMessage
 import com.minhoi.memento.data.dto.chat.Receiver
 import com.minhoi.memento.data.dto.chat.Sender
+import com.minhoi.memento.data.model.ChatFileType
 import com.minhoi.memento.databinding.ChatDateItemBinding
+import com.minhoi.memento.databinding.ReceiverFileRowItemBinding
+import com.minhoi.memento.databinding.ReceiverImageRowItemBinding
 import com.minhoi.memento.databinding.ReceiverMessageRowItemBinding
+import com.minhoi.memento.databinding.SenderFileRowItemBinding
+import com.minhoi.memento.databinding.SenderImageRowItemBinding
 import com.minhoi.memento.databinding.SenderMessageRowItemBinding
 
-class ChatAdapter(private val onImageClicked: (String) -> Unit) : ListAdapter<ChatMessage, RecyclerView.ViewHolder>(DiffCallback()) {
+class ChatAdapter() : ListAdapter<ChatMessage, RecyclerView.ViewHolder>(DiffCallback()) {
 
     inner class SenderViewHolder(private val binding: SenderMessageRowItemBinding) : RecyclerView.ViewHolder(binding.root) {
-        init {
-            binding.senderImageView.setOnClickListener {
-                val position = bindingAdapterPosition
-                val item = getItem(position) as Sender
-                onImageClicked(item.image!!)
-            }
-        }
         fun bind(item: Sender) {
             binding.senderData = item
-            if (item.image == "null" || item.image == null) {
-                binding.senderImageView.visibility = View.GONE
-                binding.senderMessage.visibility = View.VISIBLE
-            } else {
-                binding.senderImageView.visibility = View.VISIBLE
-                binding.senderMessage.visibility = View.GONE
-            }
-            if (!item.showMinute) {
-                binding.senderDate.visibility = View.GONE
-            } else {
-                binding.senderDate.visibility = View.VISIBLE
-            }
         }
     }
 
@@ -46,31 +31,10 @@ class ChatAdapter(private val onImageClicked: (String) -> Unit) : ListAdapter<Ch
             binding.receiverImageView.setOnClickListener {
                 val position = bindingAdapterPosition
                 val item = getItem(position) as Receiver
-                onImageClicked(item.image!!)
             }
         }
         fun bind(item: Receiver) {
             binding.receiverData = item
-            if (item.image == "null" || item.image == null) {
-                binding.receiverImageView.visibility = View.GONE
-                binding.receiverMessage.visibility = View.VISIBLE
-            } else {
-                binding.receiverImageView.visibility = View.VISIBLE
-                binding.receiverMessage.visibility = View.GONE
-            }
-            if (!item.showMinute) {
-                binding.apply {
-                    receiverDate.visibility = View.GONE
-                    profileImage.visibility = View.INVISIBLE
-                    receiverName.visibility = View.GONE
-                }
-            } else {
-                binding.apply {
-                    receiverDate.visibility = View.VISIBLE
-                    profileImage.visibility = View.VISIBLE
-                    receiverName.visibility = View.VISIBLE
-                }
-            }
         }
     }
 
@@ -83,14 +47,34 @@ class ChatAdapter(private val onImageClicked: (String) -> Unit) : ListAdapter<Ch
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
-            VIEW_TYPE_SENDER -> {
+            VIEW_TYPE_SENDER_TEXT -> {
                 val binding = SenderMessageRowItemBinding.inflate(inflater, parent, false)
                 SenderViewHolder(binding)
             }
 
-            VIEW_TYPE_RECEIVER -> {
+            VIEW_TYPE_SENDER_IMAGE -> {
+                val binding = SenderImageRowItemBinding.inflate(inflater, parent, false)
+                SenderImageViewHolder(binding)
+            }
+
+            VIEW_TYPE_SENDER_FILE -> {
+                val binding = SenderFileRowItemBinding.inflate(inflater, parent, false)
+                SenderFileViewHolder(binding)
+            }
+
+            VIEW_TYPE_RECEIVER_TEXT -> {
                 val binding = ReceiverMessageRowItemBinding.inflate(inflater, parent, false)
                 ReceiverViewHolder(binding)
+            }
+
+            VIEW_TYPE_RECEIVER_IMAGE -> {
+                val binding = ReceiverImageRowItemBinding.inflate(inflater, parent, false)
+                ReceiverImageViewHolder(binding)
+            }
+
+            VIEW_TYPE_RECEIVER_FILE -> {
+                val binding = ReceiverFileRowItemBinding.inflate(inflater, parent, false)
+                ReceiverFileViewHolder(binding)
             }
 
             VIEW_TYPE_DATE -> {
@@ -106,7 +90,11 @@ class ChatAdapter(private val onImageClicked: (String) -> Unit) : ListAdapter<Ch
         val item = getItem(position)
         when (holder) {
             is SenderViewHolder -> holder.bind(item as Sender)
+            is SenderImageViewHolder -> holder.bind(item as Sender)
+            is SenderFileViewHolder -> holder.bind(item as Sender)
             is ReceiverViewHolder -> holder.bind(item as Receiver)
+            is ReceiverImageViewHolder -> holder.bind(item as Receiver)
+            is ReceiverFileViewHolder -> holder.bind(item as Receiver)
             is DateViewHolder -> holder.bind(item as ChatDate)
         }
     }
@@ -114,17 +102,29 @@ class ChatAdapter(private val onImageClicked: (String) -> Unit) : ListAdapter<Ch
     override fun getItemViewType(position: Int): Int {
         val item = getItem(position)
         return when (item) {
-            is Sender -> VIEW_TYPE_SENDER
-            is Receiver -> VIEW_TYPE_RECEIVER
+            is Sender -> when (item.type) {
+                ChatFileType.MESSAGE -> VIEW_TYPE_SENDER_TEXT
+                ChatFileType.IMAGE -> VIEW_TYPE_SENDER_IMAGE
+                else -> VIEW_TYPE_SENDER_FILE
+            }
+            is Receiver -> when (item.type) {
+                ChatFileType.MESSAGE -> VIEW_TYPE_RECEIVER_TEXT
+                ChatFileType.IMAGE -> VIEW_TYPE_RECEIVER_IMAGE
+                else -> VIEW_TYPE_RECEIVER_FILE
+            }
             is ChatDate -> VIEW_TYPE_DATE
             else -> throw IllegalArgumentException("Invalid message type")
         }
     }
 
     companion object {
-        private const val VIEW_TYPE_SENDER = 0
-        private const val VIEW_TYPE_RECEIVER = 1
-        private const val VIEW_TYPE_DATE = 2
+        private const val VIEW_TYPE_SENDER_TEXT = 0
+        private const val VIEW_TYPE_SENDER_IMAGE = 1
+        private const val VIEW_TYPE_SENDER_FILE = 2
+        private const val VIEW_TYPE_RECEIVER_TEXT = 3
+        private const val VIEW_TYPE_RECEIVER_IMAGE = 4
+        private const val VIEW_TYPE_RECEIVER_FILE = 5
+        private const val VIEW_TYPE_DATE = 6
     }
 
     class DiffCallback : DiffUtil.ItemCallback<ChatMessage>() {
