@@ -18,7 +18,7 @@ import com.minhoi.memento.databinding.SenderFileRowItemBinding
 import com.minhoi.memento.databinding.SenderImageRowItemBinding
 import com.minhoi.memento.databinding.SenderMessageRowItemBinding
 
-class ChatAdapter() : ListAdapter<ChatMessage, RecyclerView.ViewHolder>(DiffCallback()) {
+class ChatAdapter(private val onImageClickListener: (String) -> Unit) : ListAdapter<ChatMessage, RecyclerView.ViewHolder>(DiffCallback()) {
 
     inner class SenderViewHolder(private val binding: SenderMessageRowItemBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item: Sender) {
@@ -27,12 +27,6 @@ class ChatAdapter() : ListAdapter<ChatMessage, RecyclerView.ViewHolder>(DiffCall
     }
 
     inner class ReceiverViewHolder(private val binding: ReceiverMessageRowItemBinding) : RecyclerView.ViewHolder(binding.root) {
-        init {
-            binding.receiverImageView.setOnClickListener {
-                val position = bindingAdapterPosition
-                val item = getItem(position) as Receiver
-            }
-        }
         fun bind(item: Receiver) {
             binding.receiverData = item
         }
@@ -54,7 +48,9 @@ class ChatAdapter() : ListAdapter<ChatMessage, RecyclerView.ViewHolder>(DiffCall
 
             VIEW_TYPE_SENDER_IMAGE -> {
                 val binding = SenderImageRowItemBinding.inflate(inflater, parent, false)
-                SenderImageViewHolder(binding)
+                SenderImageViewHolder(binding) { imageUrl ->
+                    onImageClickListener(imageUrl)
+                }
             }
 
             VIEW_TYPE_SENDER_FILE -> {
@@ -69,7 +65,9 @@ class ChatAdapter() : ListAdapter<ChatMessage, RecyclerView.ViewHolder>(DiffCall
 
             VIEW_TYPE_RECEIVER_IMAGE -> {
                 val binding = ReceiverImageRowItemBinding.inflate(inflater, parent, false)
-                ReceiverImageViewHolder(binding)
+                ReceiverImageViewHolder(binding) { imageUrl ->
+                    onImageClickListener(imageUrl)
+                }
             }
 
             VIEW_TYPE_RECEIVER_FILE -> {
