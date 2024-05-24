@@ -9,10 +9,16 @@ import com.minhoi.memento.MentoApplication
 import com.minhoi.memento.data.dto.BoardContentDto
 import com.minhoi.memento.data.dto.MemberDTO
 import com.minhoi.memento.data.dto.chat.ChatRoom
-import com.minhoi.memento.repository.BoardRepository
-import com.minhoi.memento.repository.ChatRepository
-import com.minhoi.memento.repository.MemberRepository
+import com.minhoi.memento.repository.board.BoardRepository
+import com.minhoi.memento.repository.chat.ChatRepository
+import com.minhoi.memento.repository.login.LoginRepository
+import com.minhoi.memento.repository.login.LoginRepositoryImpl
+import com.minhoi.memento.repository.member.MemberRepository
+import com.minhoi.memento.repository.member.MemberRepositoryImpl
+import com.minhoi.memento.repository.question.QuestionRepository
+import com.minhoi.memento.repository.question.QuestionRepositoryImpl
 import com.minhoi.memento.ui.UiState
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -25,11 +31,19 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import javax.inject.Inject
 
-class HomeViewModel : ViewModel() {
-    private val boardRepository = BoardRepository()
-    private val chatRepository = ChatRepository()
-    private val memberRepository = MemberRepository()
+@HiltViewModel
+class HomeViewModel @Inject constructor(
+    private val boardRepository: BoardRepository,
+    private val chatRepository: ChatRepository,
+    private val memberRepository: MemberRepository,
+    private val loginRepository: LoginRepository,
+    private val questionRepository: QuestionRepository,
+) : ViewModel() {
 
     private val member = MentoApplication.memberPrefs.getMemberPrefs()
 
@@ -80,7 +94,7 @@ class HomeViewModel : ViewModel() {
                         }
                     },
                     onError = { error ->
-                        _chatRooms.update { UiState.Error(Throwable(error)) }
+                        _chatRooms.update { UiState.Error(error.exception) }
                     }
                 )
             }

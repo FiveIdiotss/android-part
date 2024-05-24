@@ -13,7 +13,9 @@ import com.minhoi.memento.MajorAdapter
 import com.minhoi.memento.MajorItemDecoration
 import com.minhoi.memento.R
 import com.minhoi.memento.databinding.FragmentSchoolMajorBinding
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class SchoolMajorFragment : Fragment() {
 
     private lateinit var binding: FragmentSchoolMajorBinding

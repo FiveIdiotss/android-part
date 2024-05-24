@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="senderData"
+            type="com.minhoi.memento.data.dto.chat.Sender" />
+
+        <import type="android.view.View" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/background"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp">
+
+        <FrameLayout
+            android:id="@+id/messageFrameLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/senderFile"
+                android:layout_width="200dp"
+                android:layout_height="50dp"
+                android:layout_gravity="center"
+                android:background="@drawable/textview_gray_corner"
+                android:text="@{senderData.fileUrl}" />
+
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/senderDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="3dp"
+            android:text="@{senderData.date.substring(14,22)}"
+            android:textSize="12dp"
+            android:visibility="@{senderData.showMinute ? View.VISIBLE : View.GONE}"
+            app:layout_constraintBottom_toBottomOf="@+id/messageFrameLayout"
+            app:layout_constraintEnd_toStartOf="@+id/messageFrameLayout" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

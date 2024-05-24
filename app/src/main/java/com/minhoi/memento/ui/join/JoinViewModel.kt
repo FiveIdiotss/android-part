@@ -7,18 +7,22 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.minhoi.memento.data.dto.VerifyCodeRequest
 import com.minhoi.memento.data.dto.EmailVerificationRequest
-import com.minhoi.memento.repository.JoinRepository
 import com.minhoi.memento.data.dto.MajorDto
 import com.minhoi.memento.data.dto.CreateMemberRequest
 import com.minhoi.memento.data.dto.SchoolDto
+import com.minhoi.memento.repository.join.JoinRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 private val TAG = JoinViewModel::class.simpleName
 
-class JoinViewModel : ViewModel() {
-    private val joinRepository = JoinRepository()
+@HiltViewModel
+class JoinViewModel @Inject constructor(
+    private val joinRepository: JoinRepository
+) : ViewModel() {
 
     private var _verificationCode = MutableLiveData<String>()
     val verificationCode: LiveData<String> = _verificationCode

@@ -1,12 +1,9 @@
 package com.minhoi.memento.ui.chat
 
-import android.net.Uri
-import android.util.Base64
 import android.util.Log
 import android.view.MenuItem
-import androidx.activity.result.PickVisualMediaRequest
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -23,31 +20,40 @@ import com.minhoi.memento.utils.hideLoading
 import com.minhoi.memento.utils.setOnSingleClickListener
 import com.minhoi.memento.utils.showLoading
 import com.minhoi.memento.utils.showToast
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import java.io.ByteArrayOutputStream
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class ChatActivity : BaseActivity<ActivityChatBinding>() {
     private val TAG = ChatActivity::class.java.simpleName
     override val layoutResourceId: Int = R.layout.activity_chat
 
+    @Inject
+    lateinit var selectFileDialog: SelectFileDialog
+
     private var receiverId = -1L
-    private val chatAdapter: ChatAdapter by lazy { ChatAdapter() {
-        ChatImageViewerDialog.newInstance(it).show(supportFragmentManager, "imageDialog")
-    } }
+    private val chatAdapter: ChatAdapter by lazy {
+        ChatAdapter() {
+            val dialog = ChatImageViewerDialog.newInstance(it)
+            dialog.setStyle(
+                DialogFragment.STYLE_NO_TITLE,
+                android.R.style.Theme_NoTitleBar_Fullscreen
+            )
+            dialog.show(supportFragmentManager, "imageDialog")
+        }
+    }
     private val viewModel by viewModels<ChatViewModel>()
     private var roomId = -1L
     private var hasNextPage: Boolean = true
     private var isFirstLoad = true
 
     override fun initView() {
-        receiverId = intent.getLongExtra("receiverId", -1L)
-        val receiverName = intent.getStringExtra("receiverName")
-        // 채팅방 이름 설정
-        binding.receiverName.text = receiverName
+        handleIntent()
 
-        Log.d(TAG, "initView: $receiverId")
         viewModel.getChatRoomId(receiverId)
+
         // viewModel roomId 관찰하여 roomId가 정상적으로 들어오면 소켓 연결
         connectSocket()
 
@@ -62,8 +68,8 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
             addOnScrollListener(chatScrollListener)
         }
 
-        binding.imageSelectBtn.setOnSingleClickListener {
-            pickImageFromGallery()
+        binding.selectFileBtn.setOnSingleClickListener {
+            selectFileDialog.show(supportFragmentManager, "selectFileDialog")
         }
 
         /**
@@ -92,6 +98,13 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
         observePageLoadingState()
     }
 
+    private fun handleIntent() {
+        receiverId = intent.getLongExtra("receiverId", -1L)
+        val receiverName = intent.getStringExtra("receiverName")
+        // 채팅방 이름 설정
+        binding.receiverName.text = receiverName
+    }
+
     private fun setUpToolbar() {
         setSupportActionBar(binding.chatToolbar)
         supportActionBar?.apply {
@@ -109,27 +122,10 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
         return super.onOptionsItemSelected(item)
     }
 
-    private val pickImageContract =
-        registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri: Uri? ->
-            uri?.let {
-                val inputStream = contentResolver.openInputStream(uri)
-                val byteArrayOutputStream = ByteArrayOutputStream()
-                inputStream?.copyTo(byteArrayOutputStream)
-                val bytes = byteArrayOutputStream.toByteArray()
-
-                val base64String = Base64.encodeToString(bytes, Base64.DEFAULT)
-                viewModel.sendImage("data:image/jpeg;base64,$base64String", roomId)
-            }
-        }
-
-    private fun pickImageFromGallery() {
-        pickImageContract.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-    }
-
     private fun observeChatMessages() {
         viewModel.messages.observe(this) {
             val list = setShowProfileAndDate(it).toList()
-            Log.d(TAG, "observeChatMessages: $list")
+            Log.d(TAG, "observeChatMessages: ${list}")
             chatAdapter.submitList(list)
         }
     }
@@ -145,7 +141,7 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
 
         messages.forEachIndexed { index, currentMessage ->
             if (index == 0 || lastMessage!!.date.substring(0, 13) != currentMessage.date.substring(0, 13)) {
-                val chatDate = ChatDate(currentMessage.id, currentMessage.name, currentMessage.content, currentMessage.date, currentMessage.image, true)
+                val chatDate = ChatDate(currentMessage.name, currentMessage.content, currentMessage.date, true, currentMessage.type, currentMessage.fileUrl, currentMessage.id)
                 resultMessages.add(chatDate)
             }
 

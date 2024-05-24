@@ -14,13 +14,13 @@ sealed class ApiResult<out T> {
     fun handleResponse(
         emptyMsg: String = "데이터가 없습니다.",
         errorMsg: String = "인터넷 연결을 확인해주세요.",
-        onError: (String) -> Unit,
+        onError: (Error) -> Unit,
         onSuccess: (T) -> Unit
     ) {
         when (this@ApiResult) {
             is Success -> onSuccess(value)
-            is Error -> onError(errorMsg)
-            is Empty -> onError(emptyMsg)
+            is Error -> onError(this)
+            is Empty -> onError(Error(message = emptyMsg))
         }
     }
 }

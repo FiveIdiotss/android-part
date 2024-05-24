@@ -16,9 +16,11 @@ import com.minhoi.memento.ui.home.HomeViewModel
 import com.minhoi.memento.utils.hideLoading
 import com.minhoi.memento.utils.showLoading
 import com.minhoi.memento.utils.showToast
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class ChatListFragment : BaseFragment<FragmentChatListBinding>() {
 
     override val layoutResourceId: Int = R.layout.fragment_chat_list

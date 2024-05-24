@@ -4,7 +4,6 @@ import com.minhoi.memento.data.dto.BoardContentResponse
 import com.minhoi.memento.data.dto.BoardListResponse
 import com.minhoi.memento.data.dto.MentorBoardPostDto
 import com.minhoi.memento.data.dto.MentoringApplyRequest
-import com.minhoi.memento.data.model.BoardType
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -19,11 +18,19 @@ interface BoardService {
         @Body mentorBoardPostDto: MentorBoardPostDto
     ): Response<String>
 
-    @GET("api/boards")
-    suspend fun getAllMenteeBoards(
-        @Query("boardType") boardType: BoardType,
+    @GET("api/pageBoards")
+    suspend fun getBoardContents(
         @Query("page") page: Int,
         @Query("size") size: Int
+    ): Response<BoardListResponse>
+
+    @GET("api/boards/filter")
+    suspend fun getFilterBoards(
+        @Query("page") page: Int,
+        @Query("size") size: Int,
+        @Query("schoolFilter") schoolFilter: Boolean,
+        @Query("boardCategory") category: String?,
+        @Query("keyWord") searchQuery: String?
     ): Response<BoardListResponse>
 
     @GET("api/board/{boardId}")

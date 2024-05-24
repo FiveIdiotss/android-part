@@ -13,7 +13,9 @@ import com.minhoi.memento.ui.board.BoardActivity
 import com.minhoi.memento.utils.hideLoading
 import com.minhoi.memento.utils.showLoading
 import com.minhoi.memento.utils.showToast
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MyPostsActivity : BaseActivity<ActivityMyPostsBinding>() {
     override val layoutResourceId: Int = R.layout.activity_my_posts
     private val viewModel by viewModels<MypageViewModel>()
