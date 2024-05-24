@@ -16,9 +16,11 @@ import com.minhoi.memento.utils.hideLoading
 import com.minhoi.memento.utils.setOnSingleClickListener
 import com.minhoi.memento.utils.showLoading
 import com.minhoi.memento.utils.showToast
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class ReceivedContentActivity : BaseActivity<ActivityReceivedContentBinding>() {
     override val layoutResourceId: Int = R.layout.activity_received_content
     private val viewModel: MypageViewModel by viewModels()

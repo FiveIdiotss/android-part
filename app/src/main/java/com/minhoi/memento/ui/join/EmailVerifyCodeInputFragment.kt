@@ -10,10 +10,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.minhoi.memento.R
 import com.minhoi.memento.databinding.FragmentEmailVerifyCodeInputBinding
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+@AndroidEntryPoint
 class EmailVerifyCodeInputFragment : Fragment() {
 
     private lateinit var binding: FragmentEmailVerifyCodeInputBinding

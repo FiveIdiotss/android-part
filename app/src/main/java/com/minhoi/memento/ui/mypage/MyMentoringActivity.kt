@@ -1,8 +1,11 @@
 package com.minhoi.memento.ui.mypage
 
 import android.content.Intent
+import android.view.MenuItem
 import androidx.activity.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.minhoi.memento.R
 import com.minhoi.memento.adapter.MatchedMentoringAdapter
@@ -10,53 +13,138 @@ import com.minhoi.memento.base.BaseActivity
 import com.minhoi.memento.data.dto.MemberDTO
 import com.minhoi.memento.data.dto.MentoringMatchInfo
 import com.minhoi.memento.databinding.ActivityMyMentoringBinding
+import com.minhoi.memento.ui.UiState
 import com.minhoi.memento.ui.chat.ChatActivity
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
+import com.minhoi.memento.utils.hideLoading
+import com.minhoi.memento.utils.showLoading
+import com.minhoi.memento.utils.showToast
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class MyMentoringActivity : BaseActivity<ActivityMyMentoringBinding>() {
     private val TAG = MyMentoringActivity::class.java.simpleName
     override val layoutResourceId: Int = R.layout.activity_my_mentoring
 
     private val viewModel by viewModels<MypageViewModel>()
-    private val matchedMentoringAdapter: MatchedMentoringAdapter by lazy {
-        MatchedMentoringAdapter {
-            // 채팅 버튼 클릭시 상대방의 id를 ChatActivity로 전달
-            startActivity(Intent(this, ChatActivity::class.java).apply {
-                putExtra("receiverId", it.menteeMemberId)
-                putExtra("receiverName", it.menteeMemberName)
-            })
+    private val mentorAdapter: MatchedMentoringAdapter by lazy {
+        MatchedMentoringAdapter { mentorInfo ->
+            startChatActivity(mentorInfo.otherMemberId, mentorInfo.otherMemberName)
+        }
+    }
+
+    private val menteeAdapter: MatchedMentoringAdapter by lazy {
+        MatchedMentoringAdapter { menteeInfo ->
+            startChatActivity(menteeInfo.otherMemberId, menteeInfo.otherMemberName)
         }
     }
 
     override fun initView() {
+        setUpToolbar()
 
         lifecycleScope.launch {
-            viewModel.getMatchedMentoring()
+            viewModel.getMentorInfo()
+            viewModel.getMenteeInfo()
         }
 
-        binding.myMentoringRv.apply {
-            adapter = matchedMentoringAdapter
-            layoutManager = LinearLayoutManager(this@MyMentoringActivity, LinearLayoutManager.VERTICAL, false)
+        binding.myMentorRv.apply {
+            adapter = mentorAdapter
+            layoutManager =
+                LinearLayoutManager(this@MyMentoringActivity, LinearLayoutManager.VERTICAL, false)
+        }
+        binding.myMenteeRv.apply {
+            adapter = menteeAdapter
+            layoutManager =
+                LinearLayoutManager(this@MyMentoringActivity, LinearLayoutManager.VERTICAL, false)
         }
 
-        viewModel.matchedMentoringList.observe(this) { matchedMentoringList ->
-            val matchedMembers = mutableListOf<Pair<MentoringMatchInfo, MemberDTO>>()
-            // 매칭된 멘토링 목록이 생성되면 멘토링 신청자의 정보를 가져옴
-            lifecycleScope.launch {
-                val deferredList = matchedMentoringList.map { mentoringMatchInfo ->
-                    async {
-                        val member = viewModel.getOtherMemberInfo(mentoringMatchInfo.menteeMemberId)
-                        mentoringMatchInfo to member
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.mentorInfo.collectLatest {
+                    when (it) {
+                        is UiState.Empty -> {}
+                        is UiState.Loading -> {
+                            supportFragmentManager.showLoading()
+                        }
+
+                        is UiState.Success -> {
+                            supportFragmentManager.hideLoading()
+                            // 매칭된 멘토링 목록이 생성되면 멘토링 신청자의 정보를 가져옴
+                            try {
+                                val matchedMembers = getOtherMemberInfo(it.data)
+                                mentorAdapter.setList(matchedMembers)
+                            } catch (e: Exception) {
+                                showToast(e.message.toString())
+                            }
+                        }
+                        is UiState.Error -> {
+                            supportFragmentManager.hideLoading()
+                            showToast(it.error?.message.toString())
+                        }
                     }
                 }
-
-                val results = deferredList.awaitAll()
-                matchedMembers.addAll(results.filter { it.second != null }.map { it.first to it.second!! })
-                matchedMentoringAdapter.setList(matchedMembers)
+            }
+        }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.menteeInfo.collectLatest {
+                    when (it) {
+                        is UiState.Empty -> {}
+                        is UiState.Loading -> {
+                            supportFragmentManager.showLoading()
+                        }
+                        is UiState.Success -> {
+                            supportFragmentManager.hideLoading()
+                            // 매칭된 멘토링 목록이 생성되면 멘토링 신청자의 정보를 가져옴
+                            try {
+                                val matchedMembers = getOtherMemberInfo(it.data)
+                                menteeAdapter.setList(matchedMembers)
+                            } catch (e: Exception) {
+                                showToast(e.message.toString())
+                            }
+                        }
+                        is UiState.Error -> {
+                            supportFragmentManager.hideLoading()
+                            showToast(it.error?.message.toString())
+                        }
+                    }
+                }
             }
         }
     }
 
+    private fun setUpToolbar() {
+        setSupportActionBar(binding.myMentoringToolbar)
+        supportActionBar?.apply {
+            setDisplayHomeAsUpEnabled(true)
+            setDisplayShowTitleEnabled(false)
+        }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> {
+                finish()
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    private suspend fun getOtherMemberInfo(list: List<MentoringMatchInfo>): List<Pair<MentoringMatchInfo, MemberDTO>> {
+        return list.map { mentoringMatchInfo ->
+            // 동기적으로 사용자 정보를 가져오기
+            val member = viewModel.getOtherMemberInfo(mentoringMatchInfo.otherMemberId)
+            mentoringMatchInfo to member!!
+        }
+    }
+
+    private fun startChatActivity(otherMemberId: Long, otherMemberName: String) {
+        startActivity(Intent(this@MyMentoringActivity, ChatActivity::class.java).apply {
+            putExtra("receiverId", otherMemberId)
+            putExtra("receiverName", otherMemberName)
+        })
+    }
 }
+

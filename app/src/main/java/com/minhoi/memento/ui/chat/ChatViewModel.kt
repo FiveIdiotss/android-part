@@ -12,9 +12,11 @@ import com.minhoi.memento.data.dto.chat.ChatMessage
 import com.minhoi.memento.data.dto.chat.MessageDto
 import com.minhoi.memento.data.dto.chat.Receiver
 import com.minhoi.memento.data.dto.chat.Sender
-import com.minhoi.memento.repository.ChatRepository
+import com.minhoi.memento.data.model.ChatFileType
+import com.minhoi.memento.repository.chat.ChatRepository
 import com.minhoi.memento.ui.UiState
 import com.minhoi.memento.utils.parseLocalDateTime
+import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,16 +25,23 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import org.json.JSONObject
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
-class ChatViewModel : ViewModel() {
+@HiltViewModel
+class ChatViewModel @Inject constructor(
+    private val chatRepository: ChatRepository,
+    private val fileManager: FileManager
+) : ViewModel() {
+
     private val TAG = ChatViewModel::class.java.simpleName
-    private val chatRepository = ChatRepository()
     private val member = MentoApplication.memberPrefs.getMemberPrefs()
     private var currentPage: Int = 1
     private val _hasNextPage = MutableLiveData<Boolean>(true)
+    private var roomId = -1L
     val hasNextPage: LiveData<Boolean> = _hasNextPage
 
     //    private val _chatRooms: MutableStateFlow<>
@@ -48,6 +57,9 @@ class ChatViewModel : ViewModel() {
 
     private val _isPageLoading = MutableStateFlow<UiState<Boolean>>(UiState.Empty)
     val isPageLoading: StateFlow<UiState<Boolean>> = _isPageLoading.asStateFlow()
+
+    private val _saveImageState = MutableStateFlow<UiState<Boolean>>(UiState.Empty)
+    val saveImageState: StateFlow<UiState<Boolean>> = _saveImageState.asStateFlow()
 
     private val intervalMillis = 5000L
     private var stomp: StompClient? = null
@@ -111,12 +123,15 @@ class ChatViewModel : ViewModel() {
         try {
             val json = JSONObject(message)
             Log.d(TAG, "handleMessage: $json")
+            val fileType = ChatFileType.toFileType(json.getString("fileType")) ?: return
+            val fileURL = json.getString("fileURL")
             val senderId = json.getLong("senderId")
             val senderName = json.getString("senderName")
-            val content = json.getString("content")
+            val content: String? = json.getString("content")
+            val chatRoomId = json.getLong("chatRoomId")
             val date = json.getString("localDateTime")
-            val image: String? = json.getString("image")
-            val messageObject = MessageDto(senderId, content, date, senderName, image)
+            val messageObject =
+                MessageDto(fileType, fileURL, senderId, chatRoomId, content, date, senderName)
             tempMessages.addLast(getSenderOrReceiver(messageObject))
             _messages.value = tempMessages
 
@@ -132,7 +147,6 @@ class ChatViewModel : ViewModel() {
             put("chatRoomId", roomId)
             put("senderName", member.name)
         }
-
         val body = jsonObject.toString()
         Log.d(TAG, "sendMessage: $body")
         viewModelScope.launch (Dispatchers.IO) {
@@ -167,10 +181,11 @@ class ChatViewModel : ViewModel() {
             chatRepository.getRoomId(receiverId).collectLatest { result ->
                 result.handleResponse(
                     onSuccess = { room ->
+                        roomId = room.id
                         _chatRoomState.update { UiState.Success(room.id) }
                     },
                     onError = { error ->
-                        _chatRoomState.update { UiState.Error(Throwable(error)) }
+                        _chatRoomState.update { UiState.Error(error.exception) }
                     }
                 )
             }
@@ -196,7 +211,7 @@ class ChatViewModel : ViewModel() {
                         currentPage++
                     },
                     onError = { error ->
-                        _isPageLoading.value = UiState.Error(Throwable(error))
+                        _isPageLoading.value = UiState.Error(error.exception)
                         Log.d(TAG, "getMessagesError: $error")
                     }
                 )
@@ -208,10 +223,21 @@ class ChatViewModel : ViewModel() {
     private fun getSenderOrReceiver(chatMessage: MessageDto): ChatMessage {
         return when (chatMessage.senderId) {
             member.id -> {
-                Sender(chatMessage.senderId, chatMessage.senderName, chatMessage.content, parseLocalDateTime(chatMessage.date), chatMessage.image)
+                Sender(chatMessage.senderName, chatMessage.content, parseLocalDateTime(chatMessage.date), chatMessage.fileType, chatMessage.fileURL, chatMessage.senderId)
             }
             else -> {
-                Receiver(chatMessage.senderId, chatMessage.senderName, chatMessage.content, parseLocalDateTime(chatMessage.date),chatMessage.image)
+                Receiver(chatMessage.senderName, chatMessage.content, parseLocalDateTime(chatMessage.date), chatMessage.fileType, chatMessage.fileURL, chatMessage.senderId)
+            }
+        }
+    }
+
+    fun saveImageToGallery(imageUrl: String) {
+        viewModelScope.launch {
+            _saveImageState.update { UiState.Loading }
+            val result = fileManager.saveImageToGallery(imageUrl)
+            when (result) {
+                is SaveFileResult.Success -> _saveImageState.update { UiState.Success(true) }
+                is SaveFileResult.Failure -> _saveImageState.update { UiState.Error(result.error) }
             }
         }
     }

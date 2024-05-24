@@ -15,12 +15,14 @@ import com.minhoi.memento.utils.hideLoading
 import com.minhoi.memento.utils.setOnSingleClickListener
 import com.minhoi.memento.utils.showLoading
 import com.minhoi.memento.utils.showToast
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
 
+@AndroidEntryPoint
 class EditProfileActivity : BaseActivity<ActivityEditProfileBinding>(),
     EditProfileImageBottomSheetDialog.PhotoPickerListener {
 

@@ -25,10 +25,10 @@ interface MemberService {
     suspend fun setDefaultProfileImage(): Response<String>
 
     @GET("api/boards/favorites")
-    suspend fun getBookmarkBoards(@Query("boardType") boardType: BoardType): Response<List<BoardContentDto>>
+    suspend fun getBookmarkBoards(): Response<List<BoardContentDto>>
 
     @GET("api/memberBoards/{memberId}")
-    suspend fun getMemberBoards(@Path("memberId") memberId: Long, @Query("boardType") boardType: BoardType): Response<List<BoardContentDto>>
+    suspend fun getMemberBoards(@Path("memberId") memberId: Long): Response<List<BoardContentDto>>
 
     @GET("api/apply/{applyId}")
     suspend fun getApplyInfo(@Path("applyId") applyId: Long): Response<MentoringApplyDto>

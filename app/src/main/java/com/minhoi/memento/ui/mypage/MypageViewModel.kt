@@ -4,18 +4,22 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.minhoi.memento.MentoApplication
 import com.minhoi.memento.data.dto.BoardContentDto
 import com.minhoi.memento.data.dto.BoardContentForReceived
 import com.minhoi.memento.data.dto.MemberDTO
 import com.minhoi.memento.data.dto.MentoringApplyDto
+import com.minhoi.memento.data.dto.MentoringApplyListDto
 import com.minhoi.memento.data.dto.MentoringMatchInfo
 import com.minhoi.memento.data.dto.MentoringReceivedDto
-import com.minhoi.memento.repository.MemberRepository
 import com.minhoi.memento.ui.UiState
 import com.minhoi.memento.data.model.ApplyStatus
+import com.minhoi.memento.repository.board.BoardRepository
+import com.minhoi.memento.repository.member.MemberRepository
 import com.minhoi.memento.utils.extractSuccess
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,14 +27,18 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import okhttp3.MultipartBody
+import javax.inject.Inject
 
-class MypageViewModel : ViewModel() {
+@HiltViewModel
+class MypageViewModel @Inject constructor(
+    private val memberRepository: MemberRepository,
+    private val boardRepository: BoardRepository,
+) : ViewModel() {
 
-    private val memberRepository = MemberRepository()
-    private val member = MentoApplication.memberPrefs.getMemberPrefs()
+    private var member = MentoApplication.memberPrefs.getMemberPrefs()
 
-    private val _applyList = MutableLiveData<List<Pair<MentoringApplyDto, ApplyStatus>>>()
-    val applyList: LiveData<List<Pair<MentoringApplyDto, ApplyStatus>>> = _applyList
+    private val _applyList = MutableLiveData<List<Pair<MentoringApplyListDto, ApplyStatus>>>()
+    val applyList: LiveData<List<Pair<MentoringApplyListDto, ApplyStatus>>> = _applyList
 
     private val _applyContent = MutableStateFlow<UiState<MentoringApplyDto>>(UiState.Empty)
     val applyContent: StateFlow<UiState<MentoringApplyDto>> = _applyContent.asStateFlow()
@@ -45,8 +53,11 @@ class MypageViewModel : ViewModel() {
     private val _rejectState = MutableStateFlow<UiState<Boolean>>(UiState.Empty)
     val rejectState: StateFlow<UiState<Boolean>> = _acceptState.asStateFlow()
 
-    private val _matchedMentoringList = MutableLiveData<List<MentoringMatchInfo>>()
-    val matchedMentoringList: LiveData<List<MentoringMatchInfo>> = _matchedMentoringList
+    private val _mentorInfo = MutableStateFlow<UiState<List<MentoringMatchInfo>>>(UiState.Empty)
+    val mentorInfo: StateFlow<UiState<List<MentoringMatchInfo>>> = _mentorInfo.asStateFlow()
+
+    private val _menteeInfo = MutableStateFlow<UiState<List<MentoringMatchInfo>>>(UiState.Empty)
+    val menteeInfo: StateFlow<UiState<List<MentoringMatchInfo>>> = _menteeInfo.asStateFlow()
 
     private val _imageUploadState = MutableStateFlow<UiState<Boolean>>(UiState.Empty)
     val imageUploadState: StateFlow<UiState<Boolean>> = _imageUploadState.asStateFlow()
@@ -86,9 +97,7 @@ class MypageViewModel : ViewModel() {
     fun getApplyList() {
         viewModelScope.launch {
             member.let { member ->
-                getApplyState()
-                val applyStateIds = _matchedMentoringList.value?.map { it.applyId }?.toSet()
-
+                val applyStateIds = memberRepository.getMentorInfo(member.id).extractSuccess().map { it.applyId }
                 val response = memberRepository.getApplyList(member.id)
                 if (response.isSuccessful) {
                     val applyList = response.body() ?: throw Exception("ApplyList is null")
@@ -118,8 +127,8 @@ class MypageViewModel : ViewModel() {
                     onSuccess = { applyInfo ->
                         _applyContent.update { UiState.Success(applyInfo) }
                     },
-                    onError = { errorMsg ->
-                        _applyContent.update { UiState.Error(Throwable(errorMsg)) }
+                    onError = { error ->
+                        _applyContent.update { UiState.Error(error.exception) }
                     }
                 )
             }
@@ -150,33 +159,35 @@ class MypageViewModel : ViewModel() {
         }
     }
 
-    private suspend fun getApplyState() {
-        val response = memberRepository.getMatchedMentoringInfo(member.id)
-        response.collectLatest { res ->
-            res.handleResponse(
-                onSuccess = { matchedMentoringList ->
-                    // Update _matchedMentoringList with the received data
-                    _matchedMentoringList.value = matchedMentoringList
-                },
-                onError = { Log.d("MatchedMentoring", "getMatchedMentoringFailed: ${it}") }
-            )
-        }
-    }
-
-    suspend fun getMatchedMentoring() {
+    suspend fun getMentorInfo() {
         viewModelScope.launch {
-            memberRepository.getMatchedMentoringInfo(member.id).collectLatest {
-                it.handleResponse(
+            memberRepository.getMentorInfo(member.id).collectLatest { result ->
+                result.handleResponse(
                     onSuccess = { matchedMentoringList ->
-                        _matchedMentoringList.value = matchedMentoringList
+                        _mentorInfo.update { UiState.Success(matchedMentoringList) }
                     },
-                    onError = { Log.d("MatchedMentoring", "getMatchedMentoringFailed: ${it}") }
+                    onError = {
+                        _mentorInfo.update { UiState.Error(Throwable(it.toString())) }
+                    }
                 )
             }
         }
     }
 
-    fun getMemberInfo() = member
+    suspend fun getMenteeInfo() {
+        viewModelScope.launch {
+            memberRepository.getMenteeInfo(member.id).collectLatest { result ->
+                result.handleResponse(
+                    onSuccess = { matchedMentoringList ->
+                        _menteeInfo.update { UiState.Success(matchedMentoringList) }
+                    },
+                    onError = {
+                        _menteeInfo.update { UiState.Error(Throwable(it.toString())) }
+                    }
+                )
+            }
+        }
+    }
 
     fun uploadProfileImage(imagePart: MultipartBody.Part) {
         viewModelScope.launch {
@@ -186,8 +197,8 @@ class MypageViewModel : ViewModel() {
                     onSuccess = {
                         _imageUploadState.value = UiState.Success(true)
                     },
-                    onError = {
-                        _imageUploadState.value = UiState.Error(Throwable(it))
+                    onError = { error ->
+                        _imageUploadState.value = UiState.Error(error.exception)
                     }
                 )
             }
@@ -201,8 +212,8 @@ class MypageViewModel : ViewModel() {
                     onSuccess = {
                         _imageUploadState.value = UiState.Success(true)
                     },
-                    onError = {
-                        _imageUploadState.value = UiState.Error(Throwable(it))
+                    onError = { error ->
+                        _imageUploadState.value = UiState.Error(error.exception)
                     }
                 )
             }
@@ -229,8 +240,8 @@ class MypageViewModel : ViewModel() {
                             }
                             _memberBoards.update { UiState.Success(memberBoards) }
                         },
-                        onError = { errorMsg ->
-                            _memberBoards.update { UiState.Error(Throwable(errorMsg)) }
+                        onError = { error ->
+                            _memberBoards.update { UiState.Error(error.exception) }
                         }
                     )
                 }
@@ -285,8 +296,8 @@ class MypageViewModel : ViewModel() {
                         }
                         _bookmarkBoards.update { UiState.Success(bookmarkBoards) }
                     },
-                    onError = { errorMsg ->
-                        _bookmarkBoards.update { UiState.Error(Throwable(errorMsg)) }
+                    onError = { error ->
+                        _bookmarkBoards.update { UiState.Error(error.exception) }
                     }
                 )
             }

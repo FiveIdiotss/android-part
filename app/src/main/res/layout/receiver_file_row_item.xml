@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="receiverData"
+            type="com.minhoi.memento.data.dto.chat.Receiver" />
+
+        <import type="android.view.View" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/background"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="3dp">
+
+        <ImageView
+            android:id="@+id/profileImage"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="10dp"
+            android:src="@drawable/profile"
+            android:visibility="@{receiverData.showMinute ? View.VISIBLE : View.INVISIBLE}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <FrameLayout
+            android:id="@+id/messageFrameLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/profileImage"
+            app:layout_constraintTop_toBottomOf="@id/receiverName">
+
+
+            <TextView
+                android:id="@+id/receiverImageView"
+                android:layout_width="200dp"
+                android:layout_height="50dp"
+                android:layout_gravity="center"
+                android:background="@drawable/textview_gray_corner"
+                android:text="@{receiverData.fileUrl}" />
+
+
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/receiverDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="3dp"
+            android:text="@{receiverData.date.substring(14,22)}"
+            android:textSize="12dp"
+            android:visibility="@{receiverData.showMinute ? View.VISIBLE : View.GONE}"
+            app:layout_constraintBottom_toBottomOf="@+id/messageFrameLayout"
+            app:layout_constraintStart_toEndOf="@+id/messageFrameLayout" />
+
+        <TextView
+            android:id="@+id/receiverName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:text="@{receiverData.name}"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:visibility="@{receiverData.showMinute ? View.VISIBLE : View.GONE}"
+            app:layout_constraintStart_toEndOf="@+id/profileImage"
+            app:layout_constraintTop_toTopOf="@+id/profileImage" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
