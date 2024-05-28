@@ -1,5 +1,6 @@
 package com.minhoi.memento.repository.member
 
+import com.minhoi.memento.base.CommonResponse
 import com.minhoi.memento.data.dto.BoardContentDto
 import com.minhoi.memento.data.dto.MentoringMatchInfo
 import com.minhoi.memento.data.network.RetrofitClient
@@ -52,8 +53,12 @@ class MemberRepositoryImpl @Inject constructor(
         memberService.setDefaultProfileImage()
     }
 
-    override fun getMemberBoards(memberId: Long) = safeFlow {
-        memberService.getMemberBoards(memberId)
+    override fun getMemberBoards(
+        memberId: Long,
+        page: Int,
+        size: Int
+    ): Flow<ApiResult<CommonResponse<List<BoardContentDto>>>> = safeFlow {
+        memberService.getMemberBoards(memberId, page, size)
     }
 
     override fun saveFCMToken(token: String) = notificationService.saveToken(token)

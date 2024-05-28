@@ -11,8 +11,8 @@ import kotlinx.coroutines.flow.first
 class BoardPagingSource(
     private val boardRepository: BoardRepository,
     private val schoolFilter: Boolean = false,
-    private val category: String?,
-    private val searchQuery: String?
+    private val category: String? = null,
+    private val searchQuery: String? = null
 
 ) : PagingSource<Int, BoardContentDto>() {
     override fun getRefreshKey(state: PagingState<Int, BoardContentDto>): Int? {

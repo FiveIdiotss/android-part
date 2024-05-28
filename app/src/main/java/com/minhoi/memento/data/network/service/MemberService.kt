@@ -11,6 +11,7 @@ import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface MemberService {
     @GET("api/member/{memberId}")
@@ -27,7 +28,7 @@ interface MemberService {
     suspend fun getBookmarkBoards(): Response<CommonResponse<List<BoardContentDto>>>
 
     @GET("api/memberBoards/{memberId}")
-    suspend fun getMemberBoards(@Path("memberId") memberId: Long): Response<CommonResponse<List<BoardContentDto>>>
+    suspend fun getMemberBoards(@Path("memberId") memberId: Long, @Query("page") page: Int, @Query("size") size: Int): Response<CommonResponse<List<BoardContentDto>>>
 
     @GET("api/apply/{applyId}")
     suspend fun getApplyInfo(@Path("applyId") applyId: Long): Response<CommonResponse<MentoringApplyDto>>

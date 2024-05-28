@@ -35,7 +35,7 @@ interface MemberRepository {
 
     fun setDefaultProfileImage(): Flow<ApiResult<CommonResponse<String>>>
 
-    fun getMemberBoards(memberId: Long): Flow<ApiResult<CommonResponse<List<BoardContentDto>>>>
+    fun getMemberBoards(memberId: Long, page: Int, size: Int): Flow<ApiResult<CommonResponse<List<BoardContentDto>>>>
 
     fun saveFCMToken(token: String): Call<String>
 }
