@@ -1,5 +1,6 @@
 package com.minhoi.memento.repository.board
 
+import com.minhoi.memento.base.CommonResponse
 import com.minhoi.memento.data.dto.BoardListResponse
 import com.minhoi.memento.data.dto.MentoringApplyRequest
 import com.minhoi.memento.data.network.ApiResult
@@ -16,21 +17,17 @@ class BoardRepositoryImpl @Inject constructor(
         boardService.getBoardContents(1, 10)
     }
 
-    override fun getBoardContents(page: Int, size: Int) = safeFlow {
-        boardService.getBoardContents(page, size)
-    }
-
     override fun getFilterBoardContents(
         page: Int,
         size: Int,
         boardCategory: String?,
         schoolFilter: Boolean,
         searchQuery: String?
-    ): Flow<ApiResult<BoardListResponse>> = safeFlow {
+    ): Flow<ApiResult<CommonResponse<BoardListResponse>>> = safeFlow {
         boardService.getFilterBoards(page, size, schoolFilter, boardCategory, searchQuery)
     }
 
-    override fun getBoardContentsBySchool(page: Int, size: Int) = safeFlow {
+    override fun getBoardContentsBySchool(page: Int, size: Int): Flow<ApiResult<CommonResponse<BoardListResponse>>> = safeFlow {
         boardService.getFilterBoards(page, size, true, null, null)
     }
 

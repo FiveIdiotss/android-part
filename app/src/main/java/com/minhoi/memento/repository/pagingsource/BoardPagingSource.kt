@@ -1,9 +1,10 @@
-package com.minhoi.memento.pagingsource
+package com.minhoi.memento.repository.pagingsource
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.minhoi.memento.data.dto.BoardContentDto
 import com.minhoi.memento.data.network.ApiResult
+import com.minhoi.memento.data.network.ApiResult.Empty.toApiResult
 import com.minhoi.memento.repository.board.BoardRepository
 import kotlinx.coroutines.flow.first
 
@@ -29,9 +30,9 @@ class BoardPagingSource(
 
             is ApiResult.Success -> {
                 LoadResult.Page(
-                    data = loadData.value.content,
+                    data = loadData.value.data.content,
                     prevKey = if (page == 1) null else page - 1,
-                    nextKey = if (page == loadData.value.pageInfo.totalPages || loadData.value.pageInfo.totalPages == 0) null else page + 1
+                    nextKey = if (page == loadData.value.data.pageInfo.totalPages || loadData.value.data.pageInfo.totalPages == 0) null else page + 1
                 )
             }
 

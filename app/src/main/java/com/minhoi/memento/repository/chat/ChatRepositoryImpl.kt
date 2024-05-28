@@ -1,5 +1,6 @@
 package com.minhoi.memento.repository.chat
 
+import com.minhoi.memento.base.CommonResponse
 import com.minhoi.memento.data.dto.chat.ChatRoom
 import com.minhoi.memento.data.network.ApiResult
 import com.minhoi.memento.utils.safeFlow
@@ -12,11 +13,11 @@ class ChatRepositoryImpl @Inject constructor(
     private val chatService: ChatService
 ) : ChatRepository {
 
-    override fun getChatRooms(memberId: Long): Flow<ApiResult<List<ChatRoom>>> = safeFlow {
+    override fun getChatRooms(memberId: Long): Flow<ApiResult<CommonResponse<List<ChatRoom>>>> = safeFlow {
         chatService.getChatRooms(memberId)
     }
 
-    override fun getRoomId(receiverId: Long): Flow<ApiResult<ChatRoom>> = safeFlow {
+    override fun getRoomId(receiverId: Long): Flow<ApiResult<CommonResponse<ChatRoom>>> = safeFlow {
         chatService.getRoomId(receiverId)
     }
 

@@ -1,4 +1,4 @@
-package com.minhoi.memento.pagingsource
+package com.minhoi.memento.repository.pagingsource
 
 import android.util.Log
 import androidx.paging.PagingSource
@@ -27,9 +27,9 @@ class ReplyPagingSource(
             is ApiResult.Success -> {
                 Log.d("ReplyPagingSource", "load: ${loadData.value.data}")
                 LoadResult.Page(
-                    data = loadData.value.data,
+                    data = loadData.value.data.data,
                     prevKey = if (page == 1) null else page - 1,
-                    nextKey = if (page == loadData.value.pageInfo.totalPages) null else page + 1
+                    nextKey = if (page == loadData.value.data.pageInfo.totalPages) null else page + 1
                 )
             }
 
