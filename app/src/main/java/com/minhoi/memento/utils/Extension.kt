@@ -11,15 +11,16 @@ import android.widget.TimePicker
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
+import com.google.gson.Gson
+import com.minhoi.memento.base.CommonResponse
 import com.minhoi.memento.data.network.ApiResult
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
-import retrofit2.HttpException
+import kotlinx.coroutines.flow.onStart
 import retrofit2.Response
-import java.net.SocketTimeoutException
+import java.net.ConnectException
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -120,27 +121,27 @@ fun Context.dialogFragmentResize(dialogFragment: DialogFragment, width: Float, h
 /**
  * Retrofit API 호출 시, flow로 변환하고 성공, 실패, 빈 응답에 대한 처리를 위한 함수
  */
-fun <T> safeFlow(apiFunc: suspend () -> Response<T>): Flow<ApiResult<T>> = flow {
-    try {
-        val response = apiFunc.invoke()
+fun <T> safeFlow(apiFunc: suspend () -> Response<CommonResponse<T>>): Flow<ApiResult<CommonResponse<T>>> =
+    flow {
+        val response = apiFunc()
+
         if (response.isSuccessful) {
-            val body = response.body() ?: throw NullPointerException("Response body is null")
+            val body = response.body() ?: throw NullPointerException("서버와 통신에 오류가 발생하였습니다.")
             emit(ApiResult.Success(body))
         } else {
-            throw HttpException(response)
+            val body = response.errorBody() ?: throw NullPointerException("서버와 통신에 오류가 발생하였습니다.")
+            val s = Gson().fromJson(body.charStream(), CommonResponse::class.java)
+            emit(ApiResult.Error(Throwable(s.message)))
         }
-    } catch (e: NullPointerException) {
-        emit(ApiResult.Error(e, e.message))
-    } catch (e: HttpException) {
-        emit(ApiResult.Error(e, e.message))
+    }.onStart {
+        emit(ApiResult.Loading)
+    }.catch { e ->
+        when (e) {
+            is NullPointerException -> emit(ApiResult.Error(e, e.message))
+            is ConnectException -> emit(ApiResult.Error(e, "네트워크 오류가 발생했습니다. 인터넷 연결을 확인해주세요."))
+            else -> emit(ApiResult.Error(e, "네트워크 오류가 발생했습니다. 인터넷 연결을 확인해주세요."))
+        }
     }
-    catch (e: SocketTimeoutException) {
-        emit(ApiResult.Error(e, "네트워크 오류가 발생했습니다. 다시 시도해 주세요."))
-    }
-    catch (e: Exception) {
-        emit(ApiResult.Error(e, e.message))
-    }
-}
 
 /*
     * List를 생산하는 Flow에서 ApiResult가 Success일 경우 List를, 그 이외인 경우 null을 반환하는 함수(UiState에 반영하지 않고 사용할 때)

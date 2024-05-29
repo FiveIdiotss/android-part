@@ -4,8 +4,8 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.minhoi.memento.data.dto.question.QuestionContent
 import com.minhoi.memento.data.network.ApiResult
-import com.minhoi.memento.data.network.ApiResult.Empty.toApiResult
 import com.minhoi.memento.repository.question.QuestionRepository
+import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.first
 
 class QuestionPagingSource(
@@ -21,7 +21,9 @@ class QuestionPagingSource(
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, QuestionContent> {
         val page = params.key ?: STARTING_KEY
-        val loadData = questionRepository.getQuestions(page, params.loadSize).first()
+        val loadData = questionRepository.getQuestions(page, params.loadSize)
+            .filterNot { it is ApiResult.Loading }
+            .first()
         return when (loadData) {
             is ApiResult.Success -> {
                 LoadResult.Page(

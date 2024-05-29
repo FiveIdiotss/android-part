@@ -4,17 +4,17 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.minhoi.memento.data.dto.BoardContentDto
 import com.minhoi.memento.data.network.ApiResult
-import com.minhoi.memento.data.network.ApiResult.Empty.toApiResult
 import com.minhoi.memento.repository.board.BoardRepository
+import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.first
 
 class BoardPagingSource(
     private val boardRepository: BoardRepository,
     private val schoolFilter: Boolean = false,
     private val category: String? = null,
-    private val searchQuery: String? = null
+    private val searchQuery: String? = null,
 
-) : PagingSource<Int, BoardContentDto>() {
+    ) : PagingSource<Int, BoardContentDto>() {
     override fun getRefreshKey(state: PagingState<Int, BoardContentDto>): Int? {
         return state.anchorPosition?.let { position ->
             state.closestPageToPosition(position)?.prevKey?.plus(1)
@@ -24,8 +24,16 @@ class BoardPagingSource(
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, BoardContentDto> {
         val page = params.key ?: STARTING_KEY
-        val loadData = boardRepository.getFilterBoardContents(page, params.loadSize, category, schoolFilter, searchQuery).first()
-
+//        val loadData = boardRepository.getFilterBoardContents(page, params.loadSize, category, schoolFilter, searchQuery).first()
+        val loadData = boardRepository.getFilterBoardContents(
+            page,
+            params.loadSize,
+            category,
+            schoolFilter,
+            searchQuery
+        )
+            .filterNot { it is ApiResult.Loading }
+            .first()
         return when (loadData) {
 
             is ApiResult.Success -> {
@@ -36,7 +44,10 @@ class BoardPagingSource(
                 )
             }
 
-            is ApiResult.Error -> LoadResult.Error(loadData.exception!!)
+            is ApiResult.Error -> {
+                LoadResult.Error(loadData.exception!!)
+            }
+
             else -> LoadResult.Error(Exception("오류"))
         }
     }
