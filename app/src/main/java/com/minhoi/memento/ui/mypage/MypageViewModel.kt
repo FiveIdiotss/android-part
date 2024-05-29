@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.minhoi.memento.MentoApplication
 import com.minhoi.memento.data.dto.BoardContentDto
 import com.minhoi.memento.data.dto.BoardContentForReceived
+import com.minhoi.memento.data.dto.BoardListResponse
 import com.minhoi.memento.data.dto.MemberDTO
 import com.minhoi.memento.data.dto.MentoringApplyDto
 import com.minhoi.memento.data.dto.MentoringApplyListDto
@@ -16,14 +17,17 @@ import com.minhoi.memento.data.dto.MentoringMatchInfo
 import com.minhoi.memento.data.dto.MentoringReceivedDto
 import com.minhoi.memento.ui.UiState
 import com.minhoi.memento.data.model.ApplyStatus
+import com.minhoi.memento.data.network.ApiResult
 import com.minhoi.memento.repository.board.BoardRepository
 import com.minhoi.memento.repository.member.MemberRepository
-import com.minhoi.memento.utils.extractSuccess
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import okhttp3.MultipartBody
@@ -42,10 +46,6 @@ class MypageViewModel @Inject constructor(
 
     private val _applyContent = MutableStateFlow<UiState<MentoringApplyDto>>(UiState.Empty)
     val applyContent: StateFlow<UiState<MentoringApplyDto>> = _applyContent.asStateFlow()
-
-    private val _boardsWithReceivedMentoring = MutableStateFlow<UiState<List<Map<BoardContentForReceived, List<MentoringReceivedDto>>>>>(UiState.Empty)
-    val boardsWithReceivedMentoring: StateFlow<UiState<List<Map<BoardContentForReceived, List<MentoringReceivedDto>>>>> =
-        _boardsWithReceivedMentoring.asStateFlow()
 
     private val _acceptState = MutableStateFlow<UiState<Boolean>>(UiState.Empty)
     val acceptState: StateFlow<UiState<Boolean>> = _acceptState.asStateFlow()
@@ -71,9 +71,54 @@ class MypageViewModel @Inject constructor(
     private val _memberInfo = MutableLiveData<MemberDTO>()
     val memberInfo: LiveData<MemberDTO> = _memberInfo
 
+    // 요청받은 멘토링 목록의 상태를 저장하고있는 Flow
+    private val memberBoardsFlow = MutableStateFlow<ApiResult<BoardListResponse>>(ApiResult.Empty)
+    private val mentoringRequests = MutableStateFlow<ApiResult<List<MentoringReceivedDto>>>(ApiResult.Empty)
+
+    val receivedMentoring =
+        combine(memberBoardsFlow, mentoringRequests) { boardsResult, mentoringRequestsResult ->
+            Log.d("MypageViewModel", "combine: b:${boardsResult} R:${mentoringRequestsResult}")
+            when {
+                boardsResult is ApiResult.Empty || mentoringRequestsResult is ApiResult.Empty -> UiState.Empty
+                boardsResult is ApiResult.Success && mentoringRequestsResult is ApiResult.Success -> {
+                    if (boardsResult.value.content.isEmpty()) {
+                        UiState.Error(Throwable("dasd"))
+                    }
+                    if (currentPage == boardsResult.value.pageInfo.totalPages) {
+                        _isLastPage.value = true
+                    }
+
+                    val boards = boardsResult.value.content.map {
+                        it.toBoardContentForReceived()
+                    }
+                    val mentoringRequests = mentoringRequestsResult.value
+                    UiState.Success(boards.map { board ->
+                        val relatedRequests =
+                            mentoringRequests.filter { it.boardId == board.boardId }
+                        board to relatedRequests
+                    })
+                }
+
+                boardsResult is ApiResult.Error -> UiState.Error(boardsResult.exception)
+                mentoringRequestsResult is ApiResult.Error -> UiState.Error(mentoringRequestsResult.exception)
+                boardsResult is ApiResult.Loading || mentoringRequestsResult is ApiResult.Loading -> UiState.Loading
+                else -> UiState.Error(Throwable("알 수 없는 오류가 발생하였습니다"))
+            }
+        }.stateIn(
+            initialValue = UiState.Empty,
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000)
+        )
+
+    // 마이페이지 Activity들에서 paging3 이용하지 않고 page 구현하기 위해 사용되는 변수
+    private var currentPage: Int = 1
+    private val _isLastPage = MutableLiveData<Boolean>(false)
+    val isLastPage: LiveData<Boolean> = _isLastPage
+
     init {
         getMemberInfo()
     }
+
     fun getMemberInfo() {
         viewModelScope.launch {
             val response = memberRepository.getMemberInfo(member.id)
@@ -220,68 +265,32 @@ class MypageViewModel @Inject constructor(
         }
     }
 
-    fun getMemberBoards() {
+    fun getReceivedMentoring() {
         viewModelScope.launch {
-            _memberBoards.update { UiState.Loading }
-            val bookmarkBoards = memberRepository.getBookmarkBoards().extractSuccess()
-            member.let { member ->
-                memberRepository.getMemberBoards(member.id).collectLatest {
-                    it.handleResponse(
-                        // 자신의 북마크 목록의 boardId와 내가 작성한 글의 boardId 비교하여 북마크 여부 확인
-                        onSuccess = { boards ->
-                            val memberBoards = boards.map { boardContentDto ->
-                                if (bookmarkBoards.any { bookmarkBoard ->
-                                        bookmarkBoard.boardId == boardContentDto.boardId
-                                    }) {
-                                    boardContentDto.apply { isBookmarked = true }
-                                } else {
-                                    boardContentDto
-                                }
-                            }
-                            _memberBoards.update { UiState.Success(memberBoards) }
-                        },
-                        onError = { error ->
-                            _memberBoards.update { UiState.Error(error.exception) }
-                        }
-                    )
+            memberRepository.getReceivedList().collectLatest { result ->
+                when (result) {
+                    is ApiResult.Empty -> {}
+                    is ApiResult.Loading -> mentoringRequests.update { ApiResult.Loading }
+                    is ApiResult.Success -> {
+                        mentoringRequests.update { ApiResult.Success(result.value.data) }
+                    }
+                    is ApiResult.Error -> mentoringRequests.update { it }
                 }
             }
         }
     }
-
-    fun getBoardsWithReceivedMentoring() {
+    fun getMemberBoards() {
         viewModelScope.launch {
-            // loading
-            _boardsWithReceivedMentoring.update { UiState.Loading }
-            val memberBoards = memberRepository.getMemberBoards(member.id).extractSuccess().map {
-                Log.d("MypageVIewmodel", "memberBoards = $it")
-                BoardContentForReceived(
-                    it.boardId,
-                    it.memberName,
-                    it.title,
-                    it.school,
-                    it.major,
-                    it.year,
-                    it.introduction,
-                    it.target,
-                    it.content,
-                    it.memberId,
-                    it.isBookmarked,
-                    false
-                )
+            memberRepository.getMemberBoards(member.id, currentPage, 20).collectLatest { result ->
+                when (result) {
+                    is ApiResult.Empty -> {}
+                    is ApiResult.Loading -> memberBoardsFlow.update { ApiResult.Loading }
+                    is ApiResult.Success -> {
+                        memberBoardsFlow.update { ApiResult.Success(result.value.data) }
+                    }
+                    is ApiResult.Error -> memberBoardsFlow.update { it }
+                }
             }
-            val receivedList = memberRepository.getReceivedList(member.id).extractSuccess()
-            if (memberBoards == null || receivedList == null) {
-                _boardsWithReceivedMentoring.update { UiState.Error(Throwable()) }
-                return@launch
-            }
-            val boardsWithMentoringReceived =
-                mutableListOf<Map<BoardContentForReceived, List<MentoringReceivedDto>>>()
-            memberBoards.forEach {
-                val receivedContent = receivedList.filter { received -> received.boardId == it.boardId }
-                boardsWithMentoringReceived.add(mapOf(it to receivedContent))
-            }
-            _boardsWithReceivedMentoring.update { UiState.Success(boardsWithMentoringReceived) }
         }
     }
 
@@ -321,6 +330,22 @@ class MypageViewModel @Inject constructor(
                 )
             }
         }
+    }
+    fun BoardContentDto.toBoardContentForReceived(): BoardContentForReceived {
+        return BoardContentForReceived(
+            boardId = this.boardId,
+            memberName = this.memberName,
+            title = this.title,
+            school = this.school,
+            major = this.major,
+            year = this.year,
+            introduction = this.introduction,
+            target = this.target,
+            content = this.content,
+            memberId = this.memberId,
+            isBookmarked = this.isBookmarked,
+            isExpanded = false // 기본값 설정
+        )
     }
 
 }
