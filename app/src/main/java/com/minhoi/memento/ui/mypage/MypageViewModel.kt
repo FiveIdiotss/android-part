@@ -67,7 +67,7 @@ class MypageViewModel @Inject constructor(
     val memberBoards: StateFlow<UiState<List<BoardContentDto>>> = _memberBoards.asStateFlow()
 
     private val _bookmarkBoards = MutableStateFlow<UiState<List<BoardContentDto>>>(UiState.Empty)
-    val bookmarkBoards: LiveData<UiState<List<BoardContentDto>>> = _bookmarkBoards.asLiveData()
+    val bookmarkBoards: StateFlow<UiState<List<BoardContentDto>>> = _bookmarkBoards.asStateFlow()
 
     private val _memberInfo = MutableLiveData<MemberDTO>()
     val memberInfo: LiveData<MemberDTO> = _memberInfo
@@ -113,8 +113,9 @@ class MypageViewModel @Inject constructor(
 
     // 마이페이지 Activity들에서 paging3 이용하지 않고 page 구현하기 위해 사용되는 변수
     private var currentPage: Int = 1
-    private val _isLastPage = MutableLiveData<Boolean>(false)
-    val isLastPage: LiveData<Boolean> = _isLastPage
+    var isLastPage: Boolean = false
+        private set
+    val temp = mutableListOf<BoardContentDto>()
 
     init {
         getMemberInfo()
@@ -317,14 +318,16 @@ class MypageViewModel @Inject constructor(
 
     fun getBookmarkBoards() {
         viewModelScope.launch {
-            _bookmarkBoards.update { UiState.Loading }
-            memberRepository.getBookmarkBoards().collectLatest {
-                it.handleResponse(
-                    onSuccess = { bookmarkBoards ->
-                        bookmarkBoards.map {
-                            it.isBookmarked = true
+            memberRepository.getBookmarkBoards(currentPage, 10)
+                .onStart { _bookmarkBoards.update { UiState.Loading } }
+                .collectLatest { result ->
+                result.handleResponse(
+                    onSuccess = { value ->
+                        if (value.data.pageInfo.totalPages == currentPage) {
+                            isLastPage = true
                         }
-                        _bookmarkBoards.update { UiState.Success(bookmarkBoards) }
+                        currentPage++
+                        _bookmarkBoards.update { UiState.Success(value.data.content) }
                     },
                     onError = { error ->
                         _bookmarkBoards.update { UiState.Error(error.exception) }
