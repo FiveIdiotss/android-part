@@ -27,6 +27,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -63,7 +64,7 @@ class MypageViewModel @Inject constructor(
     val imageUploadState: StateFlow<UiState<Boolean>> = _imageUploadState.asStateFlow()
 
     private val _memberBoards = MutableStateFlow<UiState<List<BoardContentDto>>>(UiState.Empty)
-    val memberBoards: LiveData<UiState<List<BoardContentDto>>> = _memberBoards.asLiveData()
+    val memberBoards: StateFlow<UiState<List<BoardContentDto>>> = _memberBoards.asStateFlow()
 
     private val _bookmarkBoards = MutableStateFlow<UiState<List<BoardContentDto>>>(UiState.Empty)
     val bookmarkBoards: LiveData<UiState<List<BoardContentDto>>> = _bookmarkBoards.asLiveData()
@@ -279,9 +280,29 @@ class MypageViewModel @Inject constructor(
             }
         }
     }
+
     fun getMemberBoards() {
         viewModelScope.launch {
-            memberRepository.getMemberBoards(member.id, currentPage, 20).collectLatest { result ->
+            memberRepository.getMemberBoards(member.id, currentPage, 4)
+                .onStart { _memberBoards.update { UiState.Loading } }
+                .collectLatest { result ->
+                Log.d("MypageViewModel", "getMemberBoards: $result")
+                result.handleResponse(
+                    onSuccess = { value ->
+                        temp.addAll(value.data.content)
+                        if (value.data.pageInfo.totalPages == currentPage) {
+                            isLastPage = true
+                        }
+                        currentPage++
+                        _memberBoards.update { currentState ->
+                            Log.d("MypageViewModel", "getMemberBoards: $currentState")
+                            UiState.Success(temp + value.data.content) }
+                    },
+                    onError = { error ->
+                        _memberBoards.update { UiState.Error(error.exception) }
+                    }
+                )
+
                 when (result) {
                     is ApiResult.Empty -> {}
                     is ApiResult.Loading -> memberBoardsFlow.update { ApiResult.Loading }
