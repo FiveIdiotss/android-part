@@ -24,11 +24,16 @@ class BoardRepositoryImpl @Inject constructor(
         schoolFilter: Boolean,
         searchQuery: String?
     ): Flow<ApiResult<CommonResponse<BoardListResponse>>> = safeFlow {
-        boardService.getFilterBoards(page, size, schoolFilter, boardCategory, searchQuery)
+        boardService.getFilterBoards(page, size, schoolFilter, false, boardCategory, searchQuery)
     }
 
     override fun getBoardContentsBySchool(page: Int, size: Int): Flow<ApiResult<CommonResponse<BoardListResponse>>> = safeFlow {
-        boardService.getFilterBoards(page, size, true, null, null)
+        boardService.getFilterBoards(page, size,
+            schoolFilter = true,
+            favoriteFilter = false,
+            category = null,
+            searchQuery = null
+        )
     }
 
     override fun getBoardContent(boardId: Long) = safeFlow {

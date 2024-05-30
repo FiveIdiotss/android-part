@@ -30,6 +30,7 @@ interface BoardService {
         @Query("page") page: Int,
         @Query("size") size: Int,
         @Query("schoolFilter") schoolFilter: Boolean,
+        @Query("favoriteFilter") favoriteFilter: Boolean,
         @Query("boardCategory") category: String?,
         @Query("keyWord") searchQuery: String?
     ): Response<CommonResponse<BoardListResponse>>

@@ -3,6 +3,7 @@ package com.minhoi.memento.ui.mypage
 import android.content.Intent
 import android.view.MenuItem
 import androidx.activity.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.minhoi.memento.R
 import com.minhoi.memento.adapter.MyPostsAdapter
@@ -14,6 +15,8 @@ import com.minhoi.memento.utils.hideLoading
 import com.minhoi.memento.utils.showLoading
 import com.minhoi.memento.utils.showToast
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class BookmarkBoardListActivity : BaseActivity<ActivityBookmarkBoardListBinding>() {
@@ -28,9 +31,9 @@ class BookmarkBoardListActivity : BaseActivity<ActivityBookmarkBoardListBinding>
             },
             onBookmarkClickListener = { boardContent, position ->
                 viewModel.executeBookmarkInList(boardContent.boardId, boardContent.isBookmarked)
-                val s = bookmarkAdapter.currentList.toMutableList()
-                s.set(position, boardContent.copy(isBookmarked = !boardContent.isBookmarked))
-                bookmarkAdapter.submitList(s)
+                val currentList = bookmarkAdapter.currentList.toMutableList()
+                currentList[position] = boardContent.copy(isBookmarked = !boardContent.isBookmarked)
+                bookmarkAdapter.submitList(currentList)
             }
         )
     }
@@ -64,21 +67,23 @@ class BookmarkBoardListActivity : BaseActivity<ActivityBookmarkBoardListBinding>
     }
 
     private fun observeBookmarkBoards() {
-        viewModel.bookmarkBoards.observe(this) { state ->
-            when (state) {
-                is UiState.Empty -> {}
-                is UiState.Loading -> {
-                    supportFragmentManager.showLoading()
-                }
+        lifecycleScope.launch {
+            viewModel.bookmarkBoards.collectLatest { state ->
+                when (state) {
+                    is UiState.Empty -> {}
+                    is UiState.Loading -> {
+                        supportFragmentManager.showLoading()
+                    }
 
-                is UiState.Success -> {
-                    supportFragmentManager.hideLoading()
-                    bookmarkAdapter.submitList(state.data)
-                }
+                    is UiState.Success -> {
+                        supportFragmentManager.hideLoading()
+                        bookmarkAdapter.submitList(state.data)
+                    }
 
-                is UiState.Error -> {
-                    supportFragmentManager.hideLoading()
-                    showToast(state.error?.message.toString())
+                    is UiState.Error -> {
+                        supportFragmentManager.hideLoading()
+                        showToast(state.error?.message.toString())
+                    }
                 }
             }
         }
