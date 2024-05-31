@@ -1,4 +1,4 @@
-package com.minhoi.memento.adapter
+package com.minhoi.memento.ui.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -7,7 +7,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.minhoi.memento.data.dto.question.QuestionContent
 import com.minhoi.memento.databinding.QuestionPreviewColumnItemBinding
 
-class QuestionPreviewAdapter : ListAdapter<QuestionContent, QuestionPreviewAdapter.QuestionPreviewViewHolder>(QuestionDiffCallback()){
+class QuestionPreviewAdapter : ListAdapter<QuestionContent, QuestionPreviewAdapter.QuestionPreviewViewHolder>(
+    QuestionDiffCallback()
+){
     inner class QuestionPreviewViewHolder(private val binding: QuestionPreviewColumnItemBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item: QuestionContent) {
             binding.question = item

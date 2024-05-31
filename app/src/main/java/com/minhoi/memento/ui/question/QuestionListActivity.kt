@@ -8,10 +8,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.minhoi.memento.R
-import com.minhoi.memento.adapter.BoardLoadStateAdapter
-import com.minhoi.memento.adapter.QuestionRowAdapter
 import com.minhoi.memento.base.BaseActivity
 import com.minhoi.memento.databinding.ActivityQuestionListBinding
+import com.minhoi.memento.ui.adapter.BoardLoadStateAdapter
+import com.minhoi.memento.ui.adapter.QuestionRowAdapter
 import com.minhoi.memento.utils.setOnSingleClickListener
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest

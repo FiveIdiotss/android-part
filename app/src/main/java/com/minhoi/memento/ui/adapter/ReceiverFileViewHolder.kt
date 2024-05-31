@@ -1,4 +1,4 @@
-package com.minhoi.memento.adapter
+package com.minhoi.memento.ui.adapter
 
 import androidx.recyclerview.widget.RecyclerView
 import com.minhoi.memento.data.dto.chat.Receiver

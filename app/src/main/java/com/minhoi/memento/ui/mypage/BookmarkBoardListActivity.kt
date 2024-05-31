@@ -6,10 +6,10 @@ import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.minhoi.memento.R
-import com.minhoi.memento.adapter.MyPostsAdapter
 import com.minhoi.memento.base.BaseActivity
 import com.minhoi.memento.databinding.ActivityBookmarkBoardListBinding
 import com.minhoi.memento.ui.UiState
+import com.minhoi.memento.ui.adapter.MyPostsAdapter
 import com.minhoi.memento.ui.board.BoardActivity
 import com.minhoi.memento.utils.hideLoading
 import com.minhoi.memento.utils.showLoading

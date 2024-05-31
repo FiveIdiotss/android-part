@@ -1,4 +1,4 @@
-package com.minhoi.memento
+package com.minhoi.memento.utils
 
 import android.graphics.Canvas
 import android.graphics.Color

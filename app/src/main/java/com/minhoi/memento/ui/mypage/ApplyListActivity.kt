@@ -10,11 +10,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.minhoi.memento.R
-import com.minhoi.memento.adapter.ApplyListAdapter
-import com.minhoi.memento.adapter.ReceivedListAdapter
 import com.minhoi.memento.base.BaseActivity
 import com.minhoi.memento.databinding.ActivityApplyListBinding
 import com.minhoi.memento.ui.UiState
+import com.minhoi.memento.ui.adapter.ReceivedListAdapter
 import com.minhoi.memento.ui.board.BoardActivity
 import com.minhoi.memento.ui.mypage.received.ReceivedContentActivity
 import com.minhoi.memento.utils.hideLoading
@@ -29,7 +28,7 @@ class ApplyListActivity : BaseActivity<ActivityApplyListBinding>() {
     private val viewModel by viewModels<MypageViewModel>()
     override val layoutResourceId: Int = R.layout.activity_apply_list
     private lateinit var requestType: String
-    private lateinit var applyListAdapter: ApplyListAdapter
+    private lateinit var applyListAdapter: _root_ide_package_.com.minhoi.memento.ui.adapter.ApplyListAdapter
     private lateinit var receivedListAdapter: ReceivedListAdapter
 
     override fun initView() {
@@ -46,7 +45,7 @@ class ApplyListActivity : BaseActivity<ActivityApplyListBinding>() {
                 binding.toolbarText.text = APPLY_TITLE
 //                viewModel.getApplyList()
                 applyListAdapter =
-                    ApplyListAdapter(
+                    _root_ide_package_.com.minhoi.memento.ui.adapter.ApplyListAdapter(
                         onBoardClickListener = {
                             // onClickListener
                             // 선택한 신청서 내용 Activity에 전달

@@ -1,4 +1,4 @@
-package com.minhoi.memento.adapter
+package com.minhoi.memento.ui.adapter
 
 import androidx.recyclerview.widget.DiffUtil
 import com.minhoi.memento.data.dto.question.QuestionContent

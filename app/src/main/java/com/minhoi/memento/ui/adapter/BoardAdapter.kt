@@ -1,4 +1,4 @@
-package com.minhoi.memento.adapter
+package com.minhoi.memento.ui.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -12,23 +12,21 @@ import com.minhoi.memento.utils.setOnSingleClickListener
 class BoardAdapter(
     private val onItemClickListener: (BoardContentDto) -> Unit,
     private val onBookmarkClickListener: (BoardContentDto) -> Unit
-) :
-    PagingDataAdapter<BoardContentDto, BoardAdapter.BoardViewHolder>(BoardContentDtoDiffCallback()) {
+) : PagingDataAdapter<BoardContentDto, BoardAdapter.BoardViewHolder>(BoardContentDtoDiffCallback()) {
 
     inner class BoardViewHolder(private val binding: BoardRowItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(item: BoardContentDto) {
+            binding.bookmarkBtn.setOnSingleClickListener {
+                onBookmarkClickListener(item)
+            }
+            binding.root.setOnSingleClickListener {
+                onItemClickListener(item)
+            }
             binding.board = item
             when (item.isBookmarked) {
                 true -> binding.bookmarkBtn.setImageResource(com.minhoi.memento.R.drawable.heart_filled)
                 false -> binding.bookmarkBtn.setImageResource(com.minhoi.memento.R.drawable.heart_empty)
-            }
-            binding.bookmarkBtn.setOnSingleClickListener {
-                onBookmarkClickListener(item)
-
-            }
-            binding.root.setOnSingleClickListener {
-                onItemClickListener(item)
             }
         }
     }

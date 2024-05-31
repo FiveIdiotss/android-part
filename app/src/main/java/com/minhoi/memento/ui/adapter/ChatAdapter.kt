@@ -1,4 +1,4 @@
-package com.minhoi.memento.adapter
+package com.minhoi.memento.ui.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -18,7 +18,9 @@ import com.minhoi.memento.databinding.SenderFileRowItemBinding
 import com.minhoi.memento.databinding.SenderImageRowItemBinding
 import com.minhoi.memento.databinding.SenderMessageRowItemBinding
 
-class ChatAdapter(private val onImageClickListener: (String) -> Unit) : ListAdapter<ChatMessage, RecyclerView.ViewHolder>(DiffCallback()) {
+class ChatAdapter(private val onImageClickListener: (String) -> Unit) : ListAdapter<ChatMessage, RecyclerView.ViewHolder>(
+    DiffCallback()
+) {
 
     inner class SenderViewHolder(private val binding: SenderMessageRowItemBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item: Sender) {
