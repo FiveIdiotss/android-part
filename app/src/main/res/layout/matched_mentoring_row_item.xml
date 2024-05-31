@@ -12,10 +12,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <ImageView
+        <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/imageView2"
             android:layout_width="90dp"
             android:layout_height="90dp"
+            android:padding="5dp"
             android:layout_marginTop="10dp"
             android:layout_marginStart="10dp"
             android:layout_marginBottom="10dp"
@@ -68,13 +69,13 @@
 
         <ImageView
             android:id="@+id/chatBtn"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_marginEnd="10dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="15dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            android:src="@drawable/chat"/>
+            android:src="@drawable/chaticon"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

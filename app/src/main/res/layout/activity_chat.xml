@@ -21,54 +21,66 @@
                 android:id="@+id/receiverName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="18sp"
+                android:layout_gravity="center"
                 android:textColor="@color/black"
-                android:layout_gravity="center"/>
+                android:textSize="18sp" />
         </androidx.appcompat.widget.Toolbar>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/chatRv"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            app:layout_constraintBottom_toTopOf="@+id/message"
+            android:layout_marginBottom="10dp"
+            app:layout_constraintBottom_toTopOf="@+id/inputLayout"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/chatToolbar" />
 
-        <ImageView
-            android:id="@+id/imageSelectBtn"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_marginStart="15dp"
-            android:src="@drawable/gallery"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/message" />
-
-        <EditText
-            android:id="@+id/message"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/inputLayout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="17dp"
-            android:layout_marginBottom="10dp"
-            android:layout_marginStart="15dp"
-            android:background="@drawable/round_corner_gray_color"
-            android:inputType="text"
-            android:padding="4dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/sendBtn"
-            app:layout_constraintStart_toEndOf="@+id/imageSelectBtn" />
-
-        <ImageView
-            android:id="@+id/sendBtn"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:src="@drawable/send"
-            android:layout_marginEnd="15dp"
-            app:layout_constraintBottom_toBottomOf="@+id/message"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/message" />
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent">
 
+            <ImageView
+                android:id="@+id/selectFileBtn"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginStart="15dp"
+                android:src="@drawable/gallery"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/message" />
+
+            <EditText
+                android:id="@+id/message"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:layout_marginEnd="17dp"
+                android:layout_marginBottom="10dp"
+                android:background="@drawable/round_corner_gray_color"
+                android:inputType="text"
+                android:padding="4dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/sendBtn"
+                app:layout_constraintStart_toEndOf="@+id/selectFileBtn" />
+
+            <ImageView
+                android:id="@+id/sendBtn"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_marginEnd="15dp"
+                android:src="@drawable/send"
+                app:layout_constraintBottom_toBottomOf="@+id/message"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/message" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 </layout>

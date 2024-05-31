@@ -36,9 +36,19 @@
             android:id="@+id/questionRv"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/questionToolbar" />
 
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/toPostQuestionBtn"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_margin="30dp"
+            android:src="@drawable/upload"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
