@@ -8,12 +8,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.minhoi.memento.R
-import com.minhoi.memento.adapter.MatchedMentoringAdapter
 import com.minhoi.memento.base.BaseActivity
 import com.minhoi.memento.data.dto.MemberDTO
 import com.minhoi.memento.data.dto.MentoringMatchInfo
 import com.minhoi.memento.databinding.ActivityMyMentoringBinding
 import com.minhoi.memento.ui.UiState
+import com.minhoi.memento.ui.adapter.MatchedMentoringAdapter
 import com.minhoi.memento.ui.chat.ChatActivity
 import com.minhoi.memento.utils.hideLoading
 import com.minhoi.memento.utils.showLoading
@@ -43,10 +43,8 @@ class MyMentoringActivity : BaseActivity<ActivityMyMentoringBinding>() {
     override fun initView() {
         setUpToolbar()
 
-        lifecycleScope.launch {
-            viewModel.getMentorInfo()
-            viewModel.getMenteeInfo()
-        }
+        viewModel.getMentorInfo()
+        viewModel.getMenteeInfo()
 
         binding.myMentorRv.apply {
             adapter = mentorAdapter

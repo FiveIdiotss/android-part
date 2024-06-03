@@ -62,16 +62,19 @@
                 app:layout_constraintStart_toStartOf="@+id/textView50"
                 app:layout_constraintTop_toBottomOf="@+id/textView50" />
 
-            <com.google.android.material.switchmaterial.SwitchMaterial
+            <Switch
                 android:id="@+id/chatNotificationSwitch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="15dp"
+                android:checked="true"
+                android:track="@drawable/switch_track_selector"
                 android:thumb="@drawable/switch_thumb"
-                app:track="@drawable/switch_track_selector"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="UseSwitchCompatOrMaterialXml" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -103,16 +106,18 @@
                 app:layout_constraintStart_toStartOf="@+id/postNotificationTv"
                 app:layout_constraintTop_toBottomOf="@+id/postNotificationTv" />
 
-            <androidx.appcompat.widget.SwitchCompat
+            <Switch
                 android:id="@+id/postNotificationSwitch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="15dp"
                 android:thumb="@drawable/switch_thumb"
-                app:track="@drawable/switch_track_selector"
+                android:track="@drawable/switch_track_selector"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="UseSwitchCompatOrMaterialXml" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

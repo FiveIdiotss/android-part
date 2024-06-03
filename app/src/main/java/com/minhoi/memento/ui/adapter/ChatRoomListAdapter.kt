@@ -1,4 +1,4 @@
-package com.minhoi.memento.adapter
+package com.minhoi.memento.ui.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

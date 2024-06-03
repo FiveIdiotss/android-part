@@ -11,9 +11,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -42,24 +41,22 @@ class LoginViewModel @Inject constructor(
 
         val loginRequest = LoginRequest(email, password)
         viewModelScope.launch {
-            loginRepository.signIn(loginRequest)
-                .onStart {
-                    _loginState.value = UiState.Loading
-                }
-                .catch { e ->
-                    _loginState.value = UiState.Error(e)
-                }
-                .collectLatest { response ->
-                    if (response.isSuccessful) {
-                        MentoApplication.prefs.setAccessToken(response.body()!!.tokenDto.accessToken)
-                        MentoApplication.prefs.setRefreshToken(response.body()!!.tokenDto.refreshToken)
-                        MentoApplication.memberPrefs.setMemberPrefs(response.body()!!.memberDTO)
-                        _loginState.value = UiState.Success(true)
-                    } else {
-                        _loginState.value =
-                            UiState.Error(Throwable(response.message()))
+            _loginState.update { UiState.Loading }
+            loginRepository.signIn(loginRequest).collectLatest { result ->
+                result.handleResponse(
+                    onSuccess = { value ->
+                        _loginState.update {
+                            MentoApplication.prefs.setAccessToken(value.data.tokenDto.accessToken)
+                            MentoApplication.prefs.setRefreshToken(value.data.tokenDto.refreshToken)
+                            MentoApplication.memberPrefs.setMemberPrefs(value.data.memberDTO)
+                            UiState.Success(true)
+                        }
+                    },
+                    onError = { error ->
+                        _loginState.update { UiState.Error(error.exception) }
                     }
-                }
+                )
+            }
         }
     }
 

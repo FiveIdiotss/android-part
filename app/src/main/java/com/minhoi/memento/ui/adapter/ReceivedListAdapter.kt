@@ -1,4 +1,4 @@
-package com.minhoi.memento.adapter
+package com.minhoi.memento.ui.adapter
 
 import android.util.Log
 import android.view.LayoutInflater
@@ -10,7 +10,6 @@ import com.minhoi.memento.R
 import com.minhoi.memento.data.dto.BoardContentDto
 import com.minhoi.memento.data.dto.BoardContentForReceived
 import com.minhoi.memento.data.dto.MentoringReceivedDto
-import com.minhoi.memento.data.model.BoardType
 import com.minhoi.memento.databinding.ReceivedListInBoardRowItemBinding
 import com.minhoi.memento.databinding.ReceivedListRowItemBinding
 import com.minhoi.memento.utils.setOnSingleClickListener
@@ -22,27 +21,27 @@ class ReceivedListAdapter(
     RecyclerView.Adapter<ReceivedListAdapter.ViewHolder>() {
 
     private val boardsWithReceivedMentoring =
-        mutableListOf<Map<BoardContentForReceived, List<MentoringReceivedDto>>>()
+        mutableListOf<Pair<BoardContentForReceived, List<MentoringReceivedDto>>>()
 
     inner class ViewHolder(private val binding: ReceivedListRowItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
         init {
             binding.receivedListLayout.setOnSingleClickListener {
-                boardsWithReceivedMentoring[bindingAdapterPosition].keys.first().isExpanded =
-                    !boardsWithReceivedMentoring[bindingAdapterPosition].keys.first().isExpanded
+                boardsWithReceivedMentoring[bindingAdapterPosition].first.isExpanded =
+                    !boardsWithReceivedMentoring[bindingAdapterPosition].first.isExpanded
                 notifyItemChanged(bindingAdapterPosition)
             }
 
             binding.root.setOnSingleClickListener {
                 onBoardClickListener(
-                    boardsWithReceivedMentoring[bindingAdapterPosition].keys.first().boardId
+                    boardsWithReceivedMentoring[bindingAdapterPosition].first.boardId
                 )
             }
         }
 
-        fun bind(item: Map<BoardContentForReceived, List<MentoringReceivedDto>>) {
+        fun bind(item: Pair<BoardContentForReceived, List<MentoringReceivedDto>>) {
             Log.d("ReceivedListAdapter", "binds: $item")
-            val boardContent = item.keys.first()
+            val boardContent = item.first
             binding.board = BoardContentDto(
                 boardContent.boardId,
                 boardContent.memberName,
@@ -58,7 +57,7 @@ class ReceivedListAdapter(
             )
             binding.applyListWithBoardRv.apply {
                 adapter =
-                    ReceivedChildAdapter(item.values.first(), object : OnReceivedItemClickListener {
+                    ReceivedChildAdapter(item.second, object : OnReceivedItemClickListener {
                         override fun onItemClick(item: MentoringReceivedDto) {
                             onReceivedItemClickListener(item)
                         }
@@ -89,7 +88,7 @@ class ReceivedListAdapter(
         holder.bind(boardsWithReceivedMentoring[position])
     }
 
-    fun setList(items: List<Map<BoardContentForReceived, List<MentoringReceivedDto>>>) {
+    fun setList(items: List<Pair<BoardContentForReceived, List<MentoringReceivedDto>>>) {
         boardsWithReceivedMentoring.clear()
         boardsWithReceivedMentoring.addAll(items)
         notifyDataSetChanged()
@@ -102,11 +101,12 @@ class ReceivedListAdapter(
         RecyclerView.Adapter<ReceivedChildAdapter.InnerViewHolder>() {
         inner class InnerViewHolder(private val binding: ReceivedListInBoardRowItemBinding) :
             RecyclerView.ViewHolder(binding.root) {
-                init {
-                    binding.root.setOnSingleClickListener {
-                        onReceivedItemClickListener.onItemClick(receivedItem[bindingAdapterPosition])
-                    }
+            init {
+                binding.root.setOnSingleClickListener {
+                    onReceivedItemClickListener.onItemClick(receivedItem[bindingAdapterPosition])
                 }
+            }
+
             fun bind(item: MentoringReceivedDto) {
                 binding.receivedDto = item
             }

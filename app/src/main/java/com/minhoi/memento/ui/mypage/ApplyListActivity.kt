@@ -10,11 +10,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.minhoi.memento.R
-import com.minhoi.memento.adapter.ApplyListAdapter
-import com.minhoi.memento.adapter.ReceivedListAdapter
 import com.minhoi.memento.base.BaseActivity
 import com.minhoi.memento.databinding.ActivityApplyListBinding
 import com.minhoi.memento.ui.UiState
+import com.minhoi.memento.ui.adapter.ReceivedListAdapter
 import com.minhoi.memento.ui.board.BoardActivity
 import com.minhoi.memento.ui.mypage.received.ReceivedContentActivity
 import com.minhoi.memento.utils.hideLoading
@@ -29,7 +28,7 @@ class ApplyListActivity : BaseActivity<ActivityApplyListBinding>() {
     private val viewModel by viewModels<MypageViewModel>()
     override val layoutResourceId: Int = R.layout.activity_apply_list
     private lateinit var requestType: String
-    private lateinit var applyListAdapter: ApplyListAdapter
+    private lateinit var applyListAdapter: _root_ide_package_.com.minhoi.memento.ui.adapter.ApplyListAdapter
     private lateinit var receivedListAdapter: ReceivedListAdapter
 
     override fun initView() {
@@ -44,29 +43,34 @@ class ApplyListActivity : BaseActivity<ActivityApplyListBinding>() {
         when (requestType) {
             TYPE_APPLY -> {
                 binding.toolbarText.text = APPLY_TITLE
-                viewModel.getApplyList()
-                applyListAdapter = ApplyListAdapter(
-                    onBoardClickListener = {
-                        // onClickListener
-                        // 선택한 신청서 내용 Activity에 전달
-                        startActivity(Intent(this, BoardActivity::class.java).apply {
-                            putExtra("applyDto", it)
-                        })
-                    },
-                    onShowApplyContentListener = {
-                        // 지원서 보기 선택시 선택한 신청서 정보 가져오기
-                        viewModel.getApplyInfo(it.applyId)
+//                viewModel.getApplyList()
+                applyListAdapter =
+                    _root_ide_package_.com.minhoi.memento.ui.adapter.ApplyListAdapter(
+                        onBoardClickListener = {
+                            // onClickListener
+                            // 선택한 신청서 내용 Activity에 전달
+                            startActivity(Intent(this, BoardActivity::class.java).apply {
+                                putExtra("applyDto", it)
+                            })
+                        },
+                        onShowApplyContentListener = {
+                            // 지원서 보기 선택시 선택한 신청서 정보 가져오기
+                            viewModel.getApplyInfo(it.applyId)
 
-                        val applyContentDialogFragment = ApplyContentDialogFragment()
-                        applyContentDialogFragment.show(supportFragmentManager, applyContentDialogFragment.tag)
-                    }
-                )
+                            val applyContentDialogFragment = ApplyContentDialogFragment()
+                            applyContentDialogFragment.show(
+                                supportFragmentManager,
+                                applyContentDialogFragment.tag
+                            )
+                        }
+                    )
                 observeApplyList()
             }
 
             TYPE_RECEIVE -> {
                 binding.toolbarText.text = RECEIVE_TITLE
-                viewModel.getBoardsWithReceivedMentoring()
+                viewModel.getMemberBoards()
+                viewModel.getReceivedMentoring()
                 receivedListAdapter = ReceivedListAdapter(
                     onBoardClickListener = {
                         // 해당 글 id 전달
@@ -120,7 +124,7 @@ class ApplyListActivity : BaseActivity<ActivityApplyListBinding>() {
     private fun observeReceivedList() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.boardsWithReceivedMentoring.collectLatest {
+                viewModel.receivedMentoring.collectLatest {
                     when (it) {
                         is UiState.Empty -> {}
                         is UiState.Loading -> {

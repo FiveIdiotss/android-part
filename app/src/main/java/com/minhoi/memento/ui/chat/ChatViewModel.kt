@@ -1,23 +1,23 @@
 package com.minhoi.memento.ui.chat
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.gmail.bishoybasily.stomp.lib.Event
-import com.gmail.bishoybasily.stomp.lib.StompClient
 import com.minhoi.memento.MentoApplication
 import com.minhoi.memento.data.dto.chat.ChatMessage
 import com.minhoi.memento.data.dto.chat.MessageDto
 import com.minhoi.memento.data.dto.chat.Receiver
 import com.minhoi.memento.data.dto.chat.Sender
 import com.minhoi.memento.data.model.ChatFileType
+import com.minhoi.memento.data.network.SaveFileResult
 import com.minhoi.memento.repository.chat.ChatRepository
 import com.minhoi.memento.ui.UiState
+import com.minhoi.memento.utils.FileManager
 import com.minhoi.memento.utils.parseLocalDateTime
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -26,9 +26,11 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import okhttp3.MultipartBody
-import okhttp3.OkHttpClient
 import org.json.JSONObject
-import java.util.concurrent.TimeUnit
+import ua.naiksoftware.stomp.Stomp
+import ua.naiksoftware.stomp.dto.LifecycleEvent
+import ua.naiksoftware.stomp.dto.StompHeader
+import ua.naiksoftware.stomp.dto.StompMessage
 import javax.inject.Inject
 
 @HiltViewModel
@@ -44,7 +46,6 @@ class ChatViewModel @Inject constructor(
     private var roomId = -1L
     val hasNextPage: LiveData<Boolean> = _hasNextPage
 
-    //    private val _chatRooms: MutableStateFlow<>
     private val _connectState = MutableStateFlow<UiState<Boolean>>(UiState.Empty)
     val connectState: StateFlow<UiState<Boolean>> = _connectState.asStateFlow()
 
@@ -61,33 +62,41 @@ class ChatViewModel @Inject constructor(
     private val _saveImageState = MutableStateFlow<UiState<Boolean>>(UiState.Empty)
     val saveImageState: StateFlow<UiState<Boolean>> = _saveImageState.asStateFlow()
 
-    private val intervalMillis = 5000L
-    private var stomp: StompClient? = null
-    private var stompConnection: Disposable? = null
-    private lateinit var topic: Disposable
-    private val client = OkHttpClient.Builder()
-        .readTimeout(10, TimeUnit.SECONDS)
-        .writeTimeout(10, TimeUnit.SECONDS)
-        .connectTimeout(10, TimeUnit.SECONDS)
-        .build()
+    private var stompClient: ua.naiksoftware.stomp.StompClient? = null
 
     fun connectToWebSocket(roomId: Long) {
         val url = "ws://menteetor.site:8080/ws"
-        if (stomp != null) {
+        if (stompClient != null) {
             return
         }
-        stomp = StompClient(client, intervalMillis).apply {
-            this@apply.url = url
-        }
+        stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, url)
+
+        val headers = listOf(
+            StompHeader("chatRoomId", roomId.toString()),
+            StompHeader("senderId", member.id.toString())
+        )
+        stompClient!!.connect(headers)
 
         viewModelScope.launch {
             try {
-                stompConnection = stomp!!.connect().subscribe { event ->
+                stompClient!!.lifecycle().subscribe() { event ->
                     when (event.type) {
-                        Event.Type.OPENED -> handleWebSocketOpened(roomId)
-                        Event.Type.CLOSED -> handleWebSocketClosed()
-                        Event.Type.ERROR -> handleWebSocketError()
-                        else -> {}
+                        LifecycleEvent.Type.OPENED -> {
+                            Log.i(TAG, "opened")
+
+                            handleWebSocketOpened(roomId)
+                        }
+                        LifecycleEvent.Type.CLOSED -> {
+                            Log.i(TAG, "closed")
+
+                        }
+                        LifecycleEvent.Type.ERROR -> {
+                            Log.i(TAG, "error")
+                            Log.e(TAG, event.exception.toString())
+                        }
+                        else ->{
+                            Log.i(TAG, event.message)
+                        }
                     }
                 }
             } catch (e: Exception) {
@@ -99,15 +108,13 @@ class ChatViewModel @Inject constructor(
     /**
      * 소켓이 연결되었을 경우 서버에서 가져온 방 Id를 구독하여 메세지 수신 대기하는 함수
      */
+    @SuppressLint("CheckResult")
     private fun handleWebSocketOpened(roomId: Long) {
         _connectState.update { UiState.Success(true) }
         // 채팅방 구독
 
-        topic = stomp!!.join("/sub/chats/$roomId").subscribe { message ->
-            Log.d("Messageqqq", "connectToWebSocket: $message")
-            viewModelScope.launch(Dispatchers.Main) {
-                handleMessage(message)
-            }
+        stompClient!!.topic("/sub/chats/$roomId").subscribe { message ->
+            handleMessage(message)
         }
     }
 
@@ -119,11 +126,11 @@ class ChatViewModel @Inject constructor(
         _connectState.update { UiState.Error(exception ?: Exception("WebSocket Error")) }
     }
 
-    private fun handleMessage(message: String) {
-        try {
-            val json = JSONObject(message)
+    private fun handleMessage(message: StompMessage) {
+        viewModelScope.launch(Dispatchers.Main) {
+            val json = JSONObject(message.payload)
             Log.d(TAG, "handleMessage: $json")
-            val fileType = ChatFileType.toFileType(json.getString("fileType")) ?: return
+            val fileType = ChatFileType.toFileType(json.getString("fileType"))
             val fileURL = json.getString("fileURL")
             val senderId = json.getLong("senderId")
             val senderName = json.getString("senderName")
@@ -131,12 +138,9 @@ class ChatViewModel @Inject constructor(
             val chatRoomId = json.getLong("chatRoomId")
             val date = json.getString("localDateTime")
             val messageObject =
-                MessageDto(fileType, fileURL, senderId, chatRoomId, content, date, senderName)
+                MessageDto(fileType!!, fileURL, senderId, chatRoomId, content, date, senderName)
             tempMessages.addLast(getSenderOrReceiver(messageObject))
             _messages.value = tempMessages
-
-        } catch (e: Exception) {
-            Log.d(TAG, "handleMessage: ${e.printStackTrace()}")
         }
     }
 
@@ -148,41 +152,43 @@ class ChatViewModel @Inject constructor(
             put("senderName", member.name)
         }
         val body = jsonObject.toString()
+
         Log.d(TAG, "sendMessage: $body")
         viewModelScope.launch (Dispatchers.IO) {
-            stomp!!.send("/pub/hello", body).subscribe {
-                Log.d(TAG, "sendMessage: $it")
-            }
+            stompClient!!.send("/pub/hello", body).subscribe()
         }
     }
 
-    fun sendImage(image: String, roomId: Long) {
-        val jsonObject = JSONObject().apply {
-            put("content", null)
-            put("senderId", member.id)
-            put("chatRoomId", roomId)
-            put("senderName", member.name)
-            put("image", image)
-        }
-        val body = jsonObject.toString()
-        viewModelScope.launch (Dispatchers.IO) {
-            stomp!!.send("/pub/hello", body).subscribe {
-                Log.d(TAG, "sendMessage: $it")
+    fun sendFile(file: MultipartBody.Part) {
+        if (roomId == -1L)
+            return
+        viewModelScope.launch {
+            chatRepository.sendFile(file, roomId).collectLatest {
+                it.handleResponse(
+                    onSuccess = {
+                        Log.d(TAG, "sendFile: $it   $file")
+                        // 라시이클러뷰에 추가
+                        //
+                    },
+                    onError = {
+                        Log.d(TAG, "sendFile: ${it.message} ${it.exception?.message}  $file")
+                    }
+                )
             }
         }
     }
 
     fun disconnect() {
-        stompConnection?.dispose()
+        stompClient?.disconnect()
     }
 
     fun getChatRoomId(receiverId: Long) {
         viewModelScope.launch {
             chatRepository.getRoomId(receiverId).collectLatest { result ->
                 result.handleResponse(
-                    onSuccess = { room ->
-                        roomId = room.id
-                        _chatRoomState.update { UiState.Success(room.id) }
+                    onSuccess = { data ->
+                        roomId = data.data.id
+                        _chatRoomState.update { UiState.Success(data.data.id) }
                     },
                     onError = { error ->
                         _chatRoomState.update { UiState.Error(error.exception) }
@@ -198,13 +204,13 @@ class ChatViewModel @Inject constructor(
             chatRepository.getMessages(roomId, currentPage, 20).collectLatest { result ->
                 Log.d(TAG, "getMessagesPage: $currentPage")
                 result.handleResponse(
-                    onSuccess = { messages ->
+                    onSuccess = { response ->
                         _isPageLoading.value = UiState.Success(true)
                         Log.d(TAG, "getMessages: $messages")
-                        if (messages.last) {
+                        if (response.data.last) {
                             _hasNextPage.value = false
                         }
-                        messages.content.forEach {
+                        response.data.content.forEach {
                             tempMessages.addFirst(getSenderOrReceiver(it))
                         }
                         _messages.value = tempMessages

@@ -1,13 +1,13 @@
-package com.minhoi.memento
+package com.minhoi.memento.ui.adapter
 
 import android.content.Context
-import android.graphics.Color
 import android.graphics.Typeface
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.minhoi.memento.R
 import com.minhoi.memento.data.dto.MajorDto
 import com.minhoi.memento.databinding.MajorRowItemBinding
 
@@ -43,7 +43,8 @@ class MajorAdapter(private val context: Context, private val onClickListener: (M
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = DataBindingUtil.inflate<MajorRowItemBinding>(LayoutInflater.from(parent.context), R.layout.major_row_item, parent, false)
+        val view = DataBindingUtil.inflate<MajorRowItemBinding>(LayoutInflater.from(parent.context),
+            R.layout.major_row_item, parent, false)
         return ViewHolder(view)
     }
 

@@ -6,6 +6,10 @@
     <data>
 
     </data>
+<androidx.core.widget.NestedScrollView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -356,10 +360,11 @@
             app:layout_constraintTop_toTopOf="@+id/textView3" />
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerView"
+            android:id="@+id/mentorBoardRv"
             android:layout_width="0dp"
             android:layout_height="210dp"
             android:layout_margin="15dp"
+            android:overScrollMode="never"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView3" />
@@ -370,12 +375,12 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
             android:layout_marginTop="15dp"
-            android:text="멘티를 매칭하고싶어요"
+            android:text="질문을 같이 해결해봐요!"
             android:textSize="19dp"
             android:textStyle="bold"
             app:layout_constraintEnd_toStartOf="@+id/toMenteeBoard"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/recyclerView" />
+            app:layout_constraintTop_toBottomOf="@+id/mentorBoardRv" />
 
         <TextView
             android:id="@+id/toMenteeBoard"
@@ -388,13 +393,16 @@
             app:layout_constraintTop_toTopOf="@+id/textView5" />
 
         <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/questionRv"
             android:layout_width="0dp"
-            android:layout_height="210dp"
+            android:layout_height="wrap_content"
             android:layout_margin="15dp"
+            android:overScrollMode="never"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView5" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.core.widget.NestedScrollView>
 </layout>

@@ -80,6 +80,7 @@ class BoardActivity : BaseActivity<ActivityBoardBinding>() {
                         is UiState.Success -> {
                             supportFragmentManager.hideLoading()
                             binding.boardContent = it.data
+                            viewModel.setBookmarkState(it.data.isBookmarked)
                         }
                         is UiState.Error -> {
                             supportFragmentManager.hideLoading()

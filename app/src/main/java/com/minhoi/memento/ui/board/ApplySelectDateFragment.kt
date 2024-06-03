@@ -5,10 +5,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.minhoi.memento.R
-import com.minhoi.memento.adapter.SelectTimeTableAdapter
 import com.minhoi.memento.base.BaseFragment
 import com.minhoi.memento.data.dto.TimeTableDto
 import com.minhoi.memento.databinding.FragmentApplySelectDateBinding
+import com.minhoi.memento.ui.adapter.SelectTimeTableAdapter
 import com.minhoi.memento.utils.setOnSingleClickListener
 import com.minhoi.memento.utils.showToast
 import dagger.hilt.android.AndroidEntryPoint

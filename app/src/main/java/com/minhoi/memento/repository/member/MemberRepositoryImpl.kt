@@ -1,5 +1,6 @@
 package com.minhoi.memento.repository.member
 
+import com.minhoi.memento.base.CommonResponse
 import com.minhoi.memento.data.dto.BoardContentDto
 import com.minhoi.memento.data.dto.MentoringMatchInfo
 import com.minhoi.memento.data.network.RetrofitClient
@@ -22,24 +23,22 @@ class MemberRepositoryImpl @Inject constructor(
 
     override suspend fun getMemberInfo(memberId: Long) = memberService.getMemberInfo(memberId)
 
-    override suspend fun getApplyList(memberId: Long) = matchingService.getMyApply(memberId, "SEND")
+    override suspend fun getApplyList() = matchingService.getMyApply("SEND")
 
     override fun getApplyInfo(applyId: Long) = safeFlow {
         memberService.getApplyInfo(applyId)
     }
 
-    override fun getReceivedList(memberId: Long) = safeFlow {
-        matchingService.getReceived(memberId, "RECEIVE")
+    override fun getReceivedList() = safeFlow {
+        matchingService.getReceived("RECEIVE")
     }
 
-    override fun getMentorInfo(memberId: Long): Flow<ApiResult<List<MentoringMatchInfo>>> =
-        safeFlow {
-            matchingService.getMatchedMentoringInfo(memberId, BoardType.MENTEE)
+    override fun getMentorInfo() = safeFlow {
+            matchingService.getMatchedMentoringInfo(BoardType.MENTEE)
         }
 
-    override fun getMenteeInfo(memberId: Long): Flow<ApiResult<List<MentoringMatchInfo>>> =
-        safeFlow {
-            matchingService.getMatchedMentoringInfo(memberId, BoardType.MENTOR)
+    override fun getMenteeInfo() = safeFlow {
+            matchingService.getMatchedMentoringInfo( BoardType.MENTOR)
         }
 
     override suspend fun acceptApply(applyId: Long) = matchingService.acceptApply(applyId)
@@ -54,17 +53,12 @@ class MemberRepositoryImpl @Inject constructor(
         memberService.setDefaultProfileImage()
     }
 
-    override fun getBookmarkBoards(): Flow<ApiResult<List<BoardContentDto>>> = flow {
-        val response = memberService.getBookmarkBoards()
-        if (response.isSuccessful) {
-            emit(ApiResult.Success(response.body() ?: throw Exception("BookmarkBoards is null")))
-        } else {
-            emit(ApiResult.Error(message = response.message()))
-        }
-    }
-
-    override fun getMemberBoards(memberId: Long) = safeFlow {
-        memberService.getMemberBoards(memberId)
+    override fun getMemberBoards(
+        memberId: Long,
+        page: Int,
+        size: Int
+    ): Flow<ApiResult<CommonResponse<List<BoardContentDto>>>> = safeFlow {
+        memberService.getMemberBoards(memberId, page, size)
     }
 
     override fun saveFCMToken(token: String) = notificationService.saveToken(token)

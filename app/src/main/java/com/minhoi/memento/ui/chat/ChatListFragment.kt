@@ -8,10 +8,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.minhoi.memento.R
-import com.minhoi.memento.adapter.ChatRoomListAdapter
 import com.minhoi.memento.base.BaseFragment
 import com.minhoi.memento.databinding.FragmentChatListBinding
 import com.minhoi.memento.ui.UiState
+import com.minhoi.memento.ui.adapter.ChatRoomListAdapter
 import com.minhoi.memento.ui.home.HomeViewModel
 import com.minhoi.memento.utils.hideLoading
 import com.minhoi.memento.utils.showLoading
