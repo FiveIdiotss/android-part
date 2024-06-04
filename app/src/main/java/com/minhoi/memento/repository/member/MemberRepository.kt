@@ -1,12 +1,13 @@
 package com.minhoi.memento.repository.member
 
 import com.minhoi.memento.base.CommonResponse
-import com.minhoi.memento.data.dto.BoardContentDto
+import com.minhoi.memento.data.dto.BoardListResponse
 import com.minhoi.memento.data.dto.MemberDTO
 import com.minhoi.memento.data.dto.MentoringApplyDto
 import com.minhoi.memento.data.dto.MentoringApplyListDto
 import com.minhoi.memento.data.dto.MentoringMatchInfo
 import com.minhoi.memento.data.dto.MentoringReceivedDto
+import com.minhoi.memento.data.dto.notification.NotificationListResponse
 import com.minhoi.memento.data.network.ApiResult
 import kotlinx.coroutines.flow.Flow
 import okhttp3.MultipartBody
@@ -35,7 +36,11 @@ interface MemberRepository {
 
     fun setDefaultProfileImage(): Flow<ApiResult<CommonResponse<String>>>
 
-    fun getMemberBoards(memberId: Long, page: Int, size: Int): Flow<ApiResult<CommonResponse<List<BoardContentDto>>>>
+    fun getMemberBoards(memberId: Long, page: Int, size: Int): Flow<ApiResult<CommonResponse<BoardListResponse>>>
+
+    fun getBookmarkBoards(page: Int, size: Int): Flow<ApiResult<CommonResponse<BoardListResponse>>>
+
+    fun getNotificationList(page: Int, size: Int): Flow<ApiResult<CommonResponse<NotificationListResponse>>>
 
     fun saveFCMToken(token: String): Call<String>
 }
