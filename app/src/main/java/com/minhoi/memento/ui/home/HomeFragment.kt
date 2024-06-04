@@ -1,7 +1,7 @@
 package com.minhoi.memento.ui.home
 
 import android.content.Intent
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -25,7 +25,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
     override val layoutResourceId: Int = R.layout.fragment_home
 
-    private val viewModel by viewModels<HomeViewModel>()
+    private val viewModel by activityViewModels<HomeViewModel>()
     private lateinit var boardAdapter: BoardAdapter
     private lateinit var questionPreviewAdapter: QuestionPreviewAdapter
 
