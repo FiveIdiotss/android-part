@@ -5,8 +5,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
-import com.minhoi.memento.pagingsource.BoardPagingSource
 import com.minhoi.memento.repository.board.BoardRepository
+import com.minhoi.memento.repository.pagingsource.BoardPagingSource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow

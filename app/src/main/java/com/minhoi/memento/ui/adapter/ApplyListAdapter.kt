@@ -6,8 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.minhoi.memento.data.dto.MentoringApplyListDto
-import com.minhoi.memento.databinding.ApplyListRowItemBinding
 import com.minhoi.memento.data.model.ApplyStatus
+import com.minhoi.memento.databinding.ApplyListRowItemBinding
 import com.minhoi.memento.utils.setOnSingleClickListener
 
 class ApplyListAdapter(
@@ -63,14 +63,14 @@ class ApplyListAdapter(
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): _root_ide_package_.com.minhoi.memento.ui.adapter.ApplyListAdapter.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ApplyListAdapter.ViewHolder {
         val binding = ApplyListRowItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ViewHolder(binding)
     }
 
     override fun getItemCount(): Int = applies.size
 
-    override fun onBindViewHolder(holder: _root_ide_package_.com.minhoi.memento.ui.adapter.ApplyListAdapter.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ApplyListAdapter.ViewHolder, position: Int) {
         holder.bind(applies[position])
     }
 
