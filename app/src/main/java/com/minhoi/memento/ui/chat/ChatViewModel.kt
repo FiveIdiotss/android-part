@@ -71,11 +71,7 @@ class ChatViewModel @Inject constructor(
         }
         stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, url)
 
-        val headers = listOf(
-            StompHeader("chatRoomId", roomId.toString()),
-            StompHeader("senderId", member.id.toString())
-        )
-        stompClient!!.connect(headers)
+        stompClient!!.connect()
 
         viewModelScope.launch {
             try {
@@ -112,8 +108,11 @@ class ChatViewModel @Inject constructor(
     private fun handleWebSocketOpened(roomId: Long) {
         _connectState.update { UiState.Success(true) }
         // 채팅방 구독
-
-        stompClient!!.topic("/sub/chats/$roomId").subscribe { message ->
+        val headers = listOf(
+            StompHeader("chatRoomId", roomId.toString()),
+            StompHeader("senderId", member.id.toString())
+        )
+        stompClient!!.topic("/sub/chats/$roomId", headers).subscribe { message ->
             handleMessage(message)
         }
     }
