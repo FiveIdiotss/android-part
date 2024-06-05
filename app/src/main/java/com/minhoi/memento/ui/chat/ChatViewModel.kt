@@ -13,11 +13,13 @@ import com.minhoi.memento.data.dto.chat.Receiver
 import com.minhoi.memento.data.dto.chat.Sender
 import com.minhoi.memento.data.model.ChatFileType
 import com.minhoi.memento.data.network.SaveFileResult
+import com.minhoi.memento.data.network.socket.StompManager
 import com.minhoi.memento.repository.chat.ChatRepository
 import com.minhoi.memento.ui.UiState
 import com.minhoi.memento.utils.FileManager
 import com.minhoi.memento.utils.parseLocalDateTime
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -27,8 +29,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import okhttp3.MultipartBody
 import org.json.JSONObject
-import ua.naiksoftware.stomp.Stomp
-import ua.naiksoftware.stomp.dto.LifecycleEvent
 import ua.naiksoftware.stomp.dto.StompHeader
 import ua.naiksoftware.stomp.dto.StompMessage
 import javax.inject.Inject
@@ -62,43 +62,11 @@ class ChatViewModel @Inject constructor(
     private val _saveImageState = MutableStateFlow<UiState<Boolean>>(UiState.Empty)
     val saveImageState: StateFlow<UiState<Boolean>> = _saveImageState.asStateFlow()
 
-    private var stompClient: ua.naiksoftware.stomp.StompClient? = null
+    private val stompClient = StompManager.stompClient
+    private var subscription: Disposable? = null
 
-    fun connectToWebSocket(roomId: Long) {
-        val url = "ws://menteetor.site:8080/ws"
-        if (stompClient != null) {
-            return
-        }
-        stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, url)
-
-        stompClient!!.connect()
-
-        viewModelScope.launch {
-            try {
-                stompClient!!.lifecycle().subscribe() { event ->
-                    when (event.type) {
-                        LifecycleEvent.Type.OPENED -> {
-                            Log.i(TAG, "opened")
-
-                            handleWebSocketOpened(roomId)
-                        }
-                        LifecycleEvent.Type.CLOSED -> {
-                            Log.i(TAG, "closed")
-
-                        }
-                        LifecycleEvent.Type.ERROR -> {
-                            Log.i(TAG, "error")
-                            Log.e(TAG, event.exception.toString())
-                        }
-                        else ->{
-                            Log.i(TAG, event.message)
-                        }
-                    }
-                }
-            } catch (e: Exception) {
-                handleWebSocketError(e)
-            }
-        }
+    fun subscribeChatRoom(roomId: Long) {
+        handleWebSocketOpened(roomId)
     }
 
     /**
@@ -112,13 +80,9 @@ class ChatViewModel @Inject constructor(
             StompHeader("chatRoomId", roomId.toString()),
             StompHeader("senderId", member.id.toString())
         )
-        stompClient!!.topic("/sub/chats/$roomId", headers).subscribe { message ->
+        subscription = stompClient!!.topic("/sub/chats/$roomId", headers).subscribe { message ->
             handleMessage(message)
         }
-    }
-
-    private fun handleWebSocketClosed() {
-        // WebSocket이 닫혔을 때의 처리
     }
 
     private fun handleWebSocketError(exception: Exception? = null) {
@@ -175,10 +139,6 @@ class ChatViewModel @Inject constructor(
                 )
             }
         }
-    }
-
-    fun disconnect() {
-        stompClient?.disconnect()
     }
 
     fun getChatRoomId(receiverId: Long) {
@@ -245,6 +205,11 @@ class ChatViewModel @Inject constructor(
                 is SaveFileResult.Failure -> _saveImageState.update { UiState.Error(result.error) }
             }
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        subscription?.dispose()
     }
 
 }

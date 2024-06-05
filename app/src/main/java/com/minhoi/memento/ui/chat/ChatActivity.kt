@@ -205,7 +205,7 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
                             if (receiverId != -1L) {
                                 Log.d(TAG, "connectSocket: ${state.data}")
                                 roomId = state.data
-                                viewModel.connectToWebSocket(state.data)
+                                viewModel.subscribeChatRoom(state.data)
                                 viewModel.getMessageStream(state.data)
                             } else {
                                 showToast(LOAD_ERROR_MESSAGE)
