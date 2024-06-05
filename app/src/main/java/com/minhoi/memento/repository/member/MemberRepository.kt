@@ -42,5 +42,7 @@ interface MemberRepository {
 
     fun getNotificationList(page: Int, size: Int): Flow<ApiResult<CommonResponse<NotificationListResponse>>>
 
+    fun getUnreadNotificationCounts(): Flow<ApiResult<CommonResponse<Int>>>
+
     fun saveFCMToken(token: String): Call<String>
 }

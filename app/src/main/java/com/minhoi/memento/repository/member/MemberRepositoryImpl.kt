@@ -1,11 +1,8 @@
 package com.minhoi.memento.repository.member
 
 import com.minhoi.memento.base.CommonResponse
-import com.minhoi.memento.data.dto.BoardContentDto
 import com.minhoi.memento.data.dto.BoardListResponse
-import com.minhoi.memento.data.dto.MentoringMatchInfo
 import com.minhoi.memento.data.dto.notification.NotificationListResponse
-import com.minhoi.memento.data.network.RetrofitClient
 import com.minhoi.memento.data.model.BoardType
 import com.minhoi.memento.data.network.ApiResult
 import com.minhoi.memento.data.network.service.BoardService
@@ -14,7 +11,6 @@ import com.minhoi.memento.data.network.service.MemberService
 import com.minhoi.memento.data.network.service.NotificationService
 import com.minhoi.memento.utils.safeFlow
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import okhttp3.MultipartBody
 import javax.inject.Inject
 
@@ -77,6 +73,10 @@ class MemberRepositoryImpl @Inject constructor(
         size: Int
     ): Flow<ApiResult<CommonResponse<NotificationListResponse>>> = safeFlow {
         memberService.getNotificationList(page, size)
+    }
+
+    override fun getUnreadNotificationCounts(): Flow<ApiResult<CommonResponse<Int>>> = safeFlow {
+        memberService.getUnreadNotificationCounts()
     }
 
     override fun saveFCMToken(token: String) = notificationService.saveToken(token)

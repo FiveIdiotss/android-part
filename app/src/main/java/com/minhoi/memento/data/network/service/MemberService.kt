@@ -32,8 +32,11 @@ interface MemberService {
     @GET("api/memberBoards/{memberId}")
     suspend fun getMemberBoards(@Path("memberId") memberId: Long, @Query("page") page: Int, @Query("size") size: Int): Response<CommonResponse<BoardListResponse>>
 
-    @GET("api/fcm")
+    @GET("api/push")
     suspend fun getNotificationList(@Query("page") page: Int, @Query("size") size: Int): Response<CommonResponse<NotificationListResponse>>
+
+    @GET("api/count")
+    suspend fun getUnreadNotificationCounts(): Response<CommonResponse<Int>>
 
     @GET("api/apply/{applyId}")
     suspend fun getApplyInfo(@Path("applyId") applyId: Long): Response<CommonResponse<MentoringApplyDto>>
