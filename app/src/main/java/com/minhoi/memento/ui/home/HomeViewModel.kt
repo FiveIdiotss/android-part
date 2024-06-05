@@ -40,9 +40,6 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.json.JSONObject
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import javax.inject.Inject
 
 @HiltViewModel
@@ -50,14 +47,10 @@ class HomeViewModel @Inject constructor(
     private val boardRepository: BoardRepository,
     private val chatRepository: ChatRepository,
     private val memberRepository: MemberRepository,
-    private val loginRepository: LoginRepository,
     private val questionRepository: QuestionRepository,
 ) : ViewModel() {
 
     private val member = MentoApplication.memberPrefs.getMemberPrefs()
-
-    private val _previewBoards = MutableLiveData<List<BoardContentDto>>()
-    val previewBoards: LiveData<List<BoardContentDto>> = _previewBoards
 
     private val _questionPreviewContents = MutableLiveData<List<QuestionContent>>()
     val questionPreviewContents: LiveData<List<QuestionContent>> = _questionPreviewContents
@@ -228,5 +221,11 @@ class HomeViewModel @Inject constructor(
         } else {
             throw Exception("Network error: ${response.code()}")
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        StompManager.disconnect()
+        Log.d("HomeViewModel", "onCleared: OnCleared!!")
     }
 }
