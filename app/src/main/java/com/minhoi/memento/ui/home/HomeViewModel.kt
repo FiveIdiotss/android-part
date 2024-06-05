@@ -40,6 +40,9 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.json.JSONObject
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import javax.inject.Inject
 
 @HiltViewModel
@@ -221,6 +224,23 @@ class HomeViewModel @Inject constructor(
         } else {
             throw Exception("Network error: ${response.code()}")
         }
+    }
+
+    fun saveFCMToken(token: String) {
+        memberRepository.saveFCMToken(token).enqueue(object: Callback<String> {
+            override fun onResponse(call: Call<String>, response: Response<String>) {
+                if (response.isSuccessful) {
+                    Log.d("HomeViewModel", "initView: success")
+
+                } else {
+
+                }
+            }
+            override fun onFailure(call: Call<String>, t: Throwable) {
+                Log.d("HomeViewModel", "initView: failed")
+
+            }
+        })
     }
 
     override fun onCleared() {

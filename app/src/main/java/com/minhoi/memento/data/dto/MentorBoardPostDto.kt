@@ -15,7 +15,7 @@ data class MentorBoardPostDto (
     val content: String,
     @SerializedName("consultTime")
     val consultTime: Int,
-    @SerializedName("boardType")
+    @SerializedName("boardCategory")
     val boardType: BoardType,
     @SerializedName("times")
     val times: List<TimeTableDto>,
