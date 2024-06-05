@@ -19,6 +19,9 @@
         <action
             android:id="@+id/action_homeFragment_to_chatListFragment2"
             app:destination="@id/chatListFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_notificationListFragment"
+            app:destination="@id/notificationListFragment" />
     </fragment>
     <fragment
         android:id="@+id/mypageFragment"
@@ -30,6 +33,9 @@
         <action
             android:id="@+id/action_mypageFragment_to_chatListFragment"
             app:destination="@id/chatListFragment" />
+        <action
+            android:id="@+id/action_mypageFragment_to_notificationListFragment"
+            app:destination="@id/notificationListFragment" />
     </fragment>
     <fragment
         android:id="@+id/chatListFragment"
@@ -41,5 +47,22 @@
         <action
             android:id="@+id/action_chatListFragment_to_mypageFragment"
             app:destination="@id/mypageFragment" />
+        <action
+            android:id="@+id/action_chatListFragment_to_notificationListFragment"
+            app:destination="@id/notificationListFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/notificationListFragment"
+        android:name="com.minhoi.memento.ui.notification.NotificationListFragment"
+        android:label="NotificationListFragment" >
+        <action
+            android:id="@+id/action_notificationListFragment_to_chatListFragment"
+            app:destination="@id/chatListFragment" />
+        <action
+            android:id="@+id/action_notificationListFragment_to_mypageFragment"
+            app:destination="@id/mypageFragment" />
+        <action
+            android:id="@+id/action_notificationListFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
     </fragment>
 </navigation>
