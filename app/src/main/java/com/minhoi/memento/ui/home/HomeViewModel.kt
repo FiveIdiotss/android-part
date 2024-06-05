@@ -64,6 +64,7 @@ class HomeViewModel @Inject constructor(
     val loginState: StateFlow<UiState<Boolean>> = _loginState.asStateFlow()
 
     init {
+        StompManager.connectToSocket()
         getPreviewBoards()
         getPreviewQuestions()
         getChatRooms()
@@ -85,14 +86,41 @@ class HomeViewModel @Inject constructor(
                         _questionPreviewContents.value = it.data.content
                     },
                     onError = { error ->
+
                     }
                 )
             }
         }
     }
-    /*
-    * 채팅방 목록을 가져오고, 채팅방 목록에 대한 멤버 정보를 가져와서 Pair로 묶어서 UI에 전달하는 함수
-     */
+
+    /** 채팅방마다 구독하여 읽지 않은 메세지의 개수를 실시간으로 전달받는 함수
+    채팅방 목록 성공적으로 가져오고 구독 */
+    @SuppressLint("CheckResult")
+    fun subscribeChatRooms(rooms: List<ChatRoom>) {
+        rooms.forEach { chatRoom ->
+            StompManager.stompClient?.topic("/sub/unreadCount/${chatRoom.id}")
+                ?.subscribe { message ->
+                    val data = JSONObject(message.payload)
+                    val unreadMessageCount = data.getInt("unreadMessageCount")
+                    Log.d(
+                        "HomeViewModel",
+                        "subscribeChatRooms: ${chatRoom.id}  ${unreadMessageCount}"
+                    )
+                    val currentState = _chatRooms.value
+                    if (currentState is UiState.Success) {
+                        val updatedList = currentState.data.map { pair ->
+                            if (pair.first.id == chatRoom.id) {
+                                pair.first.copy(unreadMessageCount = unreadMessageCount) to pair.second
+                            } else {
+                                pair
+                            }
+                        }
+                        _chatRooms.update { UiState.Success(updatedList) }
+                    }
+                }
+        }
+    }
+
     @OptIn(FlowPreview::class)
     fun getChatRooms() {
         val chatRoomsWithMember = mutableListOf<Pair<ChatRoom, MemberDTO>>()
