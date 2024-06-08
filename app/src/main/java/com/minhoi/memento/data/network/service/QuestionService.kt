@@ -27,6 +27,7 @@ interface QuestionService {
     suspend fun getReplies(
         @Path("subBoardId") questionId: Long,
         @Query("page") page: Int,
+        @Query("isRecent") isRecent: Boolean,
         @Query("size") size: Int,
     ): Response<CommonResponse<ReplyListResponse>>
 

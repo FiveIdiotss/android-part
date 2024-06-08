@@ -76,6 +76,42 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         }
     }
 
+    private fun updateChatBadges(count: Int) {
+        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
+        setBadge(bottomNavigationView, R.id.chatListFragment, count)
+    }
+
+    private fun updateNotificationBadges(count: Int) {
+        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
+        setBadge(bottomNavigationView, R.id.notificationListFragment, count)
+    }
+
+    private fun observeBadgeCounts() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.chatUnreadCount.collectLatest { newCount ->
+                        updateChatBadges(newCount)
+                    }
+                }
+
+                launch {
+                    viewModel.notificationUnreadCount.collectLatest { count ->
+                        updateNotificationBadges(count)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun setBadge(bottomNavigationView: BottomNavigationView, itemId: Int, count: Int) {
+        val badgeDrawable = bottomNavigationView.getOrCreateBadge(itemId)
+        badgeDrawable.backgroundColor = ContextCompat.getColor(this, R.color.colorPrimary)
+        badgeDrawable.badgeTextColor = ContextCompat.getColor(this, R.color.white)
+        badgeDrawable.isVisible = count > 0
+        badgeDrawable.number = count
+    }
+
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission(),
     ) { isGranted: Boolean ->
