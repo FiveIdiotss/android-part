@@ -17,7 +17,7 @@ class QuestionRepositoryImpl @Inject constructor(
     override fun getQuestions(
         page: Int,
         size: Int,
-        schoolFilter: Boolean?,
+        schoolFilter: Boolean,
         boardCategory: String?,
         searchKeyWord: String?
     ): Flow<ApiResult<CommonResponse<QuestionListResponse>>> = safeFlow {

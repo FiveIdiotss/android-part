@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 interface QuestionRepository {
     fun getQuestions(page: Int,
                      size: Int,
-                     schoolFilter: Boolean?,
+                     schoolFilter: Boolean,
                      boardCategory: String?,
                      searchKeyWord: String?
     ): Flow<ApiResult<CommonResponse<QuestionListResponse>>>
