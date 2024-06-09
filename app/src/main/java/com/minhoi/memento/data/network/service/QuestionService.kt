@@ -14,8 +14,15 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface QuestionService {
-    @GET("api/pageSubBoards")
-    suspend fun getQuestions(@Query("page") page: Int, @Query("size") size: Int): Response<CommonResponse<QuestionListResponse>>
+    @GET("api/subBoards")
+    suspend fun getQuestions(
+        @Query("page") page: Int,
+        @Query("size") size: Int,
+        @Query("schoolFilter") schoolFilter: Boolean?,
+        @Query("boardCategory") boardCategory: String?,
+        @Query("keyWord") searchKeyWord: String?,
+        @Query("subBoardType") type: String,
+    ): Response<CommonResponse<QuestionListResponse>>
 
     @GET("api/subBoard/{subBoardId}")
     suspend fun getQuestion(@Path("subBoardId") questionId: Long): Response<CommonResponse<QuestionResponse>>

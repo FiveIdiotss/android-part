@@ -9,7 +9,12 @@ import com.minhoi.memento.data.network.ApiResult
 import kotlinx.coroutines.flow.Flow
 
 interface QuestionRepository {
-    fun getQuestions(page: Int, size: Int): Flow<ApiResult<CommonResponse<QuestionListResponse>>>
+    fun getQuestions(page: Int,
+                     size: Int,
+                     schoolFilter: Boolean?,
+                     boardCategory: String?,
+                     searchKeyWord: String?
+    ): Flow<ApiResult<CommonResponse<QuestionListResponse>>>
 
     fun getQuestion(questionId: Long): Flow<ApiResult<CommonResponse<QuestionResponse>>>
 
@@ -18,4 +23,6 @@ interface QuestionRepository {
     fun postReply(questionId: Long, content: String): Flow<ApiResult<CommonResponse<String>>>
 
     fun getReplies(page: Int, size: Int, questionId: Long): Flow<ApiResult<CommonResponse<ReplyListResponse>>>
+
+    fun getMyQuestion(page: Int, size: Int, memberId: Long): Flow<ApiResult<CommonResponse<QuestionListResponse>>>
 }
