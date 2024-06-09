@@ -28,12 +28,13 @@ import kotlinx.coroutines.launch
 class QuestionInfoActivity : BaseActivity<ActivityQuestionInfoBinding>() {
     override val layoutResourceId: Int = R.layout.activity_question_info
     private val viewModel by viewModels<QuestionViewModel>()
+    private var questionId: Long = -1
     private val replyAdapter: ReplyAdapter by lazy {
         ReplyAdapter()
     }
 
     override fun initView() {
-        val questionId = intent.getLongExtra("questionId", -1L)
+        questionId = intent.getLongExtra("questionId", -1L)
         Log.d("QuestionInfoActivity", "initView: $questionId")
         if (questionId == -1L) {
             showToast("일시적인 오류가 발생하였습니다. 다시 시도해주세요.")
@@ -115,10 +116,9 @@ class QuestionInfoActivity : BaseActivity<ActivityQuestionInfoBinding>() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.replyState.collectLatest { state ->
                     when (state) {
-                        is UiState.Empty -> {}
-                        is UiState.Loading -> supportFragmentManager.showLoading()
+                        is UiState.Empty, UiState.Loading -> {}
                         is UiState.Success -> {
-                            supportFragmentManager.hideLoading()
+                            viewModel.getQuestion(questionId)
                             replyAdapter.refresh()
                         }
                         is UiState.Error -> {

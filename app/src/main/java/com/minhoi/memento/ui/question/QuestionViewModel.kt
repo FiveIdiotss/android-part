@@ -75,6 +75,7 @@ class QuestionViewModel @Inject constructor(
 
     fun getQuestion(questionId: Long) {
         viewModelScope.launch {
+            _questionContent.update { UiState.Loading }
             questionRepository.getQuestion(questionId).collectLatest { result ->
                 result.handleResponse(
                     onSuccess = { data ->
