@@ -7,12 +7,14 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.minhoi.memento.data.dto.question.ReplyContent
 import com.minhoi.memento.databinding.ReplyRowItemBinding
+import com.minhoi.memento.utils.toRelativeTime
 
 class ReplyAdapter : PagingDataAdapter<ReplyContent, ReplyAdapter.ReplyViewHolder>(DiffCallback()) {
 
     inner class ReplyViewHolder(private val binding: ReplyRowItemBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item: ReplyContent) {
             binding.reply = item
+            binding.replyPostDate.text = item.postDate.toRelativeTime()
         }
     }
 
