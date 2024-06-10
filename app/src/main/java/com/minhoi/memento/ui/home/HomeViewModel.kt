@@ -10,10 +10,12 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import androidx.paging.map
 import com.minhoi.memento.MentoApplication
 import com.minhoi.memento.data.dto.BoardContentDto
 import com.minhoi.memento.data.dto.MemberDTO
 import com.minhoi.memento.data.dto.chat.ChatRoom
+import com.minhoi.memento.data.dto.chat.LatestMessageDto
 import com.minhoi.memento.data.dto.notification.NotificationListDto
 import com.minhoi.memento.data.dto.question.QuestionContent
 import com.minhoi.memento.data.network.socket.StompManager
@@ -21,6 +23,7 @@ import com.minhoi.memento.repository.board.BoardRepository
 import com.minhoi.memento.repository.chat.ChatRepository
 import com.minhoi.memento.repository.member.MemberRepository
 import com.minhoi.memento.repository.pagingsource.BoardPagingSource
+import com.minhoi.memento.repository.pagingsource.NotificationPagingSource
 import com.minhoi.memento.repository.question.QuestionRepository
 import com.minhoi.memento.ui.UiState
 import com.minhoi.memento.utils.toRelativeTime
@@ -36,7 +39,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.json.JSONObject
@@ -64,18 +66,14 @@ class HomeViewModel @Inject constructor(
     private val _loginState = MutableStateFlow<UiState<Boolean>>(UiState.Loading)
     val loginState: StateFlow<UiState<Boolean>> = _loginState.asStateFlow()
 
-    private val _notificationList = MutableStateFlow<UiState<List<NotificationListDto>>>(UiState.Empty)
-    val notificationList: StateFlow<UiState<List<NotificationListDto>>> = _notificationList.asStateFlow()
-
+    private val _notifications = MutableStateFlow<PagingData<NotificationListDto>>(PagingData.empty())
+    val notifications: StateFlow<PagingData<NotificationListDto>> = _notifications.asStateFlow()
+    
     private val _notificationUnreadCount = MutableStateFlow<Int>(0)
     val notificationUnreadCount: StateFlow<Int> = _notificationUnreadCount.asStateFlow()
 
     private val _chatUnreadCount = MutableStateFlow<Int>(0)
-
-    private var currentPage: Int = 1
-    var isLastPage: Boolean = false
-        private set
-    private val notificationTemp = mutableListOf<NotificationListDto>()
+    val chatUnreadCount: StateFlow<Int> = _chatUnreadCount.asStateFlow()
 
     init {
         StompManager.connectToSocket()
@@ -83,6 +81,20 @@ class HomeViewModel @Inject constructor(
         getPreviewQuestions()
         getUnreadNotificationCount()
         subscribeNotification()
+    }
+
+    fun getNotifications() = viewModelScope.launch {
+        Pager(
+            config = PagingConfig(pageSize = 20),
+            pagingSourceFactory = { NotificationPagingSource(memberRepository) }
+        ).flow.cachedIn(viewModelScope)
+            .map { pagingData ->
+                pagingData.map { notification ->
+                    notification.copy(arriveTime = notification.arriveTime.toRelativeTime())
+                }
+            }.collectLatest { data ->
+                _notifications.value = data
+            }
     }
 
     fun getPreviewBoards(): Flow<PagingData<BoardContentDto>> {
@@ -95,7 +107,7 @@ class HomeViewModel @Inject constructor(
 
     fun getPreviewQuestions() {
         viewModelScope.launch {
-            questionRepository.getQuestions(1, 7).collectLatest {
+            questionRepository.getQuestions(1, 7, false, null, null).collectLatest {
                 it.handleResponse(
                     onSuccess = {
                         _questionPreviewContents.value = it.data.content
@@ -146,7 +158,7 @@ class HomeViewModel @Inject constructor(
         val chatRoomsWithMember = mutableListOf<Pair<ChatRoom, MemberDTO>>()
         viewModelScope.launch {
             _chatRooms.update { UiState.Loading }
-            chatRepository.getChatRooms(member.id).collectLatest { result ->
+            chatRepository.getChatRooms().collectLatest { result ->
                 result.handleResponse(
                     onSuccess = { chatRooms ->
                         launch {
@@ -172,7 +184,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun getUnreadNotificationCount() {
+    private fun getUnreadNotificationCount() {
         viewModelScope.launch {
             memberRepository.getUnreadNotificationCounts().collectLatest {
                 it.handleResponse(
@@ -187,28 +199,8 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun getNotificationList() {
-        viewModelScope.launch {
-            memberRepository.getNotificationList(currentPage, 5)
-                .onStart { _notificationList.update { UiState.Loading } }
-                .collectLatest {
-                    it.handleResponse(
-                        onSuccess = { result ->
-                            if (result.data.pageInfo.totalPages == currentPage) isLastPage = true
-                            currentPage++
-
-                            val notifications = result.data.content.map { data ->
-                                data.copy(arriveTime = data.arriveTime.toRelativeTime())
-                            }
-                            notificationTemp.addAll(notifications)
-                            _notificationList.update { UiState.Success(notificationTemp) }
-                        },
-                        onError = { error ->
-                            _notificationList.update { UiState.Error(error.exception) }
-                        }
-                    )
-                }
-        }
+    fun resetUnreadNotificationCount() {
+        _notificationUnreadCount.update { 0 }
     }
 
     @SuppressLint("CheckResult")
