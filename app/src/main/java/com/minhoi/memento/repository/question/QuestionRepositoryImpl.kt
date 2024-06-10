@@ -54,4 +54,11 @@ class QuestionRepositoryImpl @Inject constructor(
     ): Flow<ApiResult<CommonResponse<QuestionListResponse>>> {
         TODO("Not yet implemented")
     }
+
+    override fun executeLike(questionId: Long): Flow<ApiResult<CommonResponse<String>>> = safeFlow {
+        questionService.executeLike(questionId)
+    }
+    override fun unExecuteLike(questionId: Long): Flow<ApiResult<CommonResponse<String>>> = safeFlow {
+        questionService.unExecuteLike(questionId)
+    }
 }

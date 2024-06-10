@@ -49,8 +49,14 @@ class QuestionInfoActivity : BaseActivity<ActivityQuestionInfoBinding>() {
         getReplies(questionId)
 
         binding.replyRv.apply {
+            itemAnimator = null
             adapter = replyAdapter
             layoutManager = LinearLayoutManager(this@QuestionInfoActivity, LinearLayoutManager.VERTICAL, false)
+        }
+
+        binding.likeLayout.setOnSingleClickListener {
+            Log.d("QuestionInfoActivity", "initView: ${questionId}  ${binding.questionContent!!.isLike}")
+            viewModel.executeLike(questionId, binding.questionContent!!.isLike)
         }
 
         binding.inputReply.addTextChangedListener(replyTextWatcher)
@@ -137,11 +143,9 @@ class QuestionInfoActivity : BaseActivity<ActivityQuestionInfoBinding>() {
 
     private val replyTextWatcher = object : TextWatcher {
         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
         override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
             binding.replyUploadBtn.isVisible = count > 0
         }
-
         override fun afterTextChanged(s: Editable?) {}
     }
 

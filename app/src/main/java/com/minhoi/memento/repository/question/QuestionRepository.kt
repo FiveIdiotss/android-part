@@ -25,4 +25,8 @@ interface QuestionRepository {
     fun getReplies(page: Int, size: Int, questionId: Long): Flow<ApiResult<CommonResponse<ReplyListResponse>>>
 
     fun getMyQuestion(page: Int, size: Int, memberId: Long): Flow<ApiResult<CommonResponse<QuestionListResponse>>>
+
+    fun executeLike(questionId: Long): Flow<ApiResult<CommonResponse<String>>>
+
+    fun unExecuteLike(questionId: Long): Flow<ApiResult<CommonResponse<String>>>
 }

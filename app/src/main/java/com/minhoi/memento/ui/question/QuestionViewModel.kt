@@ -131,6 +131,24 @@ class QuestionViewModel @Inject constructor(
         }
     }
 
+    fun executeLike(questionId: Long, isLike: Boolean) {
+        viewModelScope.launch {
+            when (isLike) {
+                true -> questionRepository.unExecuteLike(questionId)
+                false -> questionRepository.executeLike(questionId)
+            }.collectLatest {
+                it.handleResponse(
+                    onSuccess = {
+                        getQuestion(questionId)
+                    },
+                    onError = { error ->
+                        _questionContentState.update { UiState.Error(error.exception) }
+                    }
+                )
+            }
+        }
+    }
+
     fun setCategoryFilter(category: String?) {
         categoryQueryFlow.update { category }
     }

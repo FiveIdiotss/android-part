@@ -8,6 +8,7 @@ import com.minhoi.memento.data.dto.question.ReplyListResponse
 import com.minhoi.memento.data.dto.question.ReplyRequest
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
@@ -40,4 +41,10 @@ interface QuestionService {
 
     @POST("api/reply/{subBoardId}")
     suspend fun postReply(@Path("subBoardId") questionId: Long, @Body content: ReplyRequest): Response<CommonResponse<String>>
+
+    @POST("api/like/{subBoardId}")
+    suspend fun executeLike(@Path("subBoardId") questionId: Long): Response<CommonResponse<String>>
+
+    @DELETE("api/like/{subBoardId}")
+    suspend fun unExecuteLike(@Path("subBoardId") questionId: Long): Response<CommonResponse<String>>
 }
