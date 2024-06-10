@@ -115,17 +115,22 @@ class HomeViewModel @Inject constructor(
         rooms.forEach { chatRoom ->
             StompManager.stompClient?.topic("/sub/unreadCount/${chatRoom.id}")
                 ?.subscribe { message ->
-                    val data = JSONObject(message.payload)
-                    val unreadMessageCount = data.getInt("unreadMessageCount")
-                    Log.d(
-                        "HomeViewModel",
-                        "subscribeChatRooms: ${chatRoom.id}  ${unreadMessageCount}"
-                    )
+                    val data = message.payload
+                    val s = JSONObject(data)
+                    val count = s.getInt("unreadMessageCount")
+                    val latestMessageResponse = s.getJSONObject("latestMessageDTO")
+                    val content = latestMessageResponse.getString("content")
+                    val sendTime = latestMessageResponse.getString("localDateTime")
+
+                    _chatUnreadCount.update { count }
                     val currentState = _chatRooms.value
                     if (currentState is UiState.Success) {
                         val updatedList = currentState.data.map { pair ->
                             if (pair.first.id == chatRoom.id) {
-                                pair.first.copy(unreadMessageCount = unreadMessageCount) to pair.second
+                                pair.first.copy(
+                                    unreadMessageCount = count,
+                                    latestMessage = LatestMessageDto(content, sendTime)
+                                ) to pair.second
                             } else {
                                 pair
                             }
