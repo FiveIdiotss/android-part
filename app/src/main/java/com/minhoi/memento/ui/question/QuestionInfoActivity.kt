@@ -83,7 +83,7 @@ class QuestionInfoActivity : BaseActivity<ActivityQuestionInfoBinding>() {
     private fun observeQuestionContent() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.questionContent.collectLatest { state ->
+                viewModel.questionContentState.collectLatest { state ->
                     when (state) {
                         is UiState.Empty -> {}
                         is UiState.Loading -> supportFragmentManager.showLoading()

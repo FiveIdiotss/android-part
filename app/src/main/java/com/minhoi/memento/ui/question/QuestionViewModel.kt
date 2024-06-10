@@ -34,8 +34,8 @@ class QuestionViewModel @Inject constructor(
     private val questionRepository: QuestionRepository,
 ) : ViewModel() {
 
-    private val _questionContent = MutableStateFlow<UiState<QuestionContent>>(UiState.Loading)
-    val questionContent: StateFlow<UiState<QuestionContent>> = _questionContent.asStateFlow()
+    private val _questionContentState = MutableStateFlow<UiState<QuestionContent>>(UiState.Loading)
+    val questionContentState: StateFlow<UiState<QuestionContent>> = _questionContentState.asStateFlow()
 
     private val _replyState = MutableStateFlow<UiState<Boolean>>(UiState.Empty)
     val replyState: StateFlow<UiState<Boolean>> = _replyState.asStateFlow()
@@ -75,15 +75,15 @@ class QuestionViewModel @Inject constructor(
 
     fun getQuestion(questionId: Long) {
         viewModelScope.launch {
-            _questionContent.update { UiState.Loading }
+            _questionContentState.update { UiState.Loading }
             questionRepository.getQuestion(questionId).collectLatest { result ->
                 result.handleResponse(
                     onSuccess = { data ->
                         Log.d("QuestionVIewModel", "getQuestion: $data")
-                        _questionContent.update { UiState.Success(data.data.questionContent) }
+                        _questionContentState.update { UiState.Success(data.data.questionContent) }
                     },
                     onError = { error ->
-                        _questionContent.update { UiState.Error(error.exception) }
+                        _questionContentState.update { UiState.Error(error.exception) }
                     }
                 )
             }
