@@ -24,35 +24,40 @@ import kotlinx.coroutines.launch
 class NotificationListFragment : BaseFragment<FragmentNotificationsBinding>() {
     override val layoutResourceId: Int = R.layout.fragment_notifications
     private val viewModel by activityViewModels<HomeViewModel>()
-    private val notificationListAdapter: NotificationListAdapter by lazy {
-        NotificationListAdapter {
-            when (it.type) {
-                NotificationListType.APPLY -> {
-                    startActivity(
-                        Intent(
-                            requireContext(),
-                            BoardActivity::class.java
-                        ).putExtra("boardId", it.otherPK)
-                    )
-                }
+    private val notificationListAdapter: NotificationAdapter by lazy {
+        NotificationAdapter(
+            onItemClickListener = {
+                when (it.type) {
+                    NotificationListType.APPLY -> {
+                        startActivity(
+                            Intent(
+                                requireContext(),
+                                BoardActivity::class.java
+                            ).putExtra("boardId", it.otherPK)
+                        )
+                    }
 
-                NotificationListType.REPLY -> {
-                    startActivity(
-                        Intent(
-                            requireContext(),
-                            QuestionInfoActivity::class.java
-                        ).putExtra("questionId", it.otherPK)
-                    )
-                }
+                    NotificationListType.REPLY -> {
+                        startActivity(
+                            Intent(
+                                requireContext(),
+                                QuestionInfoActivity::class.java
+                            ).putExtra("questionId", it.otherPK)
+                        )
+                    }
 
                 NotificationListType.MATCHING_DECLINE -> {}
                 NotificationListType.MATCHING_COMPLETE -> {}
             }
         }
+                    NotificationListType.MATCHING_DECLINE -> {}
+                    NotificationListType.MATCHING_COMPLETE -> {}
+                }
+            },
     }
 
     override fun initView() {
-        viewModel.getNotificationList()
+        viewModel.getNotifications()
         observeNotificationList()
 
         binding.notificationRv.apply {
@@ -71,19 +76,8 @@ class NotificationListFragment : BaseFragment<FragmentNotificationsBinding>() {
     private fun observeNotificationList() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.notificationList.collectLatest { state ->
-                    when (state) {
-                        is UiState.Empty, UiState.Loading -> {}
-                        is UiState.Success -> {
-                            notificationListAdapter.submitList(state.data)
-                            parentFragmentManager.hideLoading()
-                        }
-
-                        is UiState.Error -> {
-                            parentFragmentManager.hideLoading()
-                            requireContext().showToast(state.error!!.message!!)
-                        }
-                    }
+                viewModel.notifications.collectLatest { state ->
+                    notificationListAdapter.submitData(state)
                 }
             }
         }
