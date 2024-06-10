@@ -79,6 +79,10 @@ class MemberRepositoryImpl @Inject constructor(
         memberService.getUnreadNotificationCounts()
     }
 
+    override fun deleteNotification(notificationId: Long): Flow<ApiResult<CommonResponse<String>>> = safeFlow {
+        memberService.deleteNotification(notificationId)
+    }
+
     override fun saveFCMToken(token: String) = notificationService.saveToken(token)
 
 }

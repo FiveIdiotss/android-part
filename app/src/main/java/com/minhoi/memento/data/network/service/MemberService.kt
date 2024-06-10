@@ -8,6 +8,7 @@ import com.minhoi.memento.data.dto.MentoringApplyDto
 import com.minhoi.memento.data.dto.notification.NotificationListResponse
 import okhttp3.MultipartBody
 import retrofit2.Response
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Multipart
 import retrofit2.http.POST
@@ -37,6 +38,9 @@ interface MemberService {
 
     @GET("api/count")
     suspend fun getUnreadNotificationCounts(): Response<CommonResponse<Int>>
+
+    @DELETE("api/push/{notificationId}")
+    suspend fun deleteNotification(@Path("notificationId") notificationId: Long): Response<CommonResponse<String>>
 
     @GET("api/apply/{applyId}")
     suspend fun getApplyInfo(@Path("applyId") applyId: Long): Response<CommonResponse<MentoringApplyDto>>
