@@ -12,5 +12,6 @@ data class NotificationListDto(
     val title: String,
     val content: String,
     @SerializedName("notificationType") val type: NotificationListType,
-    val arriveTime: String
+    val arriveTime: String,
+    val isExpanded: Boolean = false
 )
