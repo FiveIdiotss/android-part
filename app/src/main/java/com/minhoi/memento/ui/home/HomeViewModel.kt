@@ -10,6 +10,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import androidx.paging.filter
 import androidx.paging.map
 import com.minhoi.memento.MentoApplication
 import com.minhoi.memento.data.dto.BoardContentDto
@@ -68,7 +69,10 @@ class HomeViewModel @Inject constructor(
 
     private val _notifications = MutableStateFlow<PagingData<NotificationListDto>>(PagingData.empty())
     val notifications: StateFlow<PagingData<NotificationListDto>> = _notifications.asStateFlow()
-    
+
+    private val _expandState = MutableStateFlow<Boolean>(false)
+    val expandState: StateFlow<Boolean> = _expandState.asStateFlow()
+
     private val _notificationUnreadCount = MutableStateFlow<Int>(0)
     val notificationUnreadCount: StateFlow<Int> = _notificationUnreadCount.asStateFlow()
 
@@ -95,6 +99,36 @@ class HomeViewModel @Inject constructor(
             }.collectLatest { data ->
                 _notifications.value = data
             }
+    }
+
+    /** 알림 목록에서 x버튼 활성화하는 함수 */
+    fun expandNotifications() {
+        val expandedData = _notifications.value.map {
+            it.copy(isExpanded = true)
+        }
+        _notifications.update { expandedData }
+        _expandState.update { true }
+    }
+
+    fun unExpandNotifications() {
+        val expandedData = _notifications.value.map {
+            it.copy(isExpanded = false)
+        }
+        _notifications.update { expandedData }
+        _expandState.update { false }
+    }
+
+    fun deleteNotification(notificationId: Long) {
+        viewModelScope.launch {
+            val filteredData = _notifications.value.filter { it.id != notificationId }
+            _notifications.update { filteredData }
+            memberRepository.deleteNotification(notificationId).collectLatest {
+                it.handleResponse(
+                    onSuccess = {},
+                    onError = {}
+                )
+            }
+        }
     }
 
     fun getPreviewBoards(): Flow<PagingData<BoardContentDto>> {
