@@ -13,6 +13,7 @@ import com.minhoi.memento.ui.adapter.BoardAdapter
 import com.minhoi.memento.ui.adapter.QuestionPreviewAdapter
 import com.minhoi.memento.ui.board.BoardActivity
 import com.minhoi.memento.ui.board.BoardListActivity
+import com.minhoi.memento.ui.question.QuestionInfoActivity
 import com.minhoi.memento.ui.question.QuestionListActivity
 import com.minhoi.memento.utils.ColumnItemDecoration
 import com.minhoi.memento.utils.setOnSingleClickListener
@@ -37,12 +38,12 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                     "boardId", it.boardId
                 ))
             },
-            onBookmarkClickListener = {
-
-            }
+            onBookmarkClickListener = {}
         )
 
-        questionPreviewAdapter = QuestionPreviewAdapter()
+        questionPreviewAdapter = QuestionPreviewAdapter {
+            startActivity(Intent(requireContext(), QuestionInfoActivity::class.java).putExtra("questionId", it))
+        }
 
         binding.toMentorBoard.setOnSingleClickListener {
             startActivity(Intent(requireContext(), BoardListActivity::class.java))
