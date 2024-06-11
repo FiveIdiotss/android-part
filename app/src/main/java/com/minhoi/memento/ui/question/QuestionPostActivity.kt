@@ -3,7 +3,6 @@ package com.minhoi.memento.ui.question
 import android.annotation.SuppressLint
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
@@ -27,7 +26,7 @@ class QuestionPostActivity : BaseActivity<ActivityQuestionPostBinding>() {
     private val viewModel by viewModels<QuestionViewModel>()
 
     override fun initView() {
-        setUpToolbar()
+        setupToolbar("질문 작성")
         observePostQuestionState()
 
         binding.inputQuestionContent.addTextChangedListener(questionLengthTextWatcher)
@@ -45,24 +44,6 @@ class QuestionPostActivity : BaseActivity<ActivityQuestionPostBinding>() {
 
             postQuestion()
         }
-    }
-
-    private fun setUpToolbar() {
-        setSupportActionBar(binding.questionPostToolbar)
-        supportActionBar?.apply {
-            setDisplayHomeAsUpEnabled(true)
-            setDisplayShowTitleEnabled(false)
-        }
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            android.R.id.home -> {
-                finish()
-                return true
-            }
-        }
-        return super.onOptionsItemSelected(item)
     }
 
     private fun postQuestion() {

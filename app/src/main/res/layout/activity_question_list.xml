@@ -16,7 +16,7 @@
         tools:context=".ui.question.QuestionListActivity">
 
         <androidx.appcompat.widget.Toolbar
-            android:id="@+id/questionToolbar"
+            android:id="@+id/toolbar"
             android:layout_width="0dp"
             android:layout_height="?actionBarSize"
             app:layout_constraintEnd_toEndOf="parent"
@@ -28,7 +28,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="질문 글 목록"
                 android:textColor="@color/black"
                 android:textSize="18sp" />
 
@@ -43,7 +42,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/questionToolbar">
+            app:layout_constraintTop_toBottomOf="@+id/toolbar">
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/filterCategoryBtn"

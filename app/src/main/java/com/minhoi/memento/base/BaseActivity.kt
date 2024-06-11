@@ -28,14 +28,17 @@ abstract class BaseActivity<T : ViewDataBinding> : AppCompatActivity() {
         super.onDestroy()
     }
 
-    private fun setupToolbar(title: String) {
+    fun setupToolbar(title: String) {
+        if (title.isNotEmpty()) {
+            val toolbarText: TextView? = findViewById(R.id.toolbarText)
+            toolbarText?.text = title
+        }
         val toolbar: Toolbar? = findViewById(R.id.toolbar)
         toolbar?.let {
             setSupportActionBar(it)
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
+            supportActionBar?.setDisplayShowTitleEnabled(false)
         }
-        val toolbarText: TextView? = findViewById(R.id.toolbarText)
-        toolbarText?.text = title
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

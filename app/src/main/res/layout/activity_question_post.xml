@@ -14,7 +14,7 @@
         tools:context=".ui.question.QuestionPostActivity">
 
         <androidx.appcompat.widget.Toolbar
-            android:id="@+id/questionPostToolbar"
+            android:id="@+id/toolbar"
             android:layout_width="0dp"
             android:layout_height="?actionBarSize"
             app:layout_constraintEnd_toEndOf="parent"
@@ -22,10 +22,10 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <TextView
+                android:id="@+id/toolbarText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="질문 작성"
                 android:textColor="@color/black"
                 android:textSize="18sp" />
         </androidx.appcompat.widget.Toolbar>

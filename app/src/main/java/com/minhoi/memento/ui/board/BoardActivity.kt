@@ -1,7 +1,6 @@
 package com.minhoi.memento.ui.board
 
 import android.content.Intent
-import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -28,11 +27,7 @@ class BoardActivity : BaseActivity<ActivityBoardBinding>() {
         boardId = intent.getLongExtra("boardId", -1L)
         binding.viewModel = viewModel
         getBoardContent(boardId)
-        setSupportActionBar(binding.boardToolbar)
-        supportActionBar?.apply {
-            setDisplayHomeAsUpEnabled(true)
-            setDisplayShowTitleEnabled(false)
-        }
+        setupToolbar("")
 
         binding.mentorApplyBtn.setOnSingleClickListener {
             // 멘토링 신청 Activity로 전환
@@ -46,16 +41,6 @@ class BoardActivity : BaseActivity<ActivityBoardBinding>() {
         }
         observeBoardContent()
         observeBookmarkState()
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            android.R.id.home -> {
-                finish()
-                return true
-            }
-        }
-        return super.onOptionsItemSelected(item)
     }
 
     private fun getBoardContent(boardId: Long) {

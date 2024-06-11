@@ -2,7 +2,6 @@ package com.minhoi.memento.ui.question
 
 import android.content.Intent
 import android.view.Menu
-import android.view.MenuItem
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.widget.SearchView
@@ -37,9 +36,12 @@ class QuestionListActivity : BaseActivity<ActivityQuestionListBinding>() {
     }
 
     override fun initView() {
-        setUpToolbar()
-
         type = intent.getStringExtra("type")
+        when (type) {
+            "wholeQuestion" -> setupToolbar("질문 글 목록")
+            "myQuestion" -> setupToolbar("내가 작성한 질문")
+            "likeQuestion" -> setupToolbar("좋아요 표시한 질문")
+        }
 
         binding.questionRv.apply {
             adapter = questionRowAdapter.withLoadStateFooter(BoardLoadStateAdapter())
@@ -81,38 +83,18 @@ class QuestionListActivity : BaseActivity<ActivityQuestionListBinding>() {
                     "myQuestion" -> {
                         viewModel.getMyQuestions().collectLatest {
                             binding.filterLayout.visibility = View.GONE
-                            binding.toolbarText.text = "내가 작성한 질문글"
                             questionRowAdapter.submitData(it)
                         }
                     }
                     "likeQuestion" -> {
                         viewModel.getLikedQuestions().collectLatest {
                             binding.filterLayout.visibility = View.GONE
-                            binding.toolbarText.text = "좋아요 한 질문글"
                             questionRowAdapter.submitData(it)
                         }
                     }
                 }
             }
         }
-    }
-
-    private fun setUpToolbar() {
-        setSupportActionBar(binding.questionToolbar)
-        supportActionBar?.apply {
-            setDisplayHomeAsUpEnabled(true)
-            setDisplayShowTitleEnabled(false)
-        }
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            android.R.id.home -> {
-                finish()
-                return true
-            }
-        }
-        return super.onOptionsItemSelected(item)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

@@ -3,7 +3,6 @@ package com.minhoi.memento.ui.question
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
-import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
@@ -41,7 +40,7 @@ class QuestionInfoActivity : BaseActivity<ActivityQuestionInfoBinding>() {
             return
         }
 
-        setUpToolbar()
+        setupToolbar("")
         viewModel.getQuestion(questionId)
 
         observeQuestionContent()
@@ -51,11 +50,15 @@ class QuestionInfoActivity : BaseActivity<ActivityQuestionInfoBinding>() {
         binding.replyRv.apply {
             itemAnimator = null
             adapter = replyAdapter
-            layoutManager = LinearLayoutManager(this@QuestionInfoActivity, LinearLayoutManager.VERTICAL, false)
+            layoutManager =
+                LinearLayoutManager(this@QuestionInfoActivity, LinearLayoutManager.VERTICAL, false)
         }
 
         binding.likeLayout.setOnSingleClickListener {
-            Log.d("QuestionInfoActivity", "initView: ${questionId}  ${binding.questionContent!!.isLike}")
+            Log.d(
+                "QuestionInfoActivity",
+                "initView: ${questionId}  ${binding.questionContent!!.isLike}"
+            )
             viewModel.executeLike(questionId, binding.questionContent!!.isLike)
         }
 
@@ -66,24 +69,6 @@ class QuestionInfoActivity : BaseActivity<ActivityQuestionInfoBinding>() {
             binding.inputReply.setText("")
             binding.inputReply.hideKeyboard()
         }
-    }
-
-    private fun setUpToolbar() {
-        setSupportActionBar(binding.questionInfoToolbar)
-        supportActionBar?.apply {
-            setDisplayHomeAsUpEnabled(true)
-            setDisplayShowTitleEnabled(false)
-        }
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            android.R.id.home -> {
-                finish()
-                return true
-            }
-        }
-        return super.onOptionsItemSelected(item)
     }
 
     private fun observeQuestionContent() {

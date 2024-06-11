@@ -2,7 +2,6 @@ package com.minhoi.memento.ui.mypage
 
 import android.content.Intent
 import android.util.Log
-import android.view.MenuItem
 import android.view.View
 import androidx.activity.viewModels
 import androidx.lifecycle.Lifecycle
@@ -43,7 +42,7 @@ class ApplyListActivity : BaseActivity<ActivityApplyListBinding>() {
         }
         when (requestType) {
             TYPE_APPLY -> {
-                binding.toolbarText.text = APPLY_TITLE
+                setupToolbar(APPLY_TITLE)
 //                viewModel.getApplyList()
                 applyListAdapter =
                     ApplyListAdapter(
@@ -69,7 +68,7 @@ class ApplyListActivity : BaseActivity<ActivityApplyListBinding>() {
             }
 
             TYPE_RECEIVE -> {
-                binding.toolbarText.text = RECEIVE_TITLE
+                setupToolbar(RECEIVE_TITLE)
                 viewModel.getMemberBoards()
                 viewModel.getReceivedMentoring()
                 receivedListAdapter = ReceivedListAdapter(
@@ -99,16 +98,6 @@ class ApplyListActivity : BaseActivity<ActivityApplyListBinding>() {
             layoutManager = LinearLayoutManager(this@ApplyListActivity, LinearLayoutManager.VERTICAL, false)
         }
 
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            android.R.id.home -> {
-                finish()
-                return true
-            }
-        }
-        return super.onOptionsItemSelected(item)
     }
 
     private fun observeApplyList() {

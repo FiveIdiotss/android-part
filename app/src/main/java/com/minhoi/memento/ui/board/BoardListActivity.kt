@@ -42,7 +42,7 @@ class BoardListActivity : BaseActivity<ActivityBoardListBinding>() {
 
     override fun initView() {
         binding.viewModel = viewModel
-        setUpToolbar()
+        setupToolbar("멘토링 모집 게시글")
         category = intent.getStringExtra("category")
         category?.let { binding.filterCategoryBtn.text = category }
         viewModel.setCategoryFilter(category)
@@ -111,14 +111,6 @@ class BoardListActivity : BaseActivity<ActivityBoardListBinding>() {
         }
     }
 
-    private fun setUpToolbar() {
-        setSupportActionBar(binding.boardListToolbar)
-        supportActionBar?.apply {
-            setDisplayShowTitleEnabled(false)
-            setDisplayHomeAsUpEnabled(true)
-        }
-    }
-
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.boardlist_toolbar_menu, menu)
         val searchItem = menu?.findItem(R.id.action_search)
@@ -141,15 +133,10 @@ class BoardListActivity : BaseActivity<ActivityBoardListBinding>() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            android.R.id.home -> {
-                finish()
-                return true
-            }
             R.id.action_search -> {
                 return true
             }
         }
         return super.onOptionsItemSelected(item)
     }
-
 }
