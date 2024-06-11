@@ -5,6 +5,7 @@ import androidx.fragment.app.viewModels
 import com.minhoi.memento.R
 import com.minhoi.memento.base.BaseFragment
 import com.minhoi.memento.databinding.FragmentMypageBinding
+import com.minhoi.memento.ui.question.QuestionListActivity
 import com.minhoi.memento.utils.setOnSingleClickListener
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -42,6 +43,12 @@ class MypageFragment : BaseFragment<FragmentMypageBinding>() {
             }
             notificationSettingBtn.setOnSingleClickListener {
                 startActivity(Intent(requireContext(), NotificationSettingActivity::class.java))
+            }
+            myQuestionBtn.setOnSingleClickListener {
+                startActivity(Intent(requireContext(), QuestionListActivity::class.java).putExtra("type", "myQuestion"))
+            }
+            likeQuestionsBtn.setOnSingleClickListener {
+                startActivity(Intent(requireContext(), QuestionListActivity::class.java).putExtra("type", "likeQuestion"))
             }
         }
     }
