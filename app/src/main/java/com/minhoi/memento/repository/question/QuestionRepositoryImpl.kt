@@ -18,6 +18,7 @@ class QuestionRepositoryImpl @Inject constructor(
         page: Int,
         size: Int,
         schoolFilter: Boolean,
+        likeFilter: Boolean,
         boardCategory: String?,
         searchKeyWord: String?
     ): Flow<ApiResult<CommonResponse<QuestionListResponse>>> = safeFlow {
@@ -25,6 +26,7 @@ class QuestionRepositoryImpl @Inject constructor(
             page,
             size,
             schoolFilter = schoolFilter,
+            likeFilter = likeFilter,
             boardCategory = boardCategory,
             searchKeyWord = searchKeyWord,
             "QUEST"

@@ -19,7 +19,8 @@ interface QuestionService {
     suspend fun getQuestions(
         @Query("page") page: Int,
         @Query("size") size: Int,
-        @Query("schoolFilter") schoolFilter: Boolean?,
+        @Query("schoolFilter") schoolFilter: Boolean,
+        @Query("favoriteFilter") likeFilter: Boolean,
         @Query("boardCategory") boardCategory: String?,
         @Query("keyWord") searchKeyWord: String?,
         @Query("subBoardType") type: String,

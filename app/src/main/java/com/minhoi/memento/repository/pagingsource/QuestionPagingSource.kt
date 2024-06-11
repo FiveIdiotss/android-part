@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.first
 class QuestionPagingSource(
     private val questionRepository: QuestionRepository,
     private val schoolFilter: Boolean = false,
+    private val likeFilter: Boolean = false,
     private val boardCategory: String? = null,
     private val searchKeyWord: String? = null
 ) : PagingSource<Int, QuestionContent>() {
@@ -28,6 +29,7 @@ class QuestionPagingSource(
             page,
             params.loadSize,
             schoolFilter,
+            likeFilter,
             boardCategory,
             searchKeyWord
         ).filterNot { it is ApiResult.Loading }.first()

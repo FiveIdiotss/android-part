@@ -12,6 +12,7 @@ interface QuestionRepository {
     fun getQuestions(page: Int,
                      size: Int,
                      schoolFilter: Boolean,
+                     likeFilter: Boolean,
                      boardCategory: String?,
                      searchKeyWord: String?
     ): Flow<ApiResult<CommonResponse<QuestionListResponse>>>

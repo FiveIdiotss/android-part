@@ -57,16 +57,16 @@ class QuestionViewModel @Inject constructor(
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    fun getQuestions(pageSize: Int) =
+    fun getQuestions() =
         questionFilterFlow.flatMapLatest { (schoolFilter, category, searchKeyWord) ->
             Pager(
-                config = PagingConfig(pageSize = pageSize),
+                config = PagingConfig(pageSize = 20),
                 pagingSourceFactory = {
                     QuestionPagingSource(
                         questionRepository,
-                        schoolFilter,
-                        category,
-                        searchKeyWord
+                        schoolFilter = schoolFilter,
+                        boardCategory = category,
+                        searchKeyWord = searchKeyWord
                     )
                 })
                 .flow
