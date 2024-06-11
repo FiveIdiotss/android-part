@@ -11,7 +11,6 @@ import com.minhoi.memento.data.model.DayOfWeek
 import com.minhoi.memento.repository.board.BoardRepository
 import com.minhoi.memento.repository.member.MemberRepository
 import com.minhoi.memento.ui.UiState
-import com.minhoi.memento.utils.extractSuccess
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -52,18 +51,11 @@ class BoardViewModel @Inject constructor(
 
     fun getBoardContent(boardId: Long) {
         viewModelScope.launch {
-            val bookmarkBoards = memberRepository.getBookmarkBoards().extractSuccess()
             boardRepository.getBoardContent(boardId).collectLatest {
                 it.handleResponse(
-                    onSuccess = { response ->
-                        _post.value = response
-                        val isBookmarked = bookmarkBoards.any { bookmarkBoard ->
-                            bookmarkBoard.boardId == response.boardDTO.boardId
-                        }
-                        _boardBookmarkState.value = isBookmarked
-                        // bookmarkState 업데이트
-                        val boardContent = response.boardDTO.copy(isBookmarked = isBookmarked)
-                        _boardContent.update { UiState.Success(boardContent) }
+                    onSuccess = { value ->
+                        _post.value = value.data
+                        _boardContent.update { UiState.Success(value.data.boardDTO) }
                     },
                     onError = { error ->
                         _boardContent.update { UiState.Error(error.exception) }

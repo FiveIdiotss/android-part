@@ -15,5 +15,6 @@ data class ChatRoom(
     val boardTitle: String,
     @SerializedName("date")
     val startDate: String,
-    val startTime: String
+    val startTime: String,
+    val unreadMessageCount: Int
 )

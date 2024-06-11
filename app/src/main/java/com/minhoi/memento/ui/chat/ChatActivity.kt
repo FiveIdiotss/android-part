@@ -10,12 +10,12 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.minhoi.memento.R
-import com.minhoi.memento.adapter.ChatAdapter
 import com.minhoi.memento.base.BaseActivity
 import com.minhoi.memento.data.dto.chat.ChatDate
 import com.minhoi.memento.data.dto.chat.ChatMessage
 import com.minhoi.memento.databinding.ActivityChatBinding
 import com.minhoi.memento.ui.UiState
+import com.minhoi.memento.ui.adapter.ChatAdapter
 import com.minhoi.memento.utils.hideLoading
 import com.minhoi.memento.utils.setOnSingleClickListener
 import com.minhoi.memento.utils.showLoading
@@ -205,7 +205,7 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
                             if (receiverId != -1L) {
                                 Log.d(TAG, "connectSocket: ${state.data}")
                                 roomId = state.data
-                                viewModel.connectToWebSocket(state.data)
+                                viewModel.subscribeChatRoom(state.data)
                                 viewModel.getMessageStream(state.data)
                             } else {
                                 showToast(LOAD_ERROR_MESSAGE)
@@ -231,7 +231,7 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
 
     override fun onDestroy() {
         super.onDestroy()
-        viewModel.disconnect()
+//        viewModel.disconnect()
     }
 
     private val chatScrollListener = object : RecyclerView.OnScrollListener() {

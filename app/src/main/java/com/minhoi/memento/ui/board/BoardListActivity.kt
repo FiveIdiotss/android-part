@@ -2,7 +2,6 @@ package com.minhoi.memento.ui.board
 
 import android.content.Intent
 import android.view.Menu
-import com.minhoi.memento.adapter.BoardAdapter
 import android.view.MenuItem
 import android.view.View
 import androidx.activity.viewModels
@@ -14,9 +13,11 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.minhoi.memento.R
-import com.minhoi.memento.adapter.BoardLoadStateAdapter
 import com.minhoi.memento.base.BaseActivity
 import com.minhoi.memento.databinding.ActivityBoardListBinding
+import com.minhoi.memento.ui.SelectBoardCategoryBottomSheetDialog
+import com.minhoi.memento.ui.adapter.BoardAdapter
+import com.minhoi.memento.ui.adapter.BoardLoadStateAdapter
 import com.minhoi.memento.utils.setOnSingleClickListener
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest

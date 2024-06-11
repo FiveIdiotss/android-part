@@ -23,7 +23,7 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginStart="10dp"
-            android:src="@drawable/profile"
+            android:src="@drawable/defaultimage"
             android:visibility="@{receiverData.showMinute ? View.VISIBLE : View.INVISIBLE}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

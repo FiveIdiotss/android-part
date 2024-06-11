@@ -1,5 +1,6 @@
 package com.minhoi.memento.data.network.service
 
+import com.minhoi.memento.base.CommonResponse
 import com.minhoi.memento.data.dto.BoardContentResponse
 import com.minhoi.memento.data.dto.BoardListResponse
 import com.minhoi.memento.data.dto.MentorBoardPostDto
@@ -16,32 +17,33 @@ interface BoardService {
     @POST("api/board")
     suspend fun writeMenteeBoard(
         @Body mentorBoardPostDto: MentorBoardPostDto
-    ): Response<String>
+    ): Response<CommonResponse<String>>
 
-    @GET("api/pageBoards")
+    @GET("api/boards/filter")
     suspend fun getBoardContents(
         @Query("page") page: Int,
         @Query("size") size: Int
-    ): Response<BoardListResponse>
+    ): Response<CommonResponse<BoardListResponse>>
 
     @GET("api/boards/filter")
     suspend fun getFilterBoards(
         @Query("page") page: Int,
         @Query("size") size: Int,
         @Query("schoolFilter") schoolFilter: Boolean,
+        @Query("favoriteFilter") favoriteFilter: Boolean,
         @Query("boardCategory") category: String?,
         @Query("keyWord") searchQuery: String?
-    ): Response<BoardListResponse>
+    ): Response<CommonResponse<BoardListResponse>>
 
     @GET("api/board/{boardId}")
-    suspend fun getBoardContent(@Path("boardId") boardId: Long): Response<BoardContentResponse>
+    suspend fun getBoardContent(@Path("boardId") boardId: Long): Response<CommonResponse<BoardContentResponse>>
 
     @POST("api/board/{boardId}")
-    suspend fun applyMentoring(@Path("boardId") boardId: Long, @Body applyContent: MentoringApplyRequest): Response<String>
+    suspend fun applyMentoring(@Path("boardId") boardId: Long, @Body applyContent: MentoringApplyRequest): Response<CommonResponse<String>>
 
     @POST("api/board/favorite/{boardId}")
-    suspend fun bookmarkBoard(@Path("boardId") boardId: Long): Response<String>
+    suspend fun bookmarkBoard(@Path("boardId") boardId: Long): Response<CommonResponse<String>>
 
     @DELETE("api/board/favorite/{boardId}")
-    suspend fun unBookmarkBoard(@Path("boardId") boardId: Long): Response<String>
+    suspend fun unBookmarkBoard(@Path("boardId") boardId: Long): Response<CommonResponse<String>>
 }

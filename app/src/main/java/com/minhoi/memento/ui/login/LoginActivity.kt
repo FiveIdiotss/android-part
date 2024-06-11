@@ -13,6 +13,8 @@ import com.minhoi.memento.base.BaseActivity
 import com.minhoi.memento.databinding.ActivityLoginBinding
 import com.minhoi.memento.ui.UiState
 import com.minhoi.memento.utils.ProgressDialog
+import com.minhoi.memento.utils.hideLoading
+import com.minhoi.memento.utils.showLoading
 import com.minhoi.memento.utils.showToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -44,16 +46,16 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>() {
                     when (it) {
                         is UiState.Empty -> {}
                         is UiState.Loading -> {
-                            showLoading()
+                            supportFragmentManager.showLoading()
                         }
                         is UiState.Success -> {
-                            hideLoading()
+                            supportFragmentManager.hideLoading()
                             startActivity(Intent(this@LoginActivity, MainActivity::class.java))
                             finish()
                         }
                         is UiState.Error -> {
-                            hideLoading()
-                            showToast("네트워크 오류가 발생하였습니다. 다시 시도해주세요")
+                            supportFragmentManager.hideLoading()
+                            showToast(it.error!!.message!!)
                         }
                     }
                 }

@@ -20,11 +20,11 @@ data class MentoringReceivedDto(
     @SerializedName("applyState")
     val applyState: String,
 
-    @SerializedName("sendMemberId")
-    val applyMemberId: Long,
+    @SerializedName("otherMemberId")
+    val otherMemberId: Long,
 
-    @SerializedName("sendMemberName")
-    val applyMemberName: String,
+    @SerializedName("otherMemberName")
+    val otherMemberName: String,
 
     @SerializedName("date")
     val date: String,

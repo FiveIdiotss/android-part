@@ -2,16 +2,16 @@ package com.minhoi.memento.ui.chat
 
 import android.content.Intent
 import android.util.Log
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.minhoi.memento.R
-import com.minhoi.memento.adapter.ChatRoomListAdapter
 import com.minhoi.memento.base.BaseFragment
 import com.minhoi.memento.databinding.FragmentChatListBinding
 import com.minhoi.memento.ui.UiState
+import com.minhoi.memento.ui.adapter.ChatRoomListAdapter
 import com.minhoi.memento.ui.home.HomeViewModel
 import com.minhoi.memento.utils.hideLoading
 import com.minhoi.memento.utils.showLoading
@@ -24,7 +24,7 @@ import kotlinx.coroutines.launch
 class ChatListFragment : BaseFragment<FragmentChatListBinding>() {
 
     override val layoutResourceId: Int = R.layout.fragment_chat_list
-    private val viewModel by viewModels<HomeViewModel>()
+    private val viewModel by activityViewModels<HomeViewModel>()
     private val chatRoomListAdapter: ChatRoomListAdapter by lazy {
         ChatRoomListAdapter {
             // onCLickListener
@@ -36,6 +36,7 @@ class ChatListFragment : BaseFragment<FragmentChatListBinding>() {
     }
 
     override fun initView() {
+        viewModel.getChatRooms()
         observeChatRooms()
         binding.chatRoomRv.apply {
             adapter = chatRoomListAdapter
@@ -47,7 +48,7 @@ class ChatListFragment : BaseFragment<FragmentChatListBinding>() {
     * ChatRoom을 관찰하여 성공적으로 데이터를 가져오면 ChatRoomListAdapter에 데이터를 전달, 실패하면 네트워크 오류 메시지를 띄우는 함수
      */
     private fun observeChatRooms() {
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.chatRooms.collectLatest { state ->
                     when (state) {

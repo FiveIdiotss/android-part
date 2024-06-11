@@ -1,13 +1,9 @@
 package com.minhoi.memento
 
-import android.content.Intent
-import android.os.Bundle
 import androidx.viewpager2.widget.ViewPager2
-import com.minhoi.memento.adapter.IntroPagerAdapter
 import com.minhoi.memento.base.BaseActivity
 import com.minhoi.memento.databinding.ActivityIntroBinding
-import com.minhoi.memento.ui.join.JoinActivity
-import com.minhoi.memento.ui.login.LoginActivity
+import com.minhoi.memento.ui.adapter.IntroPagerAdapter
 import com.minhoi.memento.utils.setOnSingleClickListener
 
 class IntroActivity : BaseActivity<ActivityIntroBinding>() {
