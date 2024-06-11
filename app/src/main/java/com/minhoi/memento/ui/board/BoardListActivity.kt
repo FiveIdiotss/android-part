@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.minhoi.memento.R
 import com.minhoi.memento.base.BaseActivity
 import com.minhoi.memento.databinding.ActivityBoardListBinding
+import com.minhoi.memento.ui.SelectBoardCategoryBottomSheetDialog
 import com.minhoi.memento.ui.adapter.BoardAdapter
 import com.minhoi.memento.ui.adapter.BoardLoadStateAdapter
 import com.minhoi.memento.utils.setOnSingleClickListener

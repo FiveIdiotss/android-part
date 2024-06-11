@@ -13,5 +13,6 @@ data class QuestionContent(
     val memberName: String,
     val writeTime: String,
     val likeCount: Int,
+    val replyCount: Int,
     val like: Boolean
 )

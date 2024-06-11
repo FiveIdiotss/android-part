@@ -10,16 +10,21 @@ import androidx.paging.cachedIn
 import com.minhoi.memento.data.dto.question.QuestionContent
 import com.minhoi.memento.data.dto.question.QuestionPostRequest
 import com.minhoi.memento.data.dto.question.ReplyContent
-import com.minhoi.memento.pagingsource.QuestionPagingSource
-import com.minhoi.memento.pagingsource.ReplyPagingSource
+import com.minhoi.memento.repository.pagingsource.QuestionPagingSource
+import com.minhoi.memento.repository.pagingsource.ReplyPagingSource
 import com.minhoi.memento.repository.question.QuestionRepository
 import com.minhoi.memento.ui.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -29,8 +34,8 @@ class QuestionViewModel @Inject constructor(
     private val questionRepository: QuestionRepository,
 ) : ViewModel() {
 
-    private val _questionContent = MutableStateFlow<UiState<QuestionContent>>(UiState.Loading)
-    val questionContent: StateFlow<UiState<QuestionContent>> = _questionContent.asStateFlow()
+    private val _questionContentState = MutableStateFlow<UiState<QuestionContent>>(UiState.Loading)
+    val questionContentState: StateFlow<UiState<QuestionContent>> = _questionContentState.asStateFlow()
 
     private val _replyState = MutableStateFlow<UiState<Boolean>>(UiState.Empty)
     val replyState: StateFlow<UiState<Boolean>> = _replyState.asStateFlow()
@@ -38,24 +43,47 @@ class QuestionViewModel @Inject constructor(
     private val _postQuestionState = MutableStateFlow<UiState<Boolean>>(UiState.Empty)
     val postQuestionState: StateFlow<UiState<Boolean>> = _postQuestionState.asStateFlow()
 
-    fun getQuestions(pageSize: Int): Flow<PagingData<QuestionContent>> {
-        return Pager(
-            config = PagingConfig(pageSize = pageSize),
-            pagingSourceFactory = { QuestionPagingSource(questionRepository) })
-            .flow
-            .cachedIn(viewModelScope)
+    private val categoryQueryFlow = MutableStateFlow<String?>(null)
+    private val schoolFilterFlow = MutableStateFlow<Boolean>(false)
+    private val searchQueryFlow = MutableStateFlow<String?>(null)
+
+    @OptIn(FlowPreview::class)
+    private val questionFilterFlow = combine(
+        schoolFilterFlow,
+        categoryQueryFlow,
+        searchQueryFlow.debounce(300L)
+    ) { schoolFilter, category, searchKeyWord ->
+        Triple(schoolFilter, category, searchKeyWord)
     }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun getQuestions(pageSize: Int) =
+        questionFilterFlow.flatMapLatest { (schoolFilter, category, searchKeyWord) ->
+            Pager(
+                config = PagingConfig(pageSize = pageSize),
+                pagingSourceFactory = {
+                    QuestionPagingSource(
+                        questionRepository,
+                        schoolFilter,
+                        category,
+                        searchKeyWord
+                    )
+                })
+                .flow
+                .cachedIn(viewModelScope)
+        }
 
     fun getQuestion(questionId: Long) {
         viewModelScope.launch {
+            _questionContentState.update { UiState.Loading }
             questionRepository.getQuestion(questionId).collectLatest { result ->
                 result.handleResponse(
                     onSuccess = { data ->
                         Log.d("QuestionVIewModel", "getQuestion: $data")
-                        _questionContent.update { UiState.Success(data.questionContent) }
+                        _questionContentState.update { UiState.Success(data.data.questionContent) }
                     },
                     onError = { error ->
-                        _questionContent.update { UiState.Error(error.exception) }
+                        _questionContentState.update { UiState.Error(error.exception) }
                     }
                 )
             }
@@ -103,4 +131,33 @@ class QuestionViewModel @Inject constructor(
         }
     }
 
+    fun executeLike(questionId: Long, isLike: Boolean) {
+        viewModelScope.launch {
+            when (isLike) {
+                true -> questionRepository.unExecuteLike(questionId)
+                false -> questionRepository.executeLike(questionId)
+            }.collectLatest {
+                it.handleResponse(
+                    onSuccess = {
+                        getQuestion(questionId)
+                    },
+                    onError = { error ->
+                        _questionContentState.update { UiState.Error(error.exception) }
+                    }
+                )
+            }
+        }
+    }
+
+    fun setCategoryFilter(category: String?) {
+        categoryQueryFlow.update { category }
+    }
+
+    fun setSchoolFilter(isChecked: Boolean) {
+        schoolFilterFlow.update { isChecked }
+    }
+
+    fun setSearchQuery(query: String?) {
+        searchQueryFlow.update { query }
+    }
 }

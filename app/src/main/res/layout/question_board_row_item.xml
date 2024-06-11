@@ -131,7 +131,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_marginStart="5dp"
-                    android:text="1" />
+                    android:text="@{String.valueOf(questionData.replyCount)}" />
             </LinearLayout>
         </LinearLayout>
 

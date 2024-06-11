@@ -28,12 +28,13 @@ import kotlinx.coroutines.launch
 class QuestionInfoActivity : BaseActivity<ActivityQuestionInfoBinding>() {
     override val layoutResourceId: Int = R.layout.activity_question_info
     private val viewModel by viewModels<QuestionViewModel>()
+    private var questionId: Long = -1
     private val replyAdapter: ReplyAdapter by lazy {
         ReplyAdapter()
     }
 
     override fun initView() {
-        val questionId = intent.getLongExtra("questionId", -1L)
+        questionId = intent.getLongExtra("questionId", -1L)
         Log.d("QuestionInfoActivity", "initView: $questionId")
         if (questionId == -1L) {
             showToast("일시적인 오류가 발생하였습니다. 다시 시도해주세요.")
@@ -48,8 +49,14 @@ class QuestionInfoActivity : BaseActivity<ActivityQuestionInfoBinding>() {
         getReplies(questionId)
 
         binding.replyRv.apply {
+            itemAnimator = null
             adapter = replyAdapter
             layoutManager = LinearLayoutManager(this@QuestionInfoActivity, LinearLayoutManager.VERTICAL, false)
+        }
+
+        binding.likeLayout.setOnSingleClickListener {
+            Log.d("QuestionInfoActivity", "initView: ${questionId}  ${binding.questionContent!!.isLike}")
+            viewModel.executeLike(questionId, binding.questionContent!!.isLike)
         }
 
         binding.inputReply.addTextChangedListener(replyTextWatcher)
@@ -82,7 +89,7 @@ class QuestionInfoActivity : BaseActivity<ActivityQuestionInfoBinding>() {
     private fun observeQuestionContent() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.questionContent.collectLatest { state ->
+                viewModel.questionContentState.collectLatest { state ->
                     when (state) {
                         is UiState.Empty -> {}
                         is UiState.Loading -> supportFragmentManager.showLoading()
@@ -115,10 +122,9 @@ class QuestionInfoActivity : BaseActivity<ActivityQuestionInfoBinding>() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.replyState.collectLatest { state ->
                     when (state) {
-                        is UiState.Empty -> {}
-                        is UiState.Loading -> supportFragmentManager.showLoading()
+                        is UiState.Empty, UiState.Loading -> {}
                         is UiState.Success -> {
-                            supportFragmentManager.hideLoading()
+                            viewModel.getQuestion(questionId)
                             replyAdapter.refresh()
                         }
                         is UiState.Error -> {
@@ -137,11 +143,9 @@ class QuestionInfoActivity : BaseActivity<ActivityQuestionInfoBinding>() {
 
     private val replyTextWatcher = object : TextWatcher {
         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
         override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
             binding.replyUploadBtn.isVisible = count > 0
         }
-
         override fun afterTextChanged(s: Editable?) {}
     }
 

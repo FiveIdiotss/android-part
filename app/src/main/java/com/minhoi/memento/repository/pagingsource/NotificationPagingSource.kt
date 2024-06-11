@@ -2,34 +2,26 @@ package com.minhoi.memento.repository.pagingsource
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.minhoi.memento.data.dto.question.QuestionContent
+import com.minhoi.memento.data.dto.notification.NotificationListDto
 import com.minhoi.memento.data.network.ApiResult
-import com.minhoi.memento.repository.question.QuestionRepository
+import com.minhoi.memento.repository.member.MemberRepository
 import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.first
 
-class QuestionPagingSource(
-    private val questionRepository: QuestionRepository,
-    private val schoolFilter: Boolean = false,
-    private val boardCategory: String? = null,
-    private val searchKeyWord: String? = null
-) : PagingSource<Int, QuestionContent>() {
+class NotificationPagingSource(private val memberRepository: MemberRepository) : PagingSource<Int, NotificationListDto>() {
 
-    override fun getRefreshKey(state: PagingState<Int, QuestionContent>): Int? {
+    override fun getRefreshKey(state: PagingState<Int, NotificationListDto>): Int? {
         return state.anchorPosition?.let { position ->
             state.closestPageToPosition(position)?.prevKey?.plus(1)
                 ?: state.closestPageToPosition(position)?.nextKey?.minus(1)
         }
     }
 
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, QuestionContent> {
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, NotificationListDto> {
         val page = params.key ?: STARTING_KEY
-        val loadData = questionRepository.getQuestions(
+        val loadData = memberRepository.getNotificationList(
             page,
-            params.loadSize,
-            schoolFilter,
-            boardCategory,
-            searchKeyWord
+            params.loadSize
         ).filterNot { it is ApiResult.Loading }.first()
 
         return when (loadData) {

@@ -1,7 +1,7 @@
 package com.minhoi.memento.ui.home
 
 import android.content.Intent
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -13,6 +13,7 @@ import com.minhoi.memento.ui.adapter.BoardAdapter
 import com.minhoi.memento.ui.adapter.QuestionPreviewAdapter
 import com.minhoi.memento.ui.board.BoardActivity
 import com.minhoi.memento.ui.board.BoardListActivity
+import com.minhoi.memento.ui.question.QuestionInfoActivity
 import com.minhoi.memento.ui.question.QuestionListActivity
 import com.minhoi.memento.utils.ColumnItemDecoration
 import com.minhoi.memento.utils.setOnSingleClickListener
@@ -25,7 +26,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
     override val layoutResourceId: Int = R.layout.fragment_home
 
-    private val viewModel by viewModels<HomeViewModel>()
+    private val viewModel by activityViewModels<HomeViewModel>()
     private lateinit var boardAdapter: BoardAdapter
     private lateinit var questionPreviewAdapter: QuestionPreviewAdapter
 
@@ -37,12 +38,12 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                     "boardId", it.boardId
                 ))
             },
-            onBookmarkClickListener = {
-
-            }
+            onBookmarkClickListener = {}
         )
 
-        questionPreviewAdapter = QuestionPreviewAdapter()
+        questionPreviewAdapter = QuestionPreviewAdapter {
+            startActivity(Intent(requireContext(), QuestionInfoActivity::class.java).putExtra("questionId", it))
+        }
 
         binding.toMentorBoard.setOnSingleClickListener {
             startActivity(Intent(requireContext(), BoardListActivity::class.java))

@@ -5,9 +5,9 @@
         android:title="@string/menu_home"
         android:icon="@drawable/homebtn"/>
 
-    <item android:id="@+id/tempFragment"
-        android:title="임시1"
-        android:icon="@drawable/homebtn"/>
+    <item android:id="@+id/notificationListFragment"
+        android:title="알림"
+        android:icon="@drawable/notification"/>
 
     <item
         android:id="@+id/placeholder"
@@ -15,7 +15,7 @@
 
     <item android:id="@+id/chatListFragment"
         android:title="채팅"
-        android:icon="@drawable/homebtn"/>
+        android:icon="@drawable/chaticon"/>
 
     <item android:id="@+id/mypageFragment"
         android:title="@string/menu_profile"

@@ -8,10 +8,10 @@ import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
+import com.minhoi.memento.R
 import com.minhoi.memento.ui.board.BoardViewModel
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 object BindingAdapter {
     @BindingAdapter("onDateChanged")
@@ -45,7 +45,7 @@ object BindingAdapter {
     /**
      * 프로필 이미지를 불러오는 동안은 placeholder를 보여주고, 성공적으로 불러왔으면 imageView에 표시하는 함수
      */
-    @BindingAdapter("app:imageUrl", "app:placeholder")
+    @BindingAdapter("imageUrl", "placeholder")
     @JvmStatic fun loadImage(imageView: ImageView, url: String?, placeholder: Drawable) {
         if (url != null) {
             Glide.with(imageView.context)
@@ -59,4 +59,12 @@ object BindingAdapter {
             imageView.setImageDrawable(placeholder)
         }
     }
+
+    @BindingAdapter("likeStatus")
+    @JvmStatic
+    fun setLikeIcon(imageView: ImageView, isLike: Boolean) {
+        val drawableId = if (isLike) R.drawable.thumbicon else R.drawable.thumbicon_unliked
+        imageView.setImageResource(drawableId)
+    }
+
 }

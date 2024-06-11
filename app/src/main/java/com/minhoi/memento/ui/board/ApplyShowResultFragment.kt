@@ -12,9 +12,11 @@ import com.minhoi.memento.utils.hideLoading
 import com.minhoi.memento.utils.setOnSingleClickListener
 import com.minhoi.memento.utils.showLoading
 import com.minhoi.memento.utils.showToast
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class ApplyShowResultFragment : BaseFragment<FragmentApplyShowResultBinding>() {
     override val layoutResourceId: Int = R.layout.fragment_apply_show_result
     private lateinit var viewModel: BoardViewModel
@@ -43,7 +45,7 @@ class ApplyShowResultFragment : BaseFragment<FragmentApplyShowResultBinding>() {
                         }
                         is UiState.Error -> {
                             childFragmentManager.hideLoading()
-                            requireContext().showToast("네트워크 오류가 발생하였습니다. 다시 시도해주세요.")
+                            requireContext().showToast(it.error!!.message!!)
                         }
                     }
                 }
