@@ -149,6 +149,12 @@ class QuestionViewModel @Inject constructor(
         }
     }
 
+    fun getMyQuestions(): Flow<PagingData<QuestionContent>> =
+        Pager(
+            config = PagingConfig(pageSize = 20),
+            pagingSourceFactory = { QuestionPagingSource(questionRepository) }
+        ).flow.cachedIn(viewModelScope)
+
     fun setCategoryFilter(category: String?) {
         categoryQueryFlow.update { category }
     }

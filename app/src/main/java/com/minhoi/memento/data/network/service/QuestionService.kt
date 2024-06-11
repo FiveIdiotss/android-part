@@ -47,4 +47,12 @@ interface QuestionService {
 
     @DELETE("api/like/{subBoardId}")
     suspend fun unExecuteLike(@Path("subBoardId") questionId: Long): Response<CommonResponse<String>>
+
+    @GET("api/subBoards/{memberId}")
+    suspend fun getMyQuestions(
+        @Path("memberId") memberId: Long,
+        @Query("page") page: Int,
+        @Query("size") size: Int,
+        @Query("subBoardType") subBoardType: String
+    ): Response<CommonResponse<QuestionListResponse>>
 }

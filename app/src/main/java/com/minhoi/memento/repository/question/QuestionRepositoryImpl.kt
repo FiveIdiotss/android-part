@@ -47,12 +47,12 @@ class QuestionRepositoryImpl @Inject constructor(
         questionService.getReplies(questionId, page, true, size)
     }
 
-    override fun getMyQuestion(
+    override fun getMyQuestions(
         page: Int,
         size: Int,
         memberId: Long,
-    ): Flow<ApiResult<CommonResponse<QuestionListResponse>>> {
-        TODO("Not yet implemented")
+    ): Flow<ApiResult<CommonResponse<QuestionListResponse>>> = safeFlow {
+        questionService.getMyQuestions(memberId, page, size, "QUEST")
     }
 
     override fun executeLike(questionId: Long): Flow<ApiResult<CommonResponse<String>>> = safeFlow {
