@@ -2,6 +2,7 @@ package com.minhoi.memento.ui.board
 
 import android.content.Intent
 import androidx.activity.viewModels
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -39,8 +40,10 @@ class BoardActivity : BaseActivity<ActivityBoardBinding>() {
         binding.bookmarkBtn.setOnSingleClickListener {
             viewModel.boardBookmarkState.value?.let { viewModel.executeBookmark(boardId, it) }
         }
+
         observeBoardContent()
         observeBookmarkState()
+        observeIsMyPost()
     }
 
     private fun getBoardContent(boardId: Long) {
@@ -83,6 +86,22 @@ class BoardActivity : BaseActivity<ActivityBoardBinding>() {
                 binding.bookmarkBtn.setImageResource(R.drawable.heart_filled)
             } else {
                 binding.bookmarkBtn.setImageResource(R.drawable.heart_empty)
+            }
+        }
+    }
+
+    private fun observeIsMyPost() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.isMyPost.collectLatest {
+                    if (it) {
+                        binding.mentorApplyBtn.apply {
+                            text = "내가 작성한 모집 글"
+                            isClickable = false
+                            background = ContextCompat.getDrawable(context, R.drawable.round_corner_gray_filled)
+                        }
+                    }
+                }
             }
         }
     }

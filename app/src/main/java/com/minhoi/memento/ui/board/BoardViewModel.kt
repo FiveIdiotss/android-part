@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.minhoi.memento.MentoApplication
 import com.minhoi.memento.data.dto.BoardContentDto
 import com.minhoi.memento.data.dto.BoardContentResponse
 import com.minhoi.memento.data.dto.MentoringApplyRequest
@@ -27,6 +28,8 @@ class BoardViewModel @Inject constructor(
     private val memberRepository: MemberRepository,
 ) : ViewModel() {
 
+    private val member = MentoApplication.memberPrefs.getMemberPrefs()
+
     private val _post = MutableLiveData<BoardContentResponse>()
     val post: LiveData<BoardContentResponse> = _post
 
@@ -42,6 +45,9 @@ class BoardViewModel @Inject constructor(
     private val _applyState = MutableStateFlow<UiState<Boolean>>(UiState.Empty)
     val applyState: StateFlow<UiState<Boolean>> = _applyState.asStateFlow()
 
+    private val _isMyPost = MutableStateFlow<Boolean>(false)
+    val isMyPost: StateFlow<Boolean> = _isMyPost.asStateFlow()
+
     private var selectedDate: String = ""
     private var selectedTime: String = ""
 
@@ -56,6 +62,9 @@ class BoardViewModel @Inject constructor(
                     onSuccess = { value ->
                         _post.value = value.data
                         _boardContent.update { UiState.Success(value.data.boardDTO) }
+                        if (value.data.boardDTO.memberId == member.id) {
+                            _isMyPost.update { true }
+                        }
                     },
                     onError = { error ->
                         _boardContent.update { UiState.Error(error.exception) }
