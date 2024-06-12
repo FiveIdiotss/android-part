@@ -1,6 +1,10 @@
 package com.minhoi.memento.ui.board
 
+import android.annotation.SuppressLint
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
@@ -34,12 +38,17 @@ class ApplySelectDateFragment : BaseFragment<FragmentApplySelectDateBinding>() {
             layoutManager = GridLayoutManager(requireContext(), 3)
         }
 
+        binding.inputMessage.addTextChangedListener(messageLengthTextWatcher)
+
         binding.nextBtn.setOnSingleClickListener {
             with(viewModel) {
                 when {
-                    getSelectedDate().isEmpty() -> requireContext().showToast("상담 날짜는 필수 선택사항입니다.")
-                    getSelectedTime().isEmpty() -> requireContext().showToast("상담 시간은 필수 선택사항입니다.")
-                    else -> findNavController().navigate(R.id.action_applySelectDateFragment_to_applyShowResultFragment)
+                    selectedDate.isEmpty() -> requireContext().showToast("상담 날짜는 필수 선택사항입니다.")
+                    selectedTime.isEmpty() -> requireContext().showToast("상담 시간은 필수 선택사항입니다.")
+                    else -> {
+                        setMentoringMessage(binding.inputMessage.text.toString())
+                        findNavController().navigate(R.id.action_applySelectDateFragment_to_applyShowResultFragment)
+                    }
                 }
             }
         }
@@ -67,5 +76,42 @@ class ApplySelectDateFragment : BaseFragment<FragmentApplySelectDateBinding>() {
             }
         }
         return times.sorted()
+    }
+
+    private val messageLengthTextWatcher = object : TextWatcher {
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+        @SuppressLint("SetTextI18n")
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            binding.inputQuestionContentLength.text = "${s?.length ?: 0} / ${200}"
+            when (s?.length) {
+                200 -> {
+                    binding.inputQuestionContentLength.setTextColor(
+                        ContextCompat.getColor(
+                            requireContext(),
+                            R.color.red
+                        )
+                    )
+                    binding.inputMessage.background = ContextCompat.getDrawable(
+                        requireContext(),
+                        R.drawable.round_corner_red_color
+                    )
+                }
+
+                else -> {
+                    binding.inputQuestionContentLength.setTextColor(
+                        ContextCompat.getColor(
+                            requireContext(),
+                            R.color.black
+                        )
+                    )
+                    binding.inputMessage.background = ContextCompat.getDrawable(
+                        requireContext(),
+                        R.drawable.round_corner_black_color
+                    )
+                }
+            }
+        }
+        override fun afterTextChanged(s: Editable?) {}
     }
 }

@@ -48,8 +48,12 @@ class BoardViewModel @Inject constructor(
     private val _isMyPost = MutableStateFlow<Boolean>(false)
     val isMyPost: StateFlow<Boolean> = _isMyPost.asStateFlow()
 
-    private var selectedDate: String = ""
-    private var selectedTime: String = ""
+    var selectedDate: String = ""
+        private set
+    var selectedTime: String = ""
+        private set
+    var mentoringApplyMessage: String = ""
+        private set
 
     init {
         _isAvailableDay.value = false
