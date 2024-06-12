@@ -36,7 +36,6 @@ class ChatListFragment : BaseFragment<FragmentChatListBinding>() {
     }
 
     override fun initView() {
-        viewModel.getChatRooms()
         observeChatRooms()
         binding.chatRoomRv.apply {
             adapter = chatRoomListAdapter

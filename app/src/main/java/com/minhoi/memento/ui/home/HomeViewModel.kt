@@ -83,6 +83,7 @@ class HomeViewModel @Inject constructor(
         StompManager.connectToSocket()
         getPreviewBoards()
         getPreviewQuestions()
+        getChatRooms()
         getUnreadNotificationCount()
         subscribeNotification()
     }
@@ -141,7 +142,7 @@ class HomeViewModel @Inject constructor(
 
     fun getPreviewQuestions() {
         viewModelScope.launch {
-            questionRepository.getQuestions(1, 7, false, null, null).collectLatest {
+            questionRepository.getQuestions(1, 7, false, false, null, null).collectLatest {
                 it.handleResponse(
                     onSuccess = {
                         _questionPreviewContents.value = it.data.content
@@ -167,7 +168,6 @@ class HomeViewModel @Inject constructor(
                     val latestMessageResponse = s.getJSONObject("latestMessageDTO")
                     val content = latestMessageResponse.getString("content")
                     val sendTime = latestMessageResponse.getString("localDateTime")
-
                     _chatUnreadCount.update { count }
                     val currentState = _chatRooms.value
                     if (currentState is UiState.Success) {
