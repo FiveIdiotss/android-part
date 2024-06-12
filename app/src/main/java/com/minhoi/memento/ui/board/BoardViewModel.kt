@@ -90,14 +90,11 @@ class BoardViewModel @Inject constructor(
         _isAvailableDay.value = isAvailable
     }
 
-    fun getSelectedTime() = selectedTime
-    fun getSelectedDate() = selectedDate
-
     fun applyMentoring() {
         viewModelScope.launch {
             boardRepository.applyMentoring(
                 _post.value!!.boardDTO.boardId,
-                MentoringApplyRequest("content", selectedDate, selectedTime)
+                MentoringApplyRequest(mentoringApplyMessage, selectedDate, selectedTime)
             ).collectLatest {
                 it.handleResponse(
                     onSuccess = {
@@ -109,5 +106,13 @@ class BoardViewModel @Inject constructor(
                 )
             }
         }
+    }
+
+    fun setBookmarkState(state: Boolean) {
+        _boardBookmarkState.value = state
+    }
+
+    fun setMentoringMessage(message: String) {
+        mentoringApplyMessage = message
     }
 }

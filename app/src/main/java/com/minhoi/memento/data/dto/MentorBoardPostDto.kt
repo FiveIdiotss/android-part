@@ -1,7 +1,6 @@
 package com.minhoi.memento.data.dto
 
 import com.google.gson.annotations.SerializedName
-import com.minhoi.memento.data.model.BoardType
 import com.minhoi.memento.data.model.DayOfWeek
 
 data class MentorBoardPostDto (
@@ -16,7 +15,7 @@ data class MentorBoardPostDto (
     @SerializedName("consultTime")
     val consultTime: Int,
     @SerializedName("boardCategory")
-    val boardType: BoardType,
+    val boardType: String,
     @SerializedName("times")
     val times: List<TimeTableDto>,
     @SerializedName("availableDays")

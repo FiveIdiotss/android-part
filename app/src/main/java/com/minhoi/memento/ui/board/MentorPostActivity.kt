@@ -7,11 +7,11 @@ import com.minhoi.memento.R
 import com.minhoi.memento.base.BaseActivity
 import com.minhoi.memento.data.dto.MentorBoardPostDto
 import com.minhoi.memento.data.dto.TimeTableDto
-import com.minhoi.memento.data.model.BoardType
 import com.minhoi.memento.data.model.DayOfWeek
 import com.minhoi.memento.data.network.RetrofitClient
 import com.minhoi.memento.data.network.service.BoardService
 import com.minhoi.memento.databinding.ActivityMentorPostBinding
+import com.minhoi.memento.ui.SelectBoardCategoryBottomSheetDialog
 import com.minhoi.memento.ui.StartEndTimePickerDialog
 import com.minhoi.memento.ui.adapter.MentorTimeTableAdapter
 import com.minhoi.memento.utils.setOnSingleClickListener
@@ -52,6 +52,17 @@ class MentorPostActivity : BaseActivity<ActivityMentorPostBinding>() {
             layoutManager = GridLayoutManager(this@MentorPostActivity, 2)
         }
 
+        binding.selectCategoryLayout.setOnSingleClickListener {
+            SelectBoardCategoryBottomSheetDialog().apply {
+                selectCategory(object :
+                    SelectBoardCategoryBottomSheetDialog.OnCategorySelectedListener {
+                    override fun onCategorySelected(category: String) {
+                        binding.mentoringCategory.text = category
+                    }
+                })
+            }.show(supportFragmentManager, "selectCategoryFragment")
+        }
+
         binding.postButton.setOnSingleClickListener {
             // 게시물 등록
             selectedCheckBoxes.clear()
@@ -78,13 +89,18 @@ class MentorPostActivity : BaseActivity<ActivityMentorPostBinding>() {
                 return@setOnSingleClickListener
             }
 
+            if (binding.mentoringCategory.text == "카테고리 선택") {
+                showToast("멘토링 대상 단과대를 선택해주세요")
+                return@setOnSingleClickListener
+            }
+
             val post = MentorBoardPostDto(
                 binding.inputTitle.text.toString(),
                 binding.inputIntroduce.text.toString(),
                 binding.inputTarget.text.toString(),
                 binding.inputDescription.text.toString(),
                 consultTime,
-                BoardType.MENTEE,
+                binding.mentoringCategory.text.toString(),
                 mentorTimeTableAdapter.currentList,
                 selectedCheckBoxes.toList()
             )
