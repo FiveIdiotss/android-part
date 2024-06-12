@@ -206,6 +206,11 @@ class HomeViewModel @Inject constructor(
                                 .collect { pair -> chatRoomsWithMember.add(pair) }
                             // 모든 멤버 정보가 temp 리스트에 추가된 후 UI 상태 업데이트 (flatMapConcat 사용 시 순차적으로 실행)
                             subscribeChatRooms(chatRooms.data)
+                            var unreadMessageCount = 0
+                            chatRooms.data.forEach {
+                                unreadMessageCount += it.unreadMessageCount
+                            }
+                            _chatUnreadCount.update { unreadMessageCount }
                             _chatRooms.update { UiState.Success(chatRoomsWithMember) }
                             Log.d("HomeViewModel", "getChatRooms: $chatRoomsWithMember")
                         }
