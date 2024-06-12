@@ -34,5 +34,6 @@ data class BoardContentDto(
     @SerializedName("memberId")
     val memberId: Long,
 
-    var isBookmarked: Boolean = false
+    @SerializedName("favorite")
+    var isBookmarked: Boolean
 )
