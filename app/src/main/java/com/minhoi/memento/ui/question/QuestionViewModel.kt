@@ -50,8 +50,10 @@ class QuestionViewModel @Inject constructor(
     private val _postQuestionState = MutableStateFlow<UiState<Boolean>>(UiState.Empty)
     val postQuestionState: StateFlow<UiState<Boolean>> = _postQuestionState.asStateFlow()
 
-    private val _postImages = MutableStateFlow<List<MultipartBody.Part>>(emptyList())
-    val postImages: StateFlow<List<MultipartBody.Part>> = _postImages.asStateFlow()
+    private val postCategory = MutableStateFlow<String>("")
+
+    private val _postImages = MutableStateFlow<List<Uri>>(emptyList())
+    val postImages: StateFlow<List<Uri>> = _postImages.asStateFlow()
 
     private val categoryQueryFlow = MutableStateFlow<String?>(null)
     private val schoolFilterFlow = MutableStateFlow<Boolean>(false)
@@ -108,6 +110,10 @@ class QuestionViewModel @Inject constructor(
             .cachedIn(viewModelScope)
     }
 
+    fun selectQuestionCategory(category: String) {
+        postCategory.update { category }
+    }
+
     fun addPostImages(image: List<Uri>) {
         val s = image.map { uri ->
             val mimeType = fileManager.getFileMimeType(uri)
@@ -125,7 +131,7 @@ class QuestionViewModel @Inject constructor(
     fun postQuestion(title: String, content: String) {
         _postQuestionState.update { UiState.Loading }
         viewModelScope.launch {
-            val question = QuestionPostRequest(title, content, "이공", "QUEST")
+            val question = QuestionPostRequest(title, content, postCategory.value, "QUEST")
             val questionJson = Gson().toJson(question)
             val questionRequestBody =
                 questionJson.toRequestBody("application/json".toMediaTypeOrNull())

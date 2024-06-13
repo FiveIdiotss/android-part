@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.minhoi.memento.R
 import com.minhoi.memento.base.BaseActivity
 import com.minhoi.memento.databinding.ActivityQuestionPostBinding
+import com.minhoi.memento.ui.SelectBoardCategoryBottomSheetDialog
 import com.minhoi.memento.ui.UiState
 import com.minhoi.memento.ui.adapter.AddPhotoAdapter
 import com.minhoi.memento.utils.hideLoading
@@ -40,6 +41,18 @@ class QuestionPostActivity : BaseActivity<ActivityQuestionPostBinding>() {
         observePostQuestionState()
 
         binding.inputQuestionContent.addTextChangedListener(questionLengthTextWatcher)
+
+        binding.selectCategoryLayout.setOnSingleClickListener {
+            SelectBoardCategoryBottomSheetDialog().apply {
+                selectCategory(object :
+                    SelectBoardCategoryBottomSheetDialog.OnCategorySelectedListener {
+                    override fun onCategorySelected(category: String) {
+                        binding.mentoringCategory.text = category
+                        viewModel.selectQuestionCategory(category)
+                    }
+                })
+            }.show(supportFragmentManager, "selectCategoryFragment")
+        }
 
         binding.imageRv.apply {
             adapter = addPhotoAdapter
@@ -72,6 +85,7 @@ class QuestionPostActivity : BaseActivity<ActivityQuestionPostBinding>() {
         }
 
     }
+
     private fun postQuestion() {
         viewModel.postQuestion(
             binding.inputQuestionTitle.text.toString(),
@@ -142,7 +156,7 @@ class QuestionPostActivity : BaseActivity<ActivityQuestionPostBinding>() {
                     )
                     binding.inputQuestionContent.background = ContextCompat.getDrawable(
                         this@QuestionPostActivity,
-                        R.drawable.round_corner_black_color
+                        R.drawable.round_corner_blue_color
                     )
                 }
             }
