@@ -3,15 +3,19 @@ package com.minhoi.memento.ui.question
 import android.annotation.SuppressLint
 import android.text.Editable
 import android.text.TextWatcher
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.minhoi.memento.R
 import com.minhoi.memento.base.BaseActivity
 import com.minhoi.memento.databinding.ActivityQuestionPostBinding
 import com.minhoi.memento.ui.UiState
+import com.minhoi.memento.ui.adapter.AddPhotoAdapter
 import com.minhoi.memento.utils.hideLoading
 import com.minhoi.memento.utils.setOnSingleClickListener
 import com.minhoi.memento.utils.showLoading
@@ -25,11 +29,22 @@ class QuestionPostActivity : BaseActivity<ActivityQuestionPostBinding>() {
     override val layoutResourceId: Int = R.layout.activity_question_post
     private val viewModel by viewModels<QuestionViewModel>()
 
+    private val addPhotoAdapter: AddPhotoAdapter by lazy {
+        AddPhotoAdapter(onDeleteClickListener = {
+            viewModel.removePostImageAt(it)
+        })
+    }
+
     override fun initView() {
         setupToolbar("질문 작성")
         observePostQuestionState()
 
         binding.inputQuestionContent.addTextChangedListener(questionLengthTextWatcher)
+
+        binding.imageRv.apply {
+            adapter = addPhotoAdapter
+            layoutManager = LinearLayoutManager(this@QuestionPostActivity, LinearLayoutManager.HORIZONTAL, false)
+        }
 
         binding.postQuestionBtn.setOnSingleClickListener {
             if (!checkQuestionTitle()) {
@@ -38,14 +53,25 @@ class QuestionPostActivity : BaseActivity<ActivityQuestionPostBinding>() {
             }
 
             if (!checkQuestionContent()) {
-                showToast("질문 내용을 입력해주세요")
+                showToast("질문 내용을 10자 이상 입력해주세요")
                 return@setOnSingleClickListener
             }
 
             postQuestion()
         }
-    }
 
+        val pickImageContract =
+            registerForActivityResult(ActivityResultContracts.PickMultipleVisualMedia(10)) { uris ->
+                if (uris.isNotEmpty() && uris != null) {
+                    viewModel.addPostImages(uris)
+                }
+            }
+
+        binding.addImageBtn.setOnSingleClickListener {
+            pickImageContract.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+        }
+
+    }
     private fun postQuestion() {
         viewModel.postQuestion(
             binding.inputQuestionTitle.text.toString(),
@@ -54,7 +80,7 @@ class QuestionPostActivity : BaseActivity<ActivityQuestionPostBinding>() {
     }
 
     private fun checkQuestionTitle(): Boolean {
-        return binding.inputQuestionTitle.text.length > 2
+        return binding.inputQuestionTitle.text.isNotEmpty()
     }
 
     private fun checkQuestionContent(): Boolean {

@@ -28,14 +28,14 @@ class FileManager @Inject constructor(
         return contentResolver.getType(uri)
     }
 
-    fun uriToMultipartBodyPart(uri: Uri, mimeType: String): MultipartBody.Part? {
+    fun uriToMultipartBodyPart(uri: Uri, mimeType: String, fileName: String): MultipartBody.Part? {
         val contentResolver = context.contentResolver
         val inputStream = contentResolver.openInputStream(uri) ?: return null
         val file = File(context.cacheDir, getFileName(context, uri))
         val outputStream = FileOutputStream(file)
         inputStream.copyTo(outputStream)
         val requestFile = file.asRequestBody(mimeType.toMediaTypeOrNull())
-        return MultipartBody.Part.createFormData("file", file.name, requestFile)
+        return MultipartBody.Part.createFormData(fileName, file.name, requestFile)
     }
 
     private fun getFileName(context: Context, uri: Uri): String {

@@ -1,5 +1,6 @@
 package com.minhoi.memento.ui.question
 
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -7,6 +8,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import com.google.gson.Gson
 import com.minhoi.memento.data.dto.question.QuestionContent
 import com.minhoi.memento.data.dto.question.QuestionPostRequest
 import com.minhoi.memento.data.dto.question.ReplyContent
@@ -14,6 +16,7 @@ import com.minhoi.memento.repository.pagingsource.QuestionPagingSource
 import com.minhoi.memento.repository.pagingsource.ReplyPagingSource
 import com.minhoi.memento.repository.question.QuestionRepository
 import com.minhoi.memento.ui.UiState
+import com.minhoi.memento.utils.FileManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -27,10 +30,14 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import javax.inject.Inject
 
 @HiltViewModel
 class QuestionViewModel @Inject constructor(
+    private val fileManager: FileManager,
     private val questionRepository: QuestionRepository,
 ) : ViewModel() {
 
@@ -42,6 +49,9 @@ class QuestionViewModel @Inject constructor(
 
     private val _postQuestionState = MutableStateFlow<UiState<Boolean>>(UiState.Empty)
     val postQuestionState: StateFlow<UiState<Boolean>> = _postQuestionState.asStateFlow()
+
+    private val _postImages = MutableStateFlow<List<MultipartBody.Part>>(emptyList())
+    val postImages: StateFlow<List<MultipartBody.Part>> = _postImages.asStateFlow()
 
     private val categoryQueryFlow = MutableStateFlow<String?>(null)
     private val schoolFilterFlow = MutableStateFlow<Boolean>(false)
@@ -98,16 +108,35 @@ class QuestionViewModel @Inject constructor(
             .cachedIn(viewModelScope)
     }
 
+    fun addPostImages(image: List<Uri>) {
+        val s = image.map { uri ->
+            val mimeType = fileManager.getFileMimeType(uri)
+            fileManager.uriToMultipartBodyPart(uri, mimeType!!, "images")!!
+        }
+        _postImages.update { s }
+    }
+
+    fun removePostImageAt(position: Int) {
+        _postImages.update { postImages ->
+            postImages.toMutableList().apply { removeAt(position) }
+        }
+    }
+
     fun postQuestion(title: String, content: String) {
         _postQuestionState.update { UiState.Loading }
         viewModelScope.launch {
-            questionRepository.postQuestion(QuestionPostRequest(title, content))
+            val question = QuestionPostRequest(title, content, "이공", "QUEST")
+            val questionJson = Gson().toJson(question)
+            val questionRequestBody =
+                questionJson.toRequestBody("application/json".toMediaTypeOrNull())
+            questionRepository.postQuestion(questionRequestBody, _postImages.value)
                 .collectLatest { result ->
                     result.handleResponse(
                         onSuccess = {
                             _postQuestionState.update { UiState.Success(true) }
                         },
                         onError = { error ->
+                            Log.d("QuestionViewModel", "postQuestion: ${error.exception?.message}")
                             _postQuestionState.update { UiState.Error(error.exception) }
                         }
                     )

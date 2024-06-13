@@ -2,15 +2,18 @@ package com.minhoi.memento.data.network.service
 
 import com.minhoi.memento.base.CommonResponse
 import com.minhoi.memento.data.dto.question.QuestionListResponse
-import com.minhoi.memento.data.dto.question.QuestionPostRequest
 import com.minhoi.memento.data.dto.question.QuestionResponse
 import com.minhoi.memento.data.dto.question.ReplyListResponse
 import com.minhoi.memento.data.dto.question.ReplyRequest
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.Multipart
 import retrofit2.http.POST
+import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -29,8 +32,12 @@ interface QuestionService {
     @GET("api/subBoard/{subBoardId}")
     suspend fun getQuestion(@Path("subBoardId") questionId: Long): Response<CommonResponse<QuestionResponse>>
 
-    @POST("api/subBoard")
-    suspend fun postQuestion(@Body question: QuestionPostRequest): Response<CommonResponse<String>>
+    @POST("api/android/subBoard")
+    @Multipart
+    suspend fun postQuestion(
+        @Part("request") question: RequestBody,
+        @Part images: List<MultipartBody.Part>
+    ): Response<CommonResponse<String>>
 
     @GET("api/reply/{subBoardId}")
     suspend fun getReplies(
