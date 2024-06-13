@@ -39,7 +39,7 @@ class QuestionPostActivity : BaseActivity<ActivityQuestionPostBinding>() {
     override fun initView() {
         setupToolbar("질문 작성")
         observePostQuestionState()
-
+        observePostImages()
         binding.inputQuestionContent.addTextChangedListener(questionLengthTextWatcher)
 
         binding.selectCategoryLayout.setOnSingleClickListener {
@@ -99,6 +99,18 @@ class QuestionPostActivity : BaseActivity<ActivityQuestionPostBinding>() {
 
     private fun checkQuestionContent(): Boolean {
         return binding.inputQuestionContent.text.length > 10
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun observePostImages() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.postImages.collect { images ->
+                    binding.imageCount.text = "${images.count()}/10"
+                    addPhotoAdapter.submitList(images.map { it.toString() })
+                }
+            }
+        }
     }
 
     private fun observePostQuestionState() {

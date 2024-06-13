@@ -31,7 +31,6 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import javax.inject.Inject
 
@@ -115,11 +114,7 @@ class QuestionViewModel @Inject constructor(
     }
 
     fun addPostImages(image: List<Uri>) {
-        val s = image.map { uri ->
-            val mimeType = fileManager.getFileMimeType(uri)
-            fileManager.uriToMultipartBodyPart(uri, mimeType!!, "images")!!
-        }
-        _postImages.update { s }
+        _postImages.update { _postImages.value + image }
     }
 
     fun removePostImageAt(position: Int) {
@@ -135,7 +130,11 @@ class QuestionViewModel @Inject constructor(
             val questionJson = Gson().toJson(question)
             val questionRequestBody =
                 questionJson.toRequestBody("application/json".toMediaTypeOrNull())
-            questionRepository.postQuestion(questionRequestBody, _postImages.value)
+            val images = _postImages.value.map {
+                val fileType = fileManager.getFileMimeType(it)
+                fileManager.uriToMultipartBodyPart(it, fileType!!, "images")!!
+            }
+            questionRepository.postQuestion(questionRequestBody, images)
                 .collectLatest { result ->
                     result.handleResponse(
                         onSuccess = {
