@@ -19,6 +19,8 @@ interface BoardRepository {
 
     fun applyMentoring(boardId: Long, applyRequest: MentoringApplyRequest): Flow<ApiResult<CommonResponse<String>>>
 
+    fun deleteBoardContent(boardId: Long): Flow<ApiResult<CommonResponse<String>>>
+
     fun executeBookmark(boardId: Long): Flow<ApiResult<CommonResponse<String>>>
 
     fun executeUnBookmark(boardId: Long): Flow<ApiResult<CommonResponse<String>>>

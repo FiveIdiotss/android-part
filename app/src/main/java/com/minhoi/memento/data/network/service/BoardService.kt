@@ -38,6 +38,9 @@ interface BoardService {
     @GET("api/board/{boardId}")
     suspend fun getBoardContent(@Path("boardId") boardId: Long): Response<CommonResponse<BoardContentResponse>>
 
+    @DELETE("api/board/{boardId}")
+    suspend fun deleteBoardContent(@Path("boardId") boardId: Long): Response<CommonResponse<String>>
+
     @POST("api/board/{boardId}")
     suspend fun applyMentoring(@Path("boardId") boardId: Long, @Body applyContent: MentoringApplyRequest): Response<CommonResponse<String>>
 

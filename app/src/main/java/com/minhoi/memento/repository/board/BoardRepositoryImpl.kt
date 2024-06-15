@@ -44,6 +44,10 @@ class BoardRepositoryImpl @Inject constructor(
         boardService.applyMentoring(boardId, applyRequest)
     }
 
+    override fun deleteBoardContent(boardId: Long): Flow<ApiResult<CommonResponse<String>>> = safeFlow {
+        boardService.deleteBoardContent(boardId)
+    }
+
     override fun executeBookmark(boardId: Long) = safeFlow {
         boardService.bookmarkBoard(boardId)
     }

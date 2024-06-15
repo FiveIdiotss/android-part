@@ -6,6 +6,7 @@
         <variable
             name="board"
             type="com.minhoi.memento.data.dto.BoardContentDto" />
+
     </data>
 
     <com.google.android.material.card.MaterialCardView
@@ -86,6 +87,15 @@
                 app:layout_constraintStart_toStartOf="@+id/boardUserName"
                 app:layout_constraintTop_toBottomOf="@+id/boardUserName" />
 
+            <ImageView
+                android:id="@+id/settingBtn"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_margin="10dp"
+                android:visibility="gone"
+                android:src="@drawable/setting"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>
 </layout>
