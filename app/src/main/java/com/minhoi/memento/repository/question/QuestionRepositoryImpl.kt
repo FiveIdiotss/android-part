@@ -40,7 +40,7 @@ class QuestionRepositoryImpl @Inject constructor(
 
     override fun postQuestion(
         question: RequestBody,
-        images: List<MultipartBody.Part>
+        images: List<MultipartBody.Part>?
     ): Flow<ApiResult<CommonResponse<String>>> = safeFlow {
         questionService.postQuestion(question, images)
     }

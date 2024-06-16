@@ -36,7 +36,7 @@ interface QuestionService {
     @Multipart
     suspend fun postQuestion(
         @Part("request") question: RequestBody,
-        @Part images: List<MultipartBody.Part>
+        @Part images: List<MultipartBody.Part>? = null // 이미지 리스트가 없을 때는 null 처리
     ): Response<CommonResponse<String>>
 
     @GET("api/reply/{subBoardId}")

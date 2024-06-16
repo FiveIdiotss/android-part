@@ -20,7 +20,7 @@ interface QuestionRepository {
 
     fun getQuestion(questionId: Long): Flow<ApiResult<CommonResponse<QuestionResponse>>>
 
-    fun postQuestion(question: RequestBody, images: List<MultipartBody.Part>): Flow<ApiResult<CommonResponse<String>>>
+    fun postQuestion(question: RequestBody, images: List<MultipartBody.Part>?): Flow<ApiResult<CommonResponse<String>>>
 
     fun postReply(questionId: Long, content: String): Flow<ApiResult<CommonResponse<String>>>
 

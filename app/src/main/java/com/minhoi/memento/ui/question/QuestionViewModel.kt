@@ -11,6 +11,7 @@ import androidx.paging.cachedIn
 import com.google.gson.Gson
 import com.minhoi.memento.data.dto.question.QuestionContent
 import com.minhoi.memento.data.dto.question.QuestionPostRequest
+import com.minhoi.memento.data.dto.question.QuestionResponse
 import com.minhoi.memento.data.dto.question.ReplyContent
 import com.minhoi.memento.repository.pagingsource.QuestionPagingSource
 import com.minhoi.memento.repository.pagingsource.ReplyPagingSource
@@ -40,8 +41,8 @@ class QuestionViewModel @Inject constructor(
     private val questionRepository: QuestionRepository,
 ) : ViewModel() {
 
-    private val _questionContentState = MutableStateFlow<UiState<QuestionContent>>(UiState.Loading)
-    val questionContentState: StateFlow<UiState<QuestionContent>> = _questionContentState.asStateFlow()
+    private val _questionContentState = MutableStateFlow<UiState<QuestionResponse>>(UiState.Loading)
+    val questionContentState: StateFlow<UiState<QuestionResponse>> = _questionContentState.asStateFlow()
 
     private val _replyState = MutableStateFlow<UiState<Boolean>>(UiState.Empty)
     val replyState: StateFlow<UiState<Boolean>> = _replyState.asStateFlow()
@@ -91,7 +92,7 @@ class QuestionViewModel @Inject constructor(
                 result.handleResponse(
                     onSuccess = { data ->
                         Log.d("QuestionVIewModel", "getQuestion: $data")
-                        _questionContentState.update { UiState.Success(data.data.questionContent) }
+                        _questionContentState.update { UiState.Success(data.data) }
                     },
                     onError = { error ->
                         _questionContentState.update { UiState.Error(error.exception) }
@@ -130,10 +131,14 @@ class QuestionViewModel @Inject constructor(
             val questionJson = Gson().toJson(question)
             val questionRequestBody =
                 questionJson.toRequestBody("application/json".toMediaTypeOrNull())
-            val images = _postImages.value.map {
-                val fileType = fileManager.getFileMimeType(it)
-                fileManager.uriToMultipartBodyPart(it, fileType!!, "images")!!
-            }
+            val images =
+                if (_postImages.value.isEmpty()) null
+                else {
+                    _postImages.value.map {
+                        val fileType = fileManager.getFileMimeType(it)
+                        fileManager.uriToMultipartBodyPart(it, fileType!!, "images")!!
+                    }
+                }
             questionRepository.postQuestion(questionRequestBody, images)
                 .collectLatest { result ->
                     result.handleResponse(
