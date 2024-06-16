@@ -28,9 +28,9 @@ interface MemberRepository {
 
     fun getMenteeInfo(): Flow<ApiResult<CommonResponse<List<MentoringMatchInfo>>>>
 
-    suspend fun acceptApply(applyId: Long): Response<CommonResponse<String>>
+    fun acceptApply(applyId: Long): Flow<ApiResult<CommonResponse<String>>>
 
-    suspend fun rejectApply(applyId: Long): Response<CommonResponse<String>>
+    fun rejectApply(applyId: Long): Flow<ApiResult<CommonResponse<String>>>
 
     fun uploadProfileImage(image: MultipartBody.Part): Flow<ApiResult<CommonResponse<String>>>
 

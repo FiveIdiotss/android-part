@@ -41,9 +41,13 @@ class MemberRepositoryImpl @Inject constructor(
             matchingService.getMatchedMentoringInfo( BoardType.MENTOR)
         }
 
-    override suspend fun acceptApply(applyId: Long) = matchingService.acceptApply(applyId)
+    override fun acceptApply(applyId: Long): Flow<ApiResult<CommonResponse<String>>> = safeFlow {
+        matchingService.acceptApply(applyId)
+    }
 
-    override suspend fun rejectApply(applyId: Long) = matchingService.rejectApply(applyId)
+    override fun rejectApply(applyId: Long): Flow<ApiResult<CommonResponse<String>>> = safeFlow {
+        matchingService.rejectApply(applyId)
+    }
 
     override fun uploadProfileImage(image: MultipartBody.Part) = safeFlow {
         memberService.uploadProfileImage(image)
