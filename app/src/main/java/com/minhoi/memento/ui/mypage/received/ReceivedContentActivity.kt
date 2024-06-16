@@ -62,27 +62,15 @@ class ReceivedContentActivity : BaseActivity<ActivityReceivedContentBinding>() {
                 viewModel.rejectApply(receivedContent!!.applyId)
             }
         }
-
-        observeAcceptState()
-        observeRejectState()
         observeApplyContent()
+        observeMentoringEvent()
     }
 
-    private fun observeAcceptState() {
+    private fun observeMentoringEvent() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.acceptState.collectLatest { state ->
-                    branchState(state)
-                }
-            }
-        }
-    }
-
-    private fun observeRejectState() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.rejectState.collectLatest { state ->
-                    branchState(state)
+                viewModel.mentoringEvent.collect { event ->
+                    handleEvent(event)
                 }
             }
         }
@@ -111,24 +99,17 @@ class ReceivedContentActivity : BaseActivity<ActivityReceivedContentBinding>() {
         }
     }
 
-    private fun branchState(state: UiState<Boolean>) {
-        when (state) {
-            // do nothing
-            is UiState.Empty -> {}
-
-            is UiState.Success -> {
+    private fun handleEvent(event: MypageViewModel.MentoringEvent) {
+        when (event) {
+            is MypageViewModel.MentoringEvent.Accept -> {
                 showToast("수락 완료")
-                supportFragmentManager.hideLoading()
                 finish()
             }
-            is UiState.Loading -> {
-                supportFragmentManager.showLoading()
-            }
-            is UiState.Error -> {
-                supportFragmentManager.hideLoading()
-                showToast("일시적인 오류가 발생하였습니다. 다시 시도해주세요")
+            is MypageViewModel.MentoringEvent.Reject -> {
+                showToast("거절 완료")
                 finish()
             }
+            is MypageViewModel.MentoringEvent.Error -> showToast(event.exception.message!!)
         }
     }
 

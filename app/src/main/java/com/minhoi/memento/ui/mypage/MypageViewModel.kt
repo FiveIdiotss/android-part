@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.minhoi.memento.MentoApplication
 import com.minhoi.memento.data.dto.BoardContentDto
@@ -15,15 +14,18 @@ import com.minhoi.memento.data.dto.MentoringApplyDto
 import com.minhoi.memento.data.dto.MentoringApplyListDto
 import com.minhoi.memento.data.dto.MentoringMatchInfo
 import com.minhoi.memento.data.dto.MentoringReceivedDto
-import com.minhoi.memento.ui.UiState
 import com.minhoi.memento.data.model.ApplyStatus
 import com.minhoi.memento.data.network.ApiResult
 import com.minhoi.memento.repository.board.BoardRepository
 import com.minhoi.memento.repository.member.MemberRepository
+import com.minhoi.memento.ui.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
@@ -48,11 +50,8 @@ class MypageViewModel @Inject constructor(
     private val _applyContent = MutableStateFlow<UiState<MentoringApplyDto>>(UiState.Empty)
     val applyContent: StateFlow<UiState<MentoringApplyDto>> = _applyContent.asStateFlow()
 
-    private val _acceptState = MutableStateFlow<UiState<Boolean>>(UiState.Empty)
-    val acceptState: StateFlow<UiState<Boolean>> = _acceptState.asStateFlow()
-
-    private val _rejectState = MutableStateFlow<UiState<Boolean>>(UiState.Empty)
-    val rejectState: StateFlow<UiState<Boolean>> = _acceptState.asStateFlow()
+    private val _mentoringEvent = MutableSharedFlow<MentoringEvent>()
+    val mentoringEvent: SharedFlow<MentoringEvent> = _mentoringEvent.asSharedFlow()
 
     private val _mentorInfo = MutableStateFlow<UiState<List<MentoringMatchInfo>>>(UiState.Empty)
     val mentorInfo: StateFlow<UiState<List<MentoringMatchInfo>>> = _mentorInfo.asStateFlow()
@@ -182,26 +181,38 @@ class MypageViewModel @Inject constructor(
         }
     }
 
+    private fun mentoringEvent(event: MentoringEvent) {
+        viewModelScope.launch {
+            _mentoringEvent.emit(event)
+        }
+    }
+
     fun acceptApply(applyId: Long) {
         viewModelScope.launch {
-            _acceptState.update { UiState.Loading }
-            val response = memberRepository.acceptApply(applyId)
-            if (response.isSuccessful) {
-                _acceptState.update { UiState.Success(true) }
-            } else {
-                _acceptState.update { UiState.Error(null) }
+            memberRepository.acceptApply(applyId).collect {
+                it.handleResponse(
+                    onSuccess = {
+                        mentoringEvent(MentoringEvent.Accept)
+                    },
+                    onError = { error ->
+                        mentoringEvent(MentoringEvent.Error(error.exception!!))
+                    }
+                )
             }
         }
     }
 
     fun rejectApply(applyId: Long) {
-        _rejectState.update { UiState.Loading }
         viewModelScope.launch {
-            val response = memberRepository.rejectApply(applyId)
-            if (response.isSuccessful) {
-                _rejectState.update { UiState.Success(true) }
-            } else {
-                _rejectState.update { UiState.Error(null) }
+            memberRepository.rejectApply(applyId).collect {
+                it.handleResponse(
+                    onSuccess = {
+                        mentoringEvent(MentoringEvent.Accept)
+                    },
+                    onError = { error ->
+                        mentoringEvent(MentoringEvent.Error(error.exception!!))
+                    }
+                )
             }
         }
     }
@@ -372,4 +383,9 @@ class MypageViewModel @Inject constructor(
         )
     }
 
+    sealed class MentoringEvent {
+        object Accept : MentoringEvent()
+        object Reject : MentoringEvent()
+        data class Error(val exception: Throwable) : MentoringEvent()
+    }
 }
