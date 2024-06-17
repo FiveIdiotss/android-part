@@ -30,11 +30,13 @@ import com.minhoi.memento.ui.UiState
 import com.minhoi.memento.utils.toRelativeTime
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flatMapConcat
@@ -157,33 +159,62 @@ class HomeViewModel @Inject constructor(
 
     /** 채팅방마다 구독하여 읽지 않은 메세지의 개수를 실시간으로 전달받는 함수
     채팅방 목록 성공적으로 가져오고 구독 */
-    @SuppressLint("CheckResult")
-    fun subscribeChatRooms(rooms: List<ChatRoom>) {
+    suspend fun subscribeChatRooms(rooms: List<ChatRoom>) {
         rooms.forEach { chatRoom ->
-            StompManager.stompClient?.topic("/sub/unreadCount/${chatRoom.id}")
-                ?.subscribe { message ->
-                    val data = message.payload
-                    val s = JSONObject(data)
-                    val count = s.getInt("unreadMessageCount")
-                    val latestMessageResponse = s.getJSONObject("latestMessageDTO")
-                    val content = latestMessageResponse.getString("content")
-                    val sendTime = latestMessageResponse.getString("localDateTime")
-                    _chatUnreadCount.update { count }
-                    val currentState = _chatRooms.value
-                    if (currentState is UiState.Success) {
-                        val updatedList = currentState.data.map { pair ->
-                            if (pair.first.id == chatRoom.id) {
-                                pair.first.copy(
-                                    unreadMessageCount = count,
-                                    latestMessage = LatestMessageDto(content, sendTime)
-                                ) to pair.second
-                            } else {
-                                pair
-                            }
-                        }
-                        _chatRooms.update { UiState.Success(updatedList) }
-                    }
+            subscribeToChatRoom(chatRoom)
+        }
+    }
+
+    private suspend fun subscribeToChatRoom(chatRoom: ChatRoom) {
+        val topicFlow = createTopicFlow(chatRoom.id)
+
+        topicFlow.collect { data ->
+            processMessage(chatRoom, data)
+        }
+    }
+
+    private fun createTopicFlow(chatRoomId: Long) = callbackFlow {
+        val disposable = StompManager.stompClient?.topic("/sub/unreadCount/$chatRoomId")
+            ?.subscribe { message ->
+                trySend(message.payload)
+            }
+        awaitClose {
+            Log.d(TAG, "createTopicFlow: unsubscribe!!")
+            disposable?.dispose()
+        }
+    }
+
+    private fun processMessage(chatRoom: ChatRoom, data: String) {
+        try {
+            val jsonObject = JSONObject(data)
+            val count = jsonObject.getInt("unreadMessageCount")
+            val latestMessageResponse = jsonObject.getJSONObject("latestMessageDTO")
+            val content = latestMessageResponse.getString("content")
+            val sendTime = latestMessageResponse.getString("localDateTime")
+            Log.d(TAG, "processMessage: $count")
+
+            _chatUnreadCount.update { count }
+
+            updateChatRoomState(chatRoom, count, content, sendTime)
+        } catch (e: Exception) {
+            Log.e(TAG, " ${e.message}")
+        }
+    }
+
+    private fun updateChatRoomState(chatRoom: ChatRoom, count: Int, content: String, sendTime: String) {
+        val currentState = _chatRooms.value
+        if (currentState is UiState.Success) {
+            val updatedList = currentState.data.map { pair ->
+                if (pair.first.id == chatRoom.id) {
+                    pair.first.copy(
+                        unreadMessageCount = count,
+                        latestMessage = LatestMessageDto(content, sendTime)
+                    ) to pair.second
+                } else {
+                    pair
                 }
+            }
+            _chatRooms.update { UiState.Success(updatedList) }
         }
     }
 
@@ -205,7 +236,6 @@ class HomeViewModel @Inject constructor(
                                 .catch { e -> _chatRooms.update { UiState.Error(e) } }
                                 .collect { pair -> chatRoomsWithMember.add(pair) }
                             // 모든 멤버 정보가 temp 리스트에 추가된 후 UI 상태 업데이트 (flatMapConcat 사용 시 순차적으로 실행)
-                            subscribeChatRooms(chatRooms.data)
                             var unreadMessageCount = 0
                             chatRooms.data.forEach {
                                 unreadMessageCount += it.unreadMessageCount
@@ -283,5 +313,9 @@ class HomeViewModel @Inject constructor(
         super.onCleared()
         StompManager.disconnect()
         Log.d("HomeViewModel", "onCleared: OnCleared!!")
+    }
+
+    companion object {
+        private const val TAG = "HomeViewModel"
     }
 }
