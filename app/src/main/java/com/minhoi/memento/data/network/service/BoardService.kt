@@ -21,7 +21,7 @@ interface BoardService {
     @Multipart
     suspend fun postBoard(
         @Part ("request") mentorBoardPostDto: RequestBody,
-        @Part files: List<MultipartBody.Part>? = null // 이미지 리스트가 없을 때는 null 처리
+        @Part images: List<MultipartBody.Part>? = null // 이미지 리스트가 없을 때는 null 처리
     ): Response<CommonResponse<String>>
 
     @GET("api/boards/filter")
