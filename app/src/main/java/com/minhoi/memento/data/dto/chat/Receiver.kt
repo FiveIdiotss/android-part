@@ -9,5 +9,6 @@ data class Receiver(
     override val type: ChatFileType,
     override val fileUrl: String?,
     override val id: Long,
+    override val readCount: Int,
     override var showMinute: Boolean = true,
 ) : ChatMessage
