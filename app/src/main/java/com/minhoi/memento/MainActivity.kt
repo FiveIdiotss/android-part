@@ -152,4 +152,18 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
             }
         }
     }
+
+    private fun subscribeChatRooms() {
+        repeatOnStarted {
+            viewModel.chatRooms.collect { state ->
+                when (state) {
+                    is UiState.Empty, UiState.Loading -> {}
+                    is UiState.Success -> viewModel.subscribeChatRooms(state.data.map { it.first })
+                    is UiState.Error -> {
+                        showToast("네트워크 오류가 발생하였습니다. 다시 시도해주세요")
+                    }
+                }
+            }
+        }
+    }
 }
