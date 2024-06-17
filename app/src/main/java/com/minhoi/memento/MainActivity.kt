@@ -2,6 +2,7 @@ package com.minhoi.memento
 
 import android.Manifest
 import android.app.AlertDialog
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.util.Log
@@ -10,7 +11,11 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
@@ -18,19 +23,40 @@ import androidx.navigation.ui.setupWithNavController
 import com.google.android.gms.tasks.Task
 import com.google.android.material.bottomnavigation.BottomNavigationItemView
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.messaging.FirebaseMessaging
 import com.minhoi.memento.base.BaseActivity
 import com.minhoi.memento.databinding.ActivityMainBinding
+import com.minhoi.memento.ui.SplashViewModel
+import com.minhoi.memento.ui.UiState
 import com.minhoi.memento.ui.home.HomeViewModel
 import com.minhoi.memento.ui.home.PostSelectBottomSheetDialog
+import com.minhoi.memento.ui.login.LoginActivity
+import com.minhoi.memento.utils.repeatOnStarted
+import com.minhoi.memento.utils.showToast
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class MainActivity : BaseActivity<ActivityMainBinding>() {
     override val layoutResourceId: Int = R.layout.activity_main
     private val viewModel by viewModels<HomeViewModel>()
+    private val splashViewModel by viewModels<SplashViewModel>()
 
     override fun initView() {
+        val splashScreen = installSplashScreen()
+        splashScreen.setKeepOnScreenCondition {
+            splashViewModel.loginState.value is SplashViewModel.LoginState.Loading
+        }
+
+        setUpSplashScreen()
+        observeLoginState()
+        observeBadgeCounts()
         setBottomNavigation()
         askNotificationPermission()
+        subscribeChatRooms()
+
         FirebaseMessaging.getInstance().token
             .addOnCompleteListener { task: Task<String> ->
                 if (!task.isSuccessful) {
@@ -41,6 +67,32 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
                 viewModel.saveFCMToken(token)
                 Log.d("FCMLog", "Current token: $token")
             }
+    }
+
+    private fun observeLoginState() {
+        repeatOnStarted {
+            splashViewModel.loginState.collect {
+                when (it) {
+                    is SplashViewModel.LoginState.Loading, SplashViewModel.LoginState.Success -> {}
+                    is SplashViewModel.LoginState.Failure -> showToast("세션이 만료되었습니다. 로그인 창으로 이동합니다.")
+                    is SplashViewModel.LoginState.Error -> showToast("인터넷 연결을 확인해주세요.")
+                }
+            }
+        }
+    }
+
+    private fun setUpSplashScreen() {
+        splashViewModel.checkLoginState(
+            onFailure = {
+                navigateToLoginActivity()
+            }
+        )
+    }
+
+    private fun navigateToLoginActivity() {
+        val intent = Intent(this, LoginActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 
     private fun setBottomNavigation() {
