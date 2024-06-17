@@ -8,8 +8,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import com.minhoi.memento.MentoApplication
-import com.minhoi.memento.data.dto.BoardContentDto
 import com.minhoi.memento.data.dto.BoardContentResponse
+import com.minhoi.memento.data.dto.BoardImage
 import com.minhoi.memento.data.dto.MentorBoardPostDto
 import com.minhoi.memento.data.dto.MentoringApplyRequest
 import com.minhoi.memento.data.dto.TimeTableDto
@@ -42,8 +42,8 @@ class BoardViewModel @Inject constructor(
     private val _post = MutableLiveData<BoardContentResponse>()
     val post: LiveData<BoardContentResponse> = _post
 
-    private val _boardContent = MutableStateFlow<UiState<BoardContentDto>>(UiState.Loading)
-    val boardContent: StateFlow<UiState<BoardContentDto>> = _boardContent.asStateFlow()
+    private val _boardContent = MutableStateFlow<UiState<BoardContentResponse>>(UiState.Loading)
+    val boardContent: StateFlow<UiState<BoardContentResponse>> = _boardContent.asStateFlow()
 
     private val _isAvailableDay = MutableLiveData<Boolean>()
     val isAvailableDay: LiveData<Boolean> = _isAvailableDay
@@ -101,7 +101,13 @@ class BoardViewModel @Inject constructor(
                 it.handleResponse(
                     onSuccess = { value ->
                         _post.value = value.data
-                        _boardContent.update { UiState.Success(value.data.boardDTO) }
+                        if (value.data.boardImageUrls.isEmpty()) {
+                            val emptyImageData =
+                                value.data.copy(boardImageUrls = listOf(BoardImage("https://picsum.photos/300")))
+                            _boardContent.update { UiState.Success(emptyImageData) }
+                        } else {
+                            _boardContent.update { UiState.Success(value.data) }
+                        }
                         if (value.data.boardDTO.memberId == member.id) {
                             _isMyPost.update { true }
                         }
@@ -179,10 +185,10 @@ class BoardViewModel @Inject constructor(
                 else {
                     _postImages.value.map {
                         val fileType = fileManager.getFileMimeType(it)
-                        fileManager.uriToMultipartBodyPart(it, fileType!!, "files")!!
+                        fileManager.uriToMultipartBodyPart(it, fileType!!, "images")!!
                     }
                 }
-            Log.d(TAG, "postBoard: $post")
+            Log.d(TAG, "postBoard: $post image : $images")
             boardRepository.postBoard(postRequestBody, images).collect {
                 it.handleResponse(
                     onSuccess = {
@@ -202,9 +208,7 @@ class BoardViewModel @Inject constructor(
     fun setDescription(value: CharSequence) { _postDescription.value = value.toString() }
     fun setConsultTime(value: Int) { _postConsultTime.value = value }
     fun setCategory(value: CharSequence) { _postCategory.value = value.toString() }
-    fun setMentorTimeTableList(value: TimeTableDto) {
-        _postTimeTable.value += value
-    }
+    fun setMentorTimeTableList(value: TimeTableDto) { _postTimeTable.value += value }
     fun deleteMentorTimeTableAt(position: Int) {
         val currentTimetable = _postTimeTable.value.toMutableList()
         currentTimetable.removeAt(position)

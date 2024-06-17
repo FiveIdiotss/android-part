@@ -6,10 +6,12 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.viewpager2.widget.ViewPager2
 import com.minhoi.memento.R
 import com.minhoi.memento.base.BaseActivity
 import com.minhoi.memento.databinding.ActivityBoardBinding
 import com.minhoi.memento.ui.UiState
+import com.minhoi.memento.ui.adapter.board.BoardImagePagerAdapter
 import com.minhoi.memento.utils.hideLoading
 import com.minhoi.memento.utils.setOnSingleClickListener
 import com.minhoi.memento.utils.showLoading
@@ -23,12 +25,19 @@ class BoardActivity : BaseActivity<ActivityBoardBinding>() {
     private val viewModel by viewModels<BoardViewModel>()
     private var boardId: Long = -1
     override val layoutResourceId: Int = R.layout.activity_board
+    private val boardImagePagerAdapter: BoardImagePagerAdapter by lazy { BoardImagePagerAdapter() }
 
     override fun initView() {
         boardId = intent.getLongExtra("boardId", -1L)
         binding.viewModel = viewModel
         getBoardContent(boardId)
         setupToolbar("")
+
+        binding.boardImagesViewPager.apply {
+            adapter = boardImagePagerAdapter
+            orientation = ViewPager2.ORIENTATION_HORIZONTAL
+            binding.boardImageDotsIndicator.attachTo(this)
+        }
 
         binding.mentorApplyBtn.setOnSingleClickListener {
             // 멘토링 신청 Activity로 전환
@@ -67,8 +76,9 @@ class BoardActivity : BaseActivity<ActivityBoardBinding>() {
                         }
                         is UiState.Success -> {
                             supportFragmentManager.hideLoading()
-                            binding.boardContent = it.data
-                            viewModel.setBookmarkState(it.data.isBookmarked)
+                            binding.boardContent = it.data.boardDTO
+                            viewModel.setBookmarkState(it.data.boardDTO.isBookmarked)
+                            boardImagePagerAdapter.submitList(it.data.boardImageUrls)
                         }
                         is UiState.Error -> {
                             supportFragmentManager.hideLoading()
