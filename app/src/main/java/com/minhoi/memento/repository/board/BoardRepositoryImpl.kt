@@ -7,6 +7,8 @@ import com.minhoi.memento.data.network.ApiResult
 import com.minhoi.memento.data.network.service.BoardService
 import com.minhoi.memento.utils.safeFlow
 import kotlinx.coroutines.flow.Flow
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import javax.inject.Inject
 
 class BoardRepositoryImpl @Inject constructor(
@@ -34,6 +36,13 @@ class BoardRepositoryImpl @Inject constructor(
             category = null,
             searchQuery = null
         )
+    }
+
+    override fun postBoard(
+        boardContent: RequestBody,
+        images: List<MultipartBody.Part>?,
+    ): Flow<ApiResult<CommonResponse<String>>> = safeFlow {
+        boardService.postBoard(boardContent, images)
     }
 
     override fun getBoardContent(boardId: Long) = safeFlow {
