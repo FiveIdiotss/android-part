@@ -2,9 +2,11 @@ package com.minhoi.memento.repository.member
 
 import com.minhoi.memento.base.CommonResponse
 import com.minhoi.memento.data.dto.BoardListResponse
+import com.minhoi.memento.data.dto.TokenDto
 import com.minhoi.memento.data.dto.notification.NotificationListResponse
 import com.minhoi.memento.data.model.BoardType
 import com.minhoi.memento.data.network.ApiResult
+import com.minhoi.memento.data.network.service.AuthService
 import com.minhoi.memento.data.network.service.BoardService
 import com.minhoi.memento.data.network.service.MatchingService
 import com.minhoi.memento.data.network.service.MemberService
@@ -18,8 +20,13 @@ class MemberRepositoryImpl @Inject constructor(
     private val memberService: MemberService,
     private val matchingService: MatchingService,
     private val notificationService: NotificationService,
-    private val boardService: BoardService
+    private val boardService: BoardService,
+    private val authService: AuthService
 ) : MemberRepository {
+
+    override fun checkLoginState(refreshToken: String): Flow<ApiResult<CommonResponse<TokenDto>>> = safeFlow {
+        authService.getAccessToken("Bearer $refreshToken")
+    }
 
     override suspend fun getMemberInfo(memberId: Long) = memberService.getMemberInfo(memberId)
 

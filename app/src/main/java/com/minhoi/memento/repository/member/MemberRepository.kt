@@ -7,6 +7,7 @@ import com.minhoi.memento.data.dto.MentoringApplyDto
 import com.minhoi.memento.data.dto.MentoringApplyListDto
 import com.minhoi.memento.data.dto.MentoringMatchInfo
 import com.minhoi.memento.data.dto.MentoringReceivedDto
+import com.minhoi.memento.data.dto.TokenDto
 import com.minhoi.memento.data.dto.notification.NotificationListResponse
 import com.minhoi.memento.data.network.ApiResult
 import kotlinx.coroutines.flow.Flow
@@ -15,6 +16,8 @@ import retrofit2.Call
 import retrofit2.Response
 
 interface MemberRepository {
+
+    fun checkLoginState(refreshToken: String): Flow<ApiResult<CommonResponse<TokenDto>>>
 
     suspend fun getMemberInfo(memberId: Long): Response<CommonResponse<MemberDTO>>
 
