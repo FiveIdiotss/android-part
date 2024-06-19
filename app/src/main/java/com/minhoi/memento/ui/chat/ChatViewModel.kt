@@ -49,12 +49,11 @@ class ChatViewModel @Inject constructor(
     private val _connectState = MutableStateFlow<UiState<Boolean>>(UiState.Empty)
     val connectState: StateFlow<UiState<Boolean>> = _connectState.asStateFlow()
 
-    private val _chatRoomState = MutableStateFlow<UiState<Long>>(UiState.Loading)
-    val chatRoomState: StateFlow<UiState<Long>> = _chatRoomState.asStateFlow()
+    private val _chatRoomState = MutableStateFlow<UiState<ChatRoom>>(UiState.Loading)
+    val chatRoomState: StateFlow<UiState<ChatRoom>> = _chatRoomState.asStateFlow()
 
-    private val _messages = MutableLiveData<ArrayDeque<ChatMessage>>()
-    val messages: LiveData<ArrayDeque<ChatMessage>> = _messages
-    private val tempMessages = ArrayDeque<ChatMessage>()
+    private val _messages = MutableStateFlow<ArrayDeque<ChatMessage>>(ArrayDeque())
+    val messages: StateFlow<ArrayDeque<ChatMessage>> = _messages.asStateFlow()
 
     private val _isPageLoading = MutableStateFlow<UiState<Boolean>>(UiState.Empty)
     val isPageLoading: StateFlow<UiState<Boolean>> = _isPageLoading.asStateFlow()
@@ -100,10 +99,13 @@ class ChatViewModel @Inject constructor(
             val content: String? = json.getString("content")
             val chatRoomId = json.getLong("chatRoomId")
             val date = json.getString("localDateTime")
+            val readCount = json.getInt("readCount")
             val messageObject =
-                MessageDto(fileType!!, fileURL, senderId, chatRoomId, content, date, senderName)
-            tempMessages.addLast(getSenderOrReceiver(messageObject))
-            _messages.value = tempMessages
+                MessageDto(fileType!!, fileURL, senderId, chatRoomId, content, date, senderName, readCount)
+
+            val updatedMessages = ArrayDeque(_messages.value)
+            updatedMessages.addLast(getSenderOrReceiver(messageObject))
+            _messages.value = updatedMessages
         }
     }
 
@@ -165,14 +167,15 @@ class ChatViewModel @Inject constructor(
                 result.handleResponse(
                     onSuccess = { response ->
                         _isPageLoading.value = UiState.Success(true)
-                        Log.d(TAG, "getMessages: $messages")
+                        Log.d(TAG, "getMessages: ${messages.value}")
                         if (response.data.last) {
                             _hasNextPage.value = false
                         }
+                        val updatedMessages = ArrayDeque(_messages.value)
                         response.data.content.forEach {
-                            tempMessages.addFirst(getSenderOrReceiver(it))
+                            updatedMessages.addFirst(getSenderOrReceiver(it))
                         }
-                        _messages.value = tempMessages
+                        _messages.value = updatedMessages
                         currentPage++
                     },
                     onError = { error ->
@@ -211,5 +214,4 @@ class ChatViewModel @Inject constructor(
         super.onCleared()
         subscription?.dispose()
     }
-
 }

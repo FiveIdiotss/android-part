@@ -1,7 +1,7 @@
 package com.minhoi.memento.ui.chat
 
+import android.app.AlertDialog
 import android.util.Log
-import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Lifecycle
@@ -17,6 +17,7 @@ import com.minhoi.memento.databinding.ActivityChatBinding
 import com.minhoi.memento.ui.UiState
 import com.minhoi.memento.ui.adapter.ChatAdapter
 import com.minhoi.memento.utils.hideLoading
+import com.minhoi.memento.utils.repeatOnStarted
 import com.minhoi.memento.utils.setOnSingleClickListener
 import com.minhoi.memento.utils.showLoading
 import com.minhoi.memento.utils.showToast
@@ -32,6 +33,7 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
 
     @Inject
     lateinit var selectFileDialog: SelectFileDialog
+    private var extendBottomSheetDialog: MentoringExtendBottomSheetDialog? = null
 
     private var receiverId = -1L
     private val chatAdapter: ChatAdapter by lazy {
@@ -56,6 +58,7 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
 
         // viewModel roomId 관찰하여 roomId가 정상적으로 들어오면 소켓 연결
         connectSocket()
+        setBottomSheetDialog()
 
         binding.sendBtn.setOnSingleClickListener {
             sendMessage()
@@ -92,7 +95,6 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
             }
         })
 
-        setUpToolbar()
         observeChatMessages()
         observeHasNextPage()
         observePageLoadingState()
@@ -102,31 +104,16 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
         receiverId = intent.getLongExtra("receiverId", -1L)
         val receiverName = intent.getStringExtra("receiverName")
         // 채팅방 이름 설정
-        binding.receiverName.text = receiverName
-    }
-
-    private fun setUpToolbar() {
-        setSupportActionBar(binding.chatToolbar)
-        supportActionBar?.apply {
-            setDisplayShowTitleEnabled(false)
-            setDisplayHomeAsUpEnabled(true)
-        }
-    }
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            android.R.id.home -> {
-                finish()
-                return true
-            }
-        }
-        return super.onOptionsItemSelected(item)
+        setupToolbar(receiverName!!)
     }
 
     private fun observeChatMessages() {
-        viewModel.messages.observe(this) {
-            val list = setShowProfileAndDate(it).toList()
-            Log.d(TAG, "observeChatMessages: ${list}")
-            chatAdapter.submitList(list)
+        repeatOnStarted {
+            viewModel.messages.collect {
+                val list = setShowProfileAndDate(it).toList()
+                Log.d(TAG, "observeChatMessages: ${list}")
+                chatAdapter.submitList(list)
+            }
         }
     }
 
@@ -204,9 +191,9 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
                             binding.sendBtn.isEnabled = true
                             if (receiverId != -1L) {
                                 Log.d(TAG, "connectSocket: ${state.data}")
-                                roomId = state.data
-                                viewModel.subscribeChatRoom(state.data)
-                                viewModel.getMessageStream(state.data)
+                                roomId = state.data.id
+                                viewModel.subscribeChatRoom(state.data.id)
+                                viewModel.getMessageStream(state.data.id)
                             } else {
                                 showToast(LOAD_ERROR_MESSAGE)
                             }
@@ -214,7 +201,7 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
                         is UiState.Error -> {
                             supportFragmentManager.hideLoading()
                             Log.d(TAG, "connectSocket: Error")
-                            showToast(LOAD_ERROR_MESSAGE)
+                            showToast(state.error!!.message!!)
                         }
                         is UiState.Empty -> {}
                     }
@@ -231,7 +218,6 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
 
     override fun onDestroy() {
         super.onDestroy()
-//        viewModel.disconnect()
     }
 
     private val chatScrollListener = object : RecyclerView.OnScrollListener() {
