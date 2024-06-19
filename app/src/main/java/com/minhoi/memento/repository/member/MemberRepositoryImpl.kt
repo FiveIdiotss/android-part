@@ -96,4 +96,8 @@ class MemberRepositoryImpl @Inject constructor(
 
     override fun saveFCMToken(token: String) = notificationService.saveToken(token)
 
+    override fun signOut(): Flow<ApiResult<CommonResponse<String>>> = safeFlow {
+        memberService.signOut()
+    }
+
 }

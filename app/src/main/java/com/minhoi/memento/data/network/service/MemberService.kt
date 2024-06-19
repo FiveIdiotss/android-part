@@ -44,4 +44,7 @@ interface MemberService {
 
     @GET("api/apply/{applyId}")
     suspend fun getApplyInfo(@Path("applyId") applyId: Long): Response<CommonResponse<MentoringApplyDto>>
+
+    @POST("api/member/signOut")
+    suspend fun signOut(): Response<CommonResponse<String>>
 }

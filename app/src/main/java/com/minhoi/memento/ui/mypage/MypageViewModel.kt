@@ -366,6 +366,26 @@ class MypageViewModel @Inject constructor(
             }
         }
     }
+
+    fun signOut() {
+        viewModelScope.launch {
+            memberRepository.signOut().collect {
+                it.handleResponse(
+                    onSuccess = {
+                        launch {
+                            _signOutEvent.emit(true)
+                        }
+                    },
+                    onError = {
+                        launch {
+                            _signOutEvent.emit(false)
+                        }
+                    }
+                )
+            }
+        }
+    }
+
     fun BoardContentDto.toBoardContentForReceived(): BoardContentForReceived {
         return BoardContentForReceived(
             boardId = this.boardId,

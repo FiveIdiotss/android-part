@@ -50,4 +50,6 @@ interface MemberRepository {
     fun deleteNotification(notificationId: Long): Flow<ApiResult<CommonResponse<String>>>
 
     fun saveFCMToken(token: String): Call<String>
+
+    fun signOut(): Flow<ApiResult<CommonResponse<String>>>
 }
