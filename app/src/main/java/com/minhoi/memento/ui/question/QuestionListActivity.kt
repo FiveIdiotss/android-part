@@ -14,7 +14,7 @@ import com.minhoi.memento.base.BaseActivity
 import com.minhoi.memento.databinding.ActivityQuestionListBinding
 import com.minhoi.memento.ui.SelectBoardCategoryBottomSheetDialog
 import com.minhoi.memento.ui.adapter.BoardLoadStateAdapter
-import com.minhoi.memento.ui.adapter.QuestionRowAdapter
+import com.minhoi.memento.ui.adapter.question.QuestionRowAdapter
 import com.minhoi.memento.utils.setOnSingleClickListener
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest

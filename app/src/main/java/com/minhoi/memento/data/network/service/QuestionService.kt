@@ -32,7 +32,7 @@ interface QuestionService {
     @GET("api/subBoard/{subBoardId}")
     suspend fun getQuestion(@Path("subBoardId") questionId: Long): Response<CommonResponse<QuestionResponse>>
 
-    @POST("api/android/subBoard")
+    @POST("api/subBoard")
     @Multipart
     suspend fun postQuestion(
         @Part("request") question: RequestBody,

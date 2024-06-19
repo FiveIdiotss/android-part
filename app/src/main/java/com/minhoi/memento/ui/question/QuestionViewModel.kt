@@ -9,6 +9,7 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.google.gson.Gson
+import com.minhoi.memento.MentoApplication
 import com.minhoi.memento.data.dto.question.QuestionContent
 import com.minhoi.memento.data.dto.question.QuestionPostRequest
 import com.minhoi.memento.data.dto.question.QuestionResponse
@@ -40,6 +41,8 @@ class QuestionViewModel @Inject constructor(
     private val fileManager: FileManager,
     private val questionRepository: QuestionRepository,
 ) : ViewModel() {
+
+    private val member = MentoApplication.memberPrefs.getMemberPrefs()
 
     private val _questionContentState = MutableStateFlow<UiState<QuestionResponse>>(UiState.Loading)
     val questionContentState: StateFlow<UiState<QuestionResponse>> = _questionContentState.asStateFlow()
@@ -191,13 +194,19 @@ class QuestionViewModel @Inject constructor(
     fun getMyQuestions(): Flow<PagingData<QuestionContent>> =
         Pager(
             config = PagingConfig(pageSize = 20),
-            pagingSourceFactory = { QuestionPagingSource(questionRepository) }
+            pagingSourceFactory = {
+                QuestionPagingSource(
+                    questionRepository,
+                    memberFilter = true,
+                    memberId = member.id
+                )
+            }
         ).flow.cachedIn(viewModelScope)
 
     fun getLikedQuestions(): Flow<PagingData<QuestionContent>> =
         Pager(
             config = PagingConfig(pageSize = 20),
-            pagingSourceFactory = { QuestionPagingSource(questionRepository, likeFilter = true)}
+            pagingSourceFactory = { QuestionPagingSource(questionRepository, likeFilter = true) }
         ).flow.cachedIn(viewModelScope)
 
     fun setCategoryFilter(category: String?) {
