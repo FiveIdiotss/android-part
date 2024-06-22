@@ -5,13 +5,13 @@ import com.minhoi.memento.data.dto.BoardListResponse
 import com.minhoi.memento.data.dto.TokenDto
 import com.minhoi.memento.data.dto.notification.NotificationListResponse
 import com.minhoi.memento.data.model.BoardType
+import com.minhoi.memento.data.model.safeFlow
 import com.minhoi.memento.data.network.ApiResult
 import com.minhoi.memento.data.network.service.AuthService
 import com.minhoi.memento.data.network.service.BoardService
 import com.minhoi.memento.data.network.service.MatchingService
 import com.minhoi.memento.data.network.service.MemberService
 import com.minhoi.memento.data.network.service.NotificationService
-import com.minhoi.memento.utils.safeFlow
 import kotlinx.coroutines.flow.Flow
 import okhttp3.MultipartBody
 import javax.inject.Inject

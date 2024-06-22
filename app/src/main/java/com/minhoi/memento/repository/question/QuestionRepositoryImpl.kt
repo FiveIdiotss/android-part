@@ -3,9 +3,9 @@ package com.minhoi.memento.repository.question
 import com.minhoi.memento.base.CommonResponse
 import com.minhoi.memento.data.dto.question.QuestionListResponse
 import com.minhoi.memento.data.dto.question.ReplyRequest
+import com.minhoi.memento.data.model.safeFlow
 import com.minhoi.memento.data.network.ApiResult
 import com.minhoi.memento.data.network.service.QuestionService
-import com.minhoi.memento.utils.safeFlow
 import kotlinx.coroutines.flow.Flow
 import okhttp3.MultipartBody
 import okhttp3.RequestBody

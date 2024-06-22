@@ -3,9 +3,9 @@ package com.minhoi.memento.repository.board
 import com.minhoi.memento.base.CommonResponse
 import com.minhoi.memento.data.dto.BoardListResponse
 import com.minhoi.memento.data.dto.MentoringApplyRequest
+import com.minhoi.memento.data.model.safeFlow
 import com.minhoi.memento.data.network.ApiResult
 import com.minhoi.memento.data.network.service.BoardService
-import com.minhoi.memento.utils.safeFlow
 import kotlinx.coroutines.flow.Flow
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
