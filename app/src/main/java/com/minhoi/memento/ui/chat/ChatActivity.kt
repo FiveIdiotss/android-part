@@ -128,13 +128,13 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
 
         messages.forEachIndexed { index, currentMessage ->
             if (index == 0 || lastMessage!!.date.substring(0, 13) != currentMessage.date.substring(0, 13)) {
-                val chatDate = ChatDate(currentMessage.name, currentMessage.content, currentMessage.date, true, currentMessage.type, currentMessage.fileUrl, currentMessage.id)
+                val chatDate = ChatDate(currentMessage.chatId, currentMessage.name, currentMessage.content, currentMessage.date, true, currentMessage.type, currentMessage.fileUrl, currentMessage.senderId)
                 resultMessages.add(chatDate)
             }
 
             // 이전 메시지와 현재 메시지가 같은 날짜인지 확인 (분 단위까지 비교)
             val isSameDay = lastMessage?.date?.substring(14, 22) == currentMessage.date.substring(14, 22)
-            val isSameUser = lastMessage?.id == currentMessage.id
+            val isSameUser = lastMessage?.senderId == currentMessage.senderId
 
             currentMessage.showMinute = !isSameDay || !isSameUser
             resultMessages.add(currentMessage)
