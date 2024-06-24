@@ -217,6 +217,48 @@ class ChatViewModel @Inject constructor(
         }
     }
 
+    fun requestExtendMentoringTime() {
+        viewModelScope.launch {
+            chatRepository.extendMentoringTime(roomId).collect {
+                it.handleResponse(
+                    onSuccess = {
+                        Log.d(TAG, "extendMentoringTime: success")
+                    },
+                    onError = {
+                        Log.d(TAG, "extendMentoringTime: ${it.exception!!.message}")
+                    }
+                )
+            }
+        }
+    }
+
+    fun acceptExtendMentoringTime(chatId: Long) {
+        viewModelScope.launch {
+            chatRepository.processExtendMentoringTime(
+                chatId,
+                MentoringExtendStatus.ACCEPT
+            ).collect {
+
+            }
+
+        }
+    }
+
+    fun rejectExtendMentoringTime(chatId: Long) {
+        viewModelScope.launch {
+            chatRepository.processExtendMentoringTime(
+                chatId,
+                MentoringExtendStatus.DECLINE
+            ).collect {
+
+            }
+        }
+    }
+
+    fun exitMentoring() {
+
+    }
+
     override fun onCleared() {
         super.onCleared()
         subscription?.dispose()

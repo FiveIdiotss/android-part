@@ -7,21 +7,19 @@ import com.minhoi.memento.utils.setOnSingleClickListener
 
 class ReceiverMentoringExtendRequestViewHolder(
     private val binding: ReceiverMentorExtendRequestRowItemBinding,
-    private val onAcceptClickListener: () -> Unit,
-    private val onRejectClickListener: () -> Unit,
+    private val onAcceptClickListener: (Long) -> Unit,
+    private val onRejectClickListener: (Long) -> Unit,
 ) : RecyclerView.ViewHolder(binding.root) {
 
-    init {
+    fun bind(item: Receiver) {
         binding.apply {
             extendAcceptBtn.setOnSingleClickListener {
-                onAcceptClickListener()
+                onAcceptClickListener(item.chatId)
             }
             extendRejectBtn.setOnSingleClickListener {
-                onRejectClickListener()
+                onRejectClickListener(item.chatId)
             }
+            receiverData = item
         }
-    }
-    fun bind(item: Receiver) {
-        binding.receiverData = item
     }
 }

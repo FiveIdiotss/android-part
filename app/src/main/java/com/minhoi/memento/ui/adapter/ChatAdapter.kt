@@ -24,23 +24,30 @@ import com.minhoi.memento.databinding.SenderImageRowItemBinding
 import com.minhoi.memento.databinding.SenderMentorExtendAcceptRowItemBinding
 import com.minhoi.memento.databinding.SenderMessageRowItemBinding
 
-class ChatAdapter(private val onImageClickListener: (String) -> Unit) : ListAdapter<ChatMessage, RecyclerView.ViewHolder>(
+class ChatAdapter(
+    private val onImageClickListener: (String) -> Unit,
+    private val onExtendAcceptClickListener: (Long) -> Unit,
+    private val onExtendRejectClickListener: (Long) -> Unit,
+) : ListAdapter<ChatMessage, RecyclerView.ViewHolder>(
     DiffCallback()
 ) {
 
-    inner class SenderViewHolder(private val binding: SenderMessageRowItemBinding) : RecyclerView.ViewHolder(binding.root) {
+    inner class SenderViewHolder(private val binding: SenderMessageRowItemBinding) :
+        RecyclerView.ViewHolder(binding.root) {
         fun bind(item: Sender) {
             binding.senderData = item
         }
     }
 
-    inner class ReceiverViewHolder(private val binding: ReceiverMessageRowItemBinding) : RecyclerView.ViewHolder(binding.root) {
+    inner class ReceiverViewHolder(private val binding: ReceiverMessageRowItemBinding) :
+        RecyclerView.ViewHolder(binding.root) {
         fun bind(item: Receiver) {
             binding.receiverData = item
         }
     }
 
-    inner class DateViewHolder(private val binding: ChatDateItemBinding) : RecyclerView.ViewHolder(binding.root) {
+    inner class DateViewHolder(private val binding: ChatDateItemBinding) :
+        RecyclerView.ViewHolder(binding.root) {
         fun bind(item: ChatDate) {
             binding.chatDate = item
         }
@@ -72,12 +79,14 @@ class ChatAdapter(private val onImageClickListener: (String) -> Unit) : ListAdap
             }
 
             VIEW_TYPE_SENDER_EXTEND_ACCEPT -> {
-                val binding = SenderMentorExtendAcceptRowItemBinding.inflate(inflater, parent, false)
+                val binding =
+                    SenderMentorExtendAcceptRowItemBinding.inflate(inflater, parent, false)
                 SenderMentoringExtendAcceptViewHolder(binding)
             }
 
             VIEW_TYPE_SENDER_EXTEND_REJECT -> {
-                val binding = SenderExtendRequestRejectRowItemBinding.inflate(inflater, parent, false)
+                val binding =
+                    SenderExtendRequestRejectRowItemBinding.inflate(inflater, parent, false)
                 SenderMentoringExtendRejectViewHolder(binding)
             }
 
@@ -103,18 +112,20 @@ class ChatAdapter(private val onImageClickListener: (String) -> Unit) : ListAdap
                     ReceiverMentorExtendRequestRowItemBinding.inflate(inflater, parent, false)
                 ReceiverMentoringExtendRequestViewHolder(
                     binding = binding,
-                    onAcceptClickListener = {},
-                    onRejectClickListener = {}
+                    onAcceptClickListener = { onExtendAcceptClickListener(it) },
+                    onRejectClickListener = { onExtendRejectClickListener(it) }
                 )
             }
 
             VIEW_TYPE_RECEIVER_EXTEND_ACCEPT -> {
-                val binding = ReceiverMentorExtendAcceptRowItemBinding.inflate(inflater, parent, false)
+                val binding =
+                    ReceiverMentorExtendAcceptRowItemBinding.inflate(inflater, parent, false)
                 ReceiverMentoringExtendAcceptViewHolder(binding)
             }
 
             VIEW_TYPE_RECEIVER_EXTEND_REJECT -> {
-                val binding = ReceiverMentorExtendRejectRowItemBinding.inflate(inflater, parent, false)
+                val binding =
+                    ReceiverMentorExtendRejectRowItemBinding.inflate(inflater, parent, false)
                 ReceiverMentoringExtendRejectViewHolder(binding)
             }
 
@@ -141,7 +152,7 @@ class ChatAdapter(private val onImageClickListener: (String) -> Unit) : ListAdap
             is ReceiverFileViewHolder -> holder.bind(item as Receiver)
             is ReceiverMentoringExtendRequestViewHolder -> holder.bind(item as Receiver)
             is ReceiverMentoringExtendAcceptViewHolder -> holder.bind(item as Receiver)
-            is ReceiverMentoringExtendRejectViewHolder-> holder.bind(item as Receiver)
+            is ReceiverMentoringExtendRejectViewHolder -> holder.bind(item as Receiver)
             is DateViewHolder -> holder.bind(item as ChatDate)
         }
     }
@@ -157,6 +168,7 @@ class ChatAdapter(private val onImageClickListener: (String) -> Unit) : ListAdap
                 ChatMessageType.CONSULT_EXTEND_DECLINE -> VIEW_TYPE_SENDER_EXTEND_REJECT
                 else -> VIEW_TYPE_SENDER_FILE
             }
+
             is Receiver -> when (item.type) {
                 ChatMessageType.TEXT -> VIEW_TYPE_RECEIVER_TEXT
                 ChatMessageType.IMAGE -> VIEW_TYPE_RECEIVER_IMAGE
@@ -165,6 +177,7 @@ class ChatAdapter(private val onImageClickListener: (String) -> Unit) : ListAdap
                 ChatMessageType.CONSULT_EXTEND_DECLINE -> VIEW_TYPE_RECEIVER_EXTEND_REJECT
                 else -> VIEW_TYPE_RECEIVER_FILE
             }
+
             is ChatDate -> VIEW_TYPE_DATE
             else -> throw IllegalArgumentException("Invalid message type")
         }

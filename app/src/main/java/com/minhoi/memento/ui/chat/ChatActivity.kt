@@ -35,16 +35,23 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
     lateinit var selectFileDialog: SelectFileDialog
     private var extendBottomSheetDialog: MentoringExtendBottomSheetDialog? = null
 
-    private var receiverId = -1L
     private val chatAdapter: ChatAdapter by lazy {
-        ChatAdapter() {
-            val dialog = ChatImageViewerDialog.newInstance(it)
-            dialog.setStyle(
-                DialogFragment.STYLE_NO_TITLE,
-                android.R.style.Theme_NoTitleBar_Fullscreen
-            )
-            dialog.show(supportFragmentManager, "imageDialog")
-        }
+        ChatAdapter(
+            onImageClickListener = {
+                val dialog = ChatImageViewerDialog.newInstance(it)
+                dialog.setStyle(
+                    DialogFragment.STYLE_NO_TITLE,
+                    android.R.style.Theme_NoTitleBar_Fullscreen
+                )
+                dialog.show(supportFragmentManager, "imageDialog")
+            },
+            onExtendAcceptClickListener = {
+                viewModel.acceptExtendMentoringTime(it)
+            },
+            onExtendRejectClickListener = {
+                viewModel.rejectExtendMentoringTime(it)
+            }
+        )
     }
     private val viewModel by viewModels<ChatViewModel>()
     private var roomId = -1L
@@ -54,7 +61,7 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
     override fun initView() {
         handleIntent()
 
-        viewModel.getChatRoomId(receiverId)
+        viewModel.getChatRoomState(roomId)
 
         // viewModel roomId 관찰하여 roomId가 정상적으로 들어오면 소켓 연결
         connectSocket()
@@ -101,7 +108,9 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
     }
 
     private fun handleIntent() {
-        receiverId = intent.getLongExtra("receiverId", -1L)
+        roomId = intent.getLongExtra("roomId", -1L)
+        if (roomId == -1L) return
+        viewModel.setRoomId(roomId)
         val receiverName = intent.getStringExtra("receiverName")
         // 채팅방 이름 설정
         setupToolbar(receiverName!!)
@@ -114,6 +123,38 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
                 Log.d(TAG, "observeChatMessages: ${list}")
                 chatAdapter.submitList(list)
             }
+        }
+    }
+
+    private fun setBottomSheetDialog() {
+        binding.mentoringExtendBtn.setOnSingleClickListener {
+            if (extendBottomSheetDialog == null) {
+                extendBottomSheetDialog = MentoringExtendBottomSheetDialog()
+            }
+            extendBottomSheetDialog!!.apply {
+                setOnExtendClickedListener(object :
+                    MentoringExtendBottomSheetDialog.OnExtendClickedListener {
+                    override fun onExtendClicked() {
+                        viewModel.requestExtendMentoringTime()
+                    }
+                })
+            }.show(supportFragmentManager, "extendBottomSheet")
+        }
+
+        binding.mentoringExitBtn.setOnSingleClickListener {
+            AlertDialog.Builder(this)
+                .setTitle("상담 종료")
+                .setMessage("상담을 종료하시겠습니까?")
+                .setPositiveButton("예") { dialog, which ->
+                    // 예 버튼 클릭 시 실행할 코드
+                    finish() // 예시로 액티비티를 종료합니다.
+                }
+                .setNegativeButton("아니오") { dialog, which ->
+                    // 아니오 버튼 클릭 시 실행할 코드
+                    dialog.dismiss()
+                }
+                .create()
+                .show()
         }
     }
 
@@ -175,7 +216,7 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
     }
 
     /**
-     * viewModel에서 roomId를 성공적으로 가져올 경우에만 소켓 연결하고, 방의 채팅 목록 일부를 가져오는 함수
+     * viewModel에서 room을 성공적으로 가져올 경우에만 소켓 연결하고, 방의 채팅 목록 일부를 가져오는 함수
      */
     private fun connectSocket() {
         lifecycleScope.launch {
@@ -189,14 +230,9 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
                         is UiState.Success -> {
                             supportFragmentManager.hideLoading()
                             binding.sendBtn.isEnabled = true
-                            if (receiverId != -1L) {
-                                Log.d(TAG, "connectSocket: ${state.data}")
-                                roomId = state.data.id
-                                viewModel.subscribeChatRoom(state.data.id)
-                                viewModel.getMessageStream(state.data.id)
-                            } else {
-                                showToast(LOAD_ERROR_MESSAGE)
-                            }
+                            Log.d(TAG, "connectSocket: ${state.data}")
+                            viewModel.subscribeChatRoom(state.data.id)
+                            viewModel.getMessageStream(state.data.id)
                         }
                         is UiState.Error -> {
                             supportFragmentManager.hideLoading()
