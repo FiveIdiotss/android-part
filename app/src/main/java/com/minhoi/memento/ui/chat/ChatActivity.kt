@@ -233,13 +233,9 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
                         is UiState.Success -> {
                             supportFragmentManager.hideLoading()
                             binding.sendBtn.isEnabled = true
-                            Log.d(TAG, "connectSocket: ${state.data}")
-                            viewModel.subscribeChatRoom(state.data.id)
-                            viewModel.getMessageStream(state.data.id)
                         }
                         is UiState.Error -> {
                             supportFragmentManager.hideLoading()
-                            Log.d(TAG, "connectSocket: Error")
                             showToast(state.error!!.message!!)
                         }
                         is UiState.Empty -> {}

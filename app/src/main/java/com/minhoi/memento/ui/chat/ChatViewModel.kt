@@ -65,6 +65,10 @@ class ChatViewModel @Inject constructor(
     private val stompClient = StompManager.stompClient
     private var subscription: Disposable? = null
 
+    fun setRoomId(roomId: Long) {
+        this.roomId = roomId
+    }
+
     fun subscribeChatRoom(roomId: Long) {
         handleWebSocketOpened(roomId)
     }
@@ -74,7 +78,8 @@ class ChatViewModel @Inject constructor(
      */
     @SuppressLint("CheckResult")
     private fun handleWebSocketOpened(roomId: Long) {
-        _connectState.update { UiState.Success(true) }
+        // 중복 구독 방지
+        if (subscription != null) return
         // 채팅방 구독
         val headers = listOf(
             StompHeader("chatRoomId", roomId.toString()),
@@ -144,13 +149,14 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    fun getChatRoomId(receiverId: Long) {
+    fun getChatRoomState(roomId: Long) {
         viewModelScope.launch {
-            chatRepository.getRoomId(receiverId).collectLatest { result ->
+            chatRepository.getChatRoom(roomId).collect { result ->
                 result.handleResponse(
                     onSuccess = { data ->
-                        roomId = data.data.id
-                        _chatRoomState.update { UiState.Success(data.data.id) }
+                        _chatRoomState.update { UiState.Success(data.data) }
+                        getMessageStream(roomId)
+                        subscribeChatRoom(roomId)
                     },
                     onError = { error ->
                         _chatRoomState.update { UiState.Error(error.exception) }
