@@ -9,13 +9,19 @@ import com.minhoi.memento.data.dto.chat.ChatDate
 import com.minhoi.memento.data.dto.chat.ChatMessage
 import com.minhoi.memento.data.dto.chat.Receiver
 import com.minhoi.memento.data.dto.chat.Sender
-import com.minhoi.memento.data.model.ChatFileType
+import com.minhoi.memento.data.model.ChatMessageType
 import com.minhoi.memento.databinding.ChatDateItemBinding
 import com.minhoi.memento.databinding.ReceiverFileRowItemBinding
 import com.minhoi.memento.databinding.ReceiverImageRowItemBinding
+import com.minhoi.memento.databinding.ReceiverMentorExtendAcceptRowItemBinding
+import com.minhoi.memento.databinding.ReceiverMentorExtendRejectRowItemBinding
+import com.minhoi.memento.databinding.ReceiverMentorExtendRequestRowItemBinding
 import com.minhoi.memento.databinding.ReceiverMessageRowItemBinding
+import com.minhoi.memento.databinding.SenderExtendRequestRejectRowItemBinding
+import com.minhoi.memento.databinding.SenderExtendRequestRowItemBinding
 import com.minhoi.memento.databinding.SenderFileRowItemBinding
 import com.minhoi.memento.databinding.SenderImageRowItemBinding
+import com.minhoi.memento.databinding.SenderMentorExtendAcceptRowItemBinding
 import com.minhoi.memento.databinding.SenderMessageRowItemBinding
 
 class ChatAdapter(private val onImageClickListener: (String) -> Unit) : ListAdapter<ChatMessage, RecyclerView.ViewHolder>(
@@ -60,6 +66,21 @@ class ChatAdapter(private val onImageClickListener: (String) -> Unit) : ListAdap
                 SenderFileViewHolder(binding)
             }
 
+            VIEW_TYPE_SENDER_EXTEND_REQUEST -> {
+                val binding = SenderExtendRequestRowItemBinding.inflate(inflater, parent, false)
+                SenderMentoringExtendRequestViewHolder(binding)
+            }
+
+            VIEW_TYPE_SENDER_EXTEND_ACCEPT -> {
+                val binding = SenderMentorExtendAcceptRowItemBinding.inflate(inflater, parent, false)
+                SenderMentoringExtendAcceptViewHolder(binding)
+            }
+
+            VIEW_TYPE_SENDER_EXTEND_REJECT -> {
+                val binding = SenderExtendRequestRejectRowItemBinding.inflate(inflater, parent, false)
+                SenderMentoringExtendRejectViewHolder(binding)
+            }
+
             VIEW_TYPE_RECEIVER_TEXT -> {
                 val binding = ReceiverMessageRowItemBinding.inflate(inflater, parent, false)
                 ReceiverViewHolder(binding)
@@ -77,6 +98,26 @@ class ChatAdapter(private val onImageClickListener: (String) -> Unit) : ListAdap
                 ReceiverFileViewHolder(binding)
             }
 
+            VIEW_TYPE_RECEIVER_EXTEND_REQUEST -> {
+                val binding =
+                    ReceiverMentorExtendRequestRowItemBinding.inflate(inflater, parent, false)
+                ReceiverMentoringExtendRequestViewHolder(
+                    binding = binding,
+                    onAcceptClickListener = {},
+                    onRejectClickListener = {}
+                )
+            }
+
+            VIEW_TYPE_RECEIVER_EXTEND_ACCEPT -> {
+                val binding = ReceiverMentorExtendAcceptRowItemBinding.inflate(inflater, parent, false)
+                ReceiverMentoringExtendAcceptViewHolder(binding)
+            }
+
+            VIEW_TYPE_RECEIVER_EXTEND_REJECT -> {
+                val binding = ReceiverMentorExtendRejectRowItemBinding.inflate(inflater, parent, false)
+                ReceiverMentoringExtendRejectViewHolder(binding)
+            }
+
             VIEW_TYPE_DATE -> {
                 val binding = ChatDateItemBinding.inflate(inflater, parent, false)
                 DateViewHolder(binding)
@@ -92,9 +133,15 @@ class ChatAdapter(private val onImageClickListener: (String) -> Unit) : ListAdap
             is SenderViewHolder -> holder.bind(item as Sender)
             is SenderImageViewHolder -> holder.bind(item as Sender)
             is SenderFileViewHolder -> holder.bind(item as Sender)
+            is SenderMentoringExtendRequestViewHolder -> holder.bind(item as Sender)
+            is SenderMentoringExtendAcceptViewHolder -> holder.bind(item as Sender)
+            is SenderMentoringExtendRejectViewHolder -> holder.bind(item as Sender)
             is ReceiverViewHolder -> holder.bind(item as Receiver)
             is ReceiverImageViewHolder -> holder.bind(item as Receiver)
             is ReceiverFileViewHolder -> holder.bind(item as Receiver)
+            is ReceiverMentoringExtendRequestViewHolder -> holder.bind(item as Receiver)
+            is ReceiverMentoringExtendAcceptViewHolder -> holder.bind(item as Receiver)
+            is ReceiverMentoringExtendRejectViewHolder-> holder.bind(item as Receiver)
             is DateViewHolder -> holder.bind(item as ChatDate)
         }
     }
@@ -103,13 +150,19 @@ class ChatAdapter(private val onImageClickListener: (String) -> Unit) : ListAdap
         val item = getItem(position)
         return when (item) {
             is Sender -> when (item.type) {
-                ChatFileType.MESSAGE -> VIEW_TYPE_SENDER_TEXT
-                ChatFileType.IMAGE -> VIEW_TYPE_SENDER_IMAGE
+                ChatMessageType.TEXT -> VIEW_TYPE_SENDER_TEXT
+                ChatMessageType.IMAGE -> VIEW_TYPE_SENDER_IMAGE
+                ChatMessageType.CONSULT_EXTEND -> VIEW_TYPE_SENDER_EXTEND_REQUEST
+                ChatMessageType.CONSULT_EXTEND_ACCEPT -> VIEW_TYPE_SENDER_EXTEND_ACCEPT
+                ChatMessageType.CONSULT_EXTEND_DECLINE -> VIEW_TYPE_SENDER_EXTEND_REJECT
                 else -> VIEW_TYPE_SENDER_FILE
             }
             is Receiver -> when (item.type) {
-                ChatFileType.MESSAGE -> VIEW_TYPE_RECEIVER_TEXT
-                ChatFileType.IMAGE -> VIEW_TYPE_RECEIVER_IMAGE
+                ChatMessageType.TEXT -> VIEW_TYPE_RECEIVER_TEXT
+                ChatMessageType.IMAGE -> VIEW_TYPE_RECEIVER_IMAGE
+                ChatMessageType.CONSULT_EXTEND -> VIEW_TYPE_RECEIVER_EXTEND_REQUEST
+                ChatMessageType.CONSULT_EXTEND_ACCEPT -> VIEW_TYPE_RECEIVER_EXTEND_ACCEPT
+                ChatMessageType.CONSULT_EXTEND_DECLINE -> VIEW_TYPE_RECEIVER_EXTEND_REJECT
                 else -> VIEW_TYPE_RECEIVER_FILE
             }
             is ChatDate -> VIEW_TYPE_DATE
@@ -121,10 +174,17 @@ class ChatAdapter(private val onImageClickListener: (String) -> Unit) : ListAdap
         private const val VIEW_TYPE_SENDER_TEXT = 0
         private const val VIEW_TYPE_SENDER_IMAGE = 1
         private const val VIEW_TYPE_SENDER_FILE = 2
-        private const val VIEW_TYPE_RECEIVER_TEXT = 3
-        private const val VIEW_TYPE_RECEIVER_IMAGE = 4
-        private const val VIEW_TYPE_RECEIVER_FILE = 5
-        private const val VIEW_TYPE_DATE = 6
+        private const val VIEW_TYPE_SENDER_EXTEND_REQUEST = 3
+        private const val VIEW_TYPE_SENDER_EXTEND_ACCEPT = 4
+        private const val VIEW_TYPE_SENDER_EXTEND_REJECT = 5
+        private const val VIEW_TYPE_RECEIVER_TEXT = 6
+        private const val VIEW_TYPE_RECEIVER_IMAGE = 7
+        private const val VIEW_TYPE_RECEIVER_FILE = 8
+        private const val VIEW_TYPE_RECEIVER_EXTEND_REQUEST = 9
+        private const val VIEW_TYPE_RECEIVER_EXTEND_ACCEPT = 10
+        private const val VIEW_TYPE_RECEIVER_EXTEND_REJECT = 11
+        private const val VIEW_TYPE_DATE = 12
+
     }
 
     class DiffCallback : DiffUtil.ItemCallback<ChatMessage>() {
