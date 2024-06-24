@@ -1,12 +1,15 @@
 package com.minhoi.memento.utils
 
+import android.app.DownloadManager
 import android.content.ContentValues
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
+import android.os.Environment
 import android.provider.MediaStore
 import android.provider.OpenableColumns
+import androidx.core.net.toUri
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.Target
 import com.minhoi.memento.data.network.SaveFileResult
@@ -22,6 +25,24 @@ import javax.inject.Inject
 class FileManager @Inject constructor(
     private val context: Context,
 ) {
+
+    private val downloadManager = context.getSystemService(DownloadManager::class.java)
+
+    fun downloadFile(uri: String): Long {
+        if (uri.isEmpty()) {
+            context.showToast("오류가 발생하였습니다. 다시 시도해주세요.")
+            return -1
+        }
+        context.showToast("다운로드를 시작합니다.")
+        val fileUri = uri.toUri()
+        val request = DownloadManager.Request(fileUri)
+            .setMimeType(getFileMimeType(fileUri))
+            .setAllowedOverMetered(true)
+            .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_ONLY_COMPLETION)
+            .setTitle(uri)
+            .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, Uri.parse(uri).lastPathSegment)
+        return downloadManager.enqueue(request)
+    }
 
     fun getFileMimeType(uri: Uri): String? {
         val contentResolver = context.contentResolver

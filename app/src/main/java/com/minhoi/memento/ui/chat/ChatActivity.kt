@@ -45,6 +45,9 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
                 )
                 dialog.show(supportFragmentManager, "imageDialog")
             },
+            onFileClickListener = {
+                viewModel.downloadFile(it)
+            },
             onExtendAcceptClickListener = {
                 viewModel.acceptExtendMentoringTime(it)
             },

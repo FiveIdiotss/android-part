@@ -66,6 +66,10 @@
         <activity
             android:name=".MainActivity"
             android:exported="true" />
+        <receiver android:name=".utils.DownloadCompletedReceiver" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.DOWNLOAD_COMPLETE"/>
+            </intent-filter>
     </application>
 
 </manifest>

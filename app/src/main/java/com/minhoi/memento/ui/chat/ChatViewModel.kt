@@ -132,16 +132,10 @@ class ChatViewModel @Inject constructor(
     }
 
     fun sendFile(file: MultipartBody.Part) {
-        if (roomId == -1L)
-            return
         viewModelScope.launch {
-            chatRepository.sendFile(file, roomId).collectLatest {
+            chatRepository.sendFile(file, roomId).collect {
                 it.handleResponse(
-                    onSuccess = {
-                        Log.d(TAG, "sendFile: $it   $file")
-                        // 라시이클러뷰에 추가
-                        //
-                    },
+                    onSuccess = {},
                     onError = {
                         Log.d(TAG, "sendFile: ${it.message} ${it.exception?.message}  $file")
                     }
@@ -217,6 +211,12 @@ class ChatViewModel @Inject constructor(
         }
     }
 
+    fun downloadFile(fileUrl: String) {
+        viewModelScope.launch {
+            fileManager.downloadFile(fileUrl)
+        }
+    }
+
     fun requestExtendMentoringTime() {
         viewModelScope.launch {
             chatRepository.extendMentoringTime(roomId).collect {
@@ -253,10 +253,6 @@ class ChatViewModel @Inject constructor(
 
             }
         }
-    }
-
-    fun exitMentoring() {
-
     }
 
     override fun onCleared() {

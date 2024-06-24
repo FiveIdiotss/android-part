@@ -26,8 +26,9 @@ import com.minhoi.memento.databinding.SenderMessageRowItemBinding
 
 class ChatAdapter(
     private val onImageClickListener: (String) -> Unit,
+    private val onFileClickListener: (String) -> Unit,
     private val onExtendAcceptClickListener: (Long) -> Unit,
-    private val onExtendRejectClickListener: (Long) -> Unit,
+    private val onExtendRejectClickListener: (Long) -> Unit
 ) : ListAdapter<ChatMessage, RecyclerView.ViewHolder>(
     DiffCallback()
 ) {
@@ -70,7 +71,9 @@ class ChatAdapter(
 
             VIEW_TYPE_SENDER_FILE -> {
                 val binding = SenderFileRowItemBinding.inflate(inflater, parent, false)
-                SenderFileViewHolder(binding)
+                SenderFileViewHolder(binding) { fileUrl ->
+                    onFileClickListener(fileUrl)
+                }
             }
 
             VIEW_TYPE_SENDER_EXTEND_REQUEST -> {
@@ -104,7 +107,9 @@ class ChatAdapter(
 
             VIEW_TYPE_RECEIVER_FILE -> {
                 val binding = ReceiverFileRowItemBinding.inflate(inflater, parent, false)
-                ReceiverFileViewHolder(binding)
+                ReceiverFileViewHolder(binding) { fileUrl ->
+                    onFileClickListener(fileUrl)
+                }
             }
 
             VIEW_TYPE_RECEIVER_EXTEND_REQUEST -> {
