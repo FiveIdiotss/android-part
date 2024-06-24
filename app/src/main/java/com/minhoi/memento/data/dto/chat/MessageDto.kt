@@ -2,6 +2,7 @@ package com.minhoi.memento.data.dto.chat
 
 import com.google.gson.annotations.SerializedName
 import com.minhoi.memento.data.model.ChatMessageType
+import com.minhoi.memento.utils.parseLocalDateTime
 
 data class MessageDto(
     val messageType: ChatMessageType,
@@ -16,7 +17,7 @@ data class MessageDto(
     fun toSender(): Sender = Sender(
         name = senderName,
         content = content,
-        date = date,
+        date = parseLocalDateTime(date),
         type = messageType,
         fileUrl = fileURL,
         id = senderId,
@@ -26,7 +27,7 @@ data class MessageDto(
     fun toReceiver(): Receiver = Receiver(
         name = senderName,
         content = content,
-        date = date,
+        date = parseLocalDateTime(date),
         type = messageType,
         fileUrl = fileURL,
         id = senderId,
