@@ -8,10 +8,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.minhoi.memento.MentoApplication
 import com.minhoi.memento.data.dto.chat.ChatMessage
+import com.minhoi.memento.data.dto.chat.ChatRoom
 import com.minhoi.memento.data.dto.chat.MessageDto
 import com.minhoi.memento.data.dto.chat.Receiver
 import com.minhoi.memento.data.dto.chat.Sender
-import com.minhoi.memento.data.model.ChatFileType
+import com.minhoi.memento.data.model.ChatMessageType
 import com.minhoi.memento.data.network.SaveFileResult
 import com.minhoi.memento.data.network.socket.StompManager
 import com.minhoi.memento.repository.chat.ChatRepository
@@ -92,7 +93,7 @@ class ChatViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.Main) {
             val json = JSONObject(message.payload)
             Log.d(TAG, "handleMessage: $json")
-            val fileType = ChatFileType.toFileType(json.getString("fileType"))
+            val fileType = ChatMessageType.toMessageType(json.getString("fileType"))
             val fileURL = json.getString("fileURL")
             val senderId = json.getLong("senderId")
             val senderName = json.getString("senderName")
@@ -101,10 +102,16 @@ class ChatViewModel @Inject constructor(
             val date = json.getString("localDateTime")
             val readCount = json.getInt("readCount")
             val messageObject =
-                MessageDto(fileType!!, fileURL, senderId, chatRoomId, content, date, senderName, readCount)
+                MessageDto(fileType, fileURL, senderId, chatRoomId, content, date, senderName, readCount)
+
+            val chatMessage = if (senderId == member.id) {
+                messageObject.toSender()
+            } else {
+                messageObject.toReceiver()
+            }
 
             val updatedMessages = ArrayDeque(_messages.value)
-            updatedMessages.addLast(getSenderOrReceiver(messageObject))
+            updatedMessages.addLast(chatMessage)
             _messages.value = updatedMessages
         }
     }
