@@ -15,7 +15,6 @@ import com.minhoi.memento.data.dto.MentoringApplyRequest
 import com.minhoi.memento.data.dto.TimeTableDto
 import com.minhoi.memento.data.model.DayOfWeek
 import com.minhoi.memento.repository.board.BoardRepository
-import com.minhoi.memento.repository.member.MemberRepository
 import com.minhoi.memento.ui.UiState
 import com.minhoi.memento.utils.FileManager
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -33,7 +32,6 @@ import javax.inject.Inject
 @HiltViewModel
 class BoardViewModel @Inject constructor(
     private val boardRepository: BoardRepository,
-    private val memberRepository: MemberRepository,
     private val fileManager: FileManager
 ) : ViewModel() {
 
@@ -155,6 +153,13 @@ class BoardViewModel @Inject constructor(
             when (isBookmarked) {
                 true -> boardRepository.executeUnBookmark(boardId)
                 false -> boardRepository.executeBookmark(boardId)
+            }.collect {
+                it.handleResponse(
+                    onSuccess = {
+                        _boardBookmarkState.value = !isBookmarked
+                    },
+                    onError = {}
+                )
             }
         }
     }
