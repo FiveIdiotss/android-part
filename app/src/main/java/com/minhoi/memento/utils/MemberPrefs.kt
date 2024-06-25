@@ -22,6 +22,7 @@ class MemberPrefs(context: Context) {
         editor.putString("schoolName", value.schoolName).apply()
         editor.putString("majorName", value.majorName).apply()
         editor.putString("profileImageUrl", value.profileImageUrl).apply()
+        editor.putInt("consultCount", value.consultCount).apply()
     }
 
     fun getMemberPrefs(): MemberDTO {
@@ -33,6 +34,7 @@ class MemberPrefs(context: Context) {
         val schoolName = sharedPreference.getString("schoolName", "")
         val majorName = sharedPreference.getString("majorName", "")
         val profileImageUrl = sharedPreference.getString("profileImageUrl", "")
-        return MemberDTO(id, email!!, name!!, year, gender!!, schoolName!!, majorName!!, profileImageUrl!!)
+        val consultCount = sharedPreference.getInt("consultCount", 0)
+        return MemberDTO(id, email!!, name!!, year, gender!!, schoolName!!, majorName!!, profileImageUrl!!, consultCount)
     }
 }
