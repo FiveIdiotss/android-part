@@ -10,15 +10,13 @@ import com.minhoi.memento.MentoApplication
 import com.minhoi.memento.data.dto.chat.ChatMessage
 import com.minhoi.memento.data.dto.chat.ChatRoom
 import com.minhoi.memento.data.dto.chat.MessageDto
-import com.minhoi.memento.data.dto.chat.Receiver
-import com.minhoi.memento.data.dto.chat.Sender
-import com.minhoi.memento.data.model.ChatMessageType
+import com.minhoi.memento.data.model.MentoringExtendStatus
+import com.minhoi.memento.data.network.GsonClient
 import com.minhoi.memento.data.network.SaveFileResult
 import com.minhoi.memento.data.network.socket.StompManager
 import com.minhoi.memento.repository.chat.ChatRepository
 import com.minhoi.memento.ui.UiState
 import com.minhoi.memento.utils.FileManager
-import com.minhoi.memento.utils.parseLocalDateTime
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.Dispatchers
@@ -96,25 +94,9 @@ class ChatViewModel @Inject constructor(
 
     private fun handleMessage(message: StompMessage) {
         viewModelScope.launch(Dispatchers.Main) {
-            val json = JSONObject(message.payload)
-            Log.d(TAG, "handleMessage: $json")
-            val fileType = ChatMessageType.toMessageType(json.getString("fileType"))
-            val fileURL = json.getString("fileURL")
-            val senderId = json.getLong("senderId")
-            val senderName = json.getString("senderName")
-            val content: String? = json.getString("content")
-            val chatRoomId = json.getLong("chatRoomId")
-            val date = json.getString("localDateTime")
-            val readCount = json.getInt("readCount")
-            val messageObject =
-                MessageDto(fileType, fileURL, senderId, chatRoomId, content, date, senderName, readCount)
-
-            val chatMessage = if (senderId == member.id) {
-                messageObject.toSender()
-            } else {
-                messageObject.toReceiver()
-            }
-
+            val messageObject = GsonClient.instance.fromJson(message.payload, MessageDto::class.java)
+            val chatMessage = getSenderOrReceiver(messageObject)
+            Log.d(TAG, "handleMessage: ${chatMessage}")
             val updatedMessages = ArrayDeque(_messages.value)
             updatedMessages.addLast(chatMessage)
             _messages.value = updatedMessages
@@ -170,11 +152,9 @@ class ChatViewModel @Inject constructor(
         _isPageLoading.value = UiState.Loading
         viewModelScope.launch {
             chatRepository.getMessages(roomId, currentPage, 20).collectLatest { result ->
-                Log.d(TAG, "getMessagesPage: $currentPage")
                 result.handleResponse(
                     onSuccess = { response ->
                         _isPageLoading.value = UiState.Success(true)
-                        Log.d(TAG, "getMessages: ${messages.value}")
                         if (response.data.last) {
                             _hasNextPage.value = false
                         }
@@ -182,6 +162,7 @@ class ChatViewModel @Inject constructor(
                         response.data.content.forEach {
                             updatedMessages.addFirst(getSenderOrReceiver(it))
                         }
+                        //TODO forEach 이외 방법
                         _messages.value = updatedMessages
                         currentPage++
                     },
@@ -197,12 +178,8 @@ class ChatViewModel @Inject constructor(
     // 메세지 보낸 멤버가 로그인 한 멤버인지 다른 멤버인지 구분하는 함수
     private fun getSenderOrReceiver(chatMessage: MessageDto): ChatMessage {
         return when (chatMessage.senderId) {
-            member.id -> {
-                Sender(chatMessage.senderName, chatMessage.content, parseLocalDateTime(chatMessage.date), chatMessage.fileType, chatMessage.fileURL, chatMessage.senderId)
-            }
-            else -> {
-                Receiver(chatMessage.senderName, chatMessage.content, parseLocalDateTime(chatMessage.date), chatMessage.fileType, chatMessage.fileURL, chatMessage.senderId)
-            }
+            member.id -> chatMessage.toSender()
+            else -> chatMessage.toReceiver()
         }
     }
 
