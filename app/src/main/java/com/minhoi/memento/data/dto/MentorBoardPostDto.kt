@@ -19,6 +19,7 @@ data class MentorBoardPostDto (
     @SerializedName("times")
     val times: List<TimeTableDto>,
     @SerializedName("availableDays")
-    val availableDays: List<DayOfWeek>
+    val availableDays: List<DayOfWeek>,
+    val platform: String = "APP"
 )
 
