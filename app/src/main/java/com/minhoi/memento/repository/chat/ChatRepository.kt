@@ -16,4 +16,7 @@ interface ChatRepository {
     fun getMessages(roomId: Long, page: Int, size: Int): Flow<ApiResult<CommonResponse<AllChatMessageResponse>>>
 
     fun sendFile(file: MultipartBody.Part, roomId: Long): Flow<ApiResult<CommonResponse<FileUploadResponse>>>
+    fun extendMentoringTime(roomId: Long): Flow<ApiResult<CommonResponse<String>>>
+
+    fun processExtendMentoringTime(chatId: Long, status: MentoringExtendStatus): Flow<ApiResult<CommonResponse<String>>>
 }

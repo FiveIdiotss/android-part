@@ -28,4 +28,15 @@ class ChatRepositoryImpl @Inject constructor(
     override fun sendFile(file: MultipartBody.Part, roomId: Long) = safeFlow {
         chatService.sendFile(file, roomId)
     }
+
+    override fun extendMentoringTime(roomId: Long): Flow<ApiResult<CommonResponse<String>>> = safeFlow {
+        chatService.extendMentoringTime(roomId)
+    }
+
+    override fun processExtendMentoringTime(
+        chatId: Long,
+        status: MentoringExtendStatus,
+    ): Flow<ApiResult<CommonResponse<String>>> = safeFlow {
+        chatService.processExtendMentoringTime(chatId, status)
+    }
 }
