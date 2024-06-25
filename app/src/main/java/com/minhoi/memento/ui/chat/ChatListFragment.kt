@@ -29,7 +29,7 @@ class ChatListFragment : BaseFragment<FragmentChatListBinding>() {
         ChatRoomListAdapter {
             // onCLickListener
             startActivity(Intent(requireContext(), ChatActivity::class.java).apply {
-                putExtra("receiverId", it.receiverId)
+                putExtra("roomId", it.id)
                 putExtra("receiverName", it.receiverName)
             })
         }
@@ -68,5 +68,10 @@ class ChatListFragment : BaseFragment<FragmentChatListBinding>() {
                 }
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.getChatRooms()
     }
 }

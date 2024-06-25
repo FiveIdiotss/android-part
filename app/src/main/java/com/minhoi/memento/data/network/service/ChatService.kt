@@ -3,7 +3,7 @@ package com.minhoi.memento.data.network.service
 import com.minhoi.memento.base.CommonResponse
 import com.minhoi.memento.data.dto.chat.AllChatMessageResponse
 import com.minhoi.memento.data.dto.chat.ChatRoom
-import com.minhoi.memento.data.dto.chat.FileUploadResponse
+import com.minhoi.memento.data.model.MentoringExtendStatus
 import okhttp3.MultipartBody
 import retrofit2.Response
 import retrofit2.http.GET
@@ -15,10 +15,10 @@ import retrofit2.http.Query
 
 interface ChatService {
     @GET("api/chat/chatRooms")
-    suspend fun getChatRooms(@Query("memberId") memberId: Long): Response<CommonResponse<List<ChatRoom>>>
+    suspend fun getChatRooms(): Response<CommonResponse<List<ChatRoom>>>
 
     @GET("api/chat/chatRoom")
-    suspend fun getRoomId(@Query("receiverId") receiverId: Long): Response<CommonResponse<ChatRoom>>
+    suspend fun getChatRoom(@Query("chatRoomId") roomId: Long): Response<CommonResponse<ChatRoom>>
 
     @GET("api/chat/messages/{chatRoomId}")
     suspend fun getChatMessages(@Path("chatRoomId") roomId: Long, @Query("page") page: Int, @Query("size") size: Int): Response<CommonResponse<AllChatMessageResponse>>
@@ -28,5 +28,11 @@ interface ChatService {
     suspend fun sendFile(
         @Part file: MultipartBody.Part,
         @Query("chatRoomId") roomId: Long
-    ): Response<CommonResponse<FileUploadResponse>>
+    ): Response<CommonResponse<String>>
+
+    @POST("api/chat/extend/{chatRoomId}")
+    suspend fun extendMentoringTime(@Path("chatRoomId") roomId: Long): Response<CommonResponse<String>>
+
+    @POST("api/chat/extend/{chatId}")
+    suspend fun processExtendMentoringTime(@Path("chatId") chatId: Long, @Query("status") status: MentoringExtendStatus): Response<CommonResponse<String>>
 }
