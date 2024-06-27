@@ -1,21 +1,23 @@
 package com.minhoi.memento.repository.join
 
+import com.minhoi.memento.base.CommonResponse
 import com.minhoi.memento.data.dto.CreateMemberRequest
 import com.minhoi.memento.data.dto.EmailVerificationRequest
 import com.minhoi.memento.data.dto.MajorDto
 import com.minhoi.memento.data.dto.SchoolDto
 import com.minhoi.memento.data.dto.VerifyCodeRequest
-import retrofit2.Response
+import com.minhoi.memento.data.network.ApiResult
+import kotlinx.coroutines.flow.Flow
 
 interface JoinRepository {
 
-    suspend fun getSchools(): Response<List<SchoolDto>>
+    fun getSchools(): Flow<ApiResult<CommonResponse<List<SchoolDto>>>>
 
-    suspend fun getMajors(name: String): Response<List<MajorDto>>
+    fun getMajors(name: String): Flow<ApiResult<CommonResponse<List<MajorDto>>>>
 
-    suspend fun join(member: CreateMemberRequest): Response<String>
+    fun join(member: CreateMemberRequest): Flow<ApiResult<CommonResponse<String>>>
 
-    suspend fun verifyEmail(emailVerificationRequest: EmailVerificationRequest): Response<String>
+    fun verifyEmail(emailVerificationRequest: EmailVerificationRequest): Flow<ApiResult<String>>
 
-    suspend fun verifyCode(verifyCodeRequest: VerifyCodeRequest): Response<String>
+    fun verifyCode(verifyCodeRequest: VerifyCodeRequest): Flow<ApiResult<String>>
 }

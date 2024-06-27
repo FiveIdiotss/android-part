@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -49,20 +48,31 @@ class SchoolMajorFragment : Fragment() {
             layoutManager = LinearLayoutManager(requireActivity())
             addItemDecoration(MajorItemDecoration(80))
         }
-        setUpMajors()
-
         binding.majorNextBtn.setOnClickListener {
-            if (isMajorSelected()) {
-                Toast.makeText(requireContext(), "학과는 필수 선택사항입니다.", Toast.LENGTH_LONG).show()
-            } else {
-                findNavController().navigate(R.id.action_schoolMajorFragment_to_emailInputFragment)
-            }
+            findNavController().navigate(R.id.action_schoolMajorFragment_to_emailInputFragment)
         }
+        setUpMajors()
+        observeMajorSelect()
     }
 
     private fun setUpMajors() {
         joinViewModel.majors.observe(viewLifecycleOwner) { majors ->
             majorAdapter.setItems(majors)
+        }
+    }
+
+    private fun observeMajorSelect() {
+        joinViewModel.majorId.observe(viewLifecycleOwner) { majorId ->
+            when (majorId) {
+                -1 -> {
+                    binding.majorNextBtn.setBackgroundResource(R.drawable.round_corner_gray_filled)
+                    binding.majorNextBtn.isEnabled = false
+                }
+                else -> {
+                    binding.majorNextBtn.setBackgroundResource(R.drawable.round_corner_blue_filled)
+                    binding.majorNextBtn.isEnabled = true
+                }
+            }
         }
     }
 

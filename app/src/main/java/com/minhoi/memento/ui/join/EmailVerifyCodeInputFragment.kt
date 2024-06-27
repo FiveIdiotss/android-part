@@ -6,14 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.minhoi.memento.R
 import com.minhoi.memento.databinding.FragmentEmailVerifyCodeInputBinding
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @AndroidEntryPoint
 class EmailVerifyCodeInputFragment : Fragment() {
@@ -49,24 +45,19 @@ class EmailVerifyCodeInputFragment : Fragment() {
 
     private fun observeVerificationState() {
         joinViewModel.verificationState.observe(viewLifecycleOwner) {
-            if(it) {
+            if (it) {
                 findNavController().navigate(R.id.action_emailVerifyCodeInputFragment_to_profileFragment)
+            } else {
+                binding.codeValidationHint.text = "유효하지 않은 코드입니다"
             }
         }
     }
 
     private fun observeIsValidCode() {
         joinViewModel.verificationCode.observe(viewLifecycleOwner) { code ->
-            if (code.length >= 4) {
-                lifecycleScope.launch {
-                    joinViewModel.verifyCode()
-
-                    withContext(Dispatchers.Main) {
-                        binding.codeValidationHint.text = "유효하지 않은 코드입니다"
-                    }
-                }
+            if (code.length == 4) {
+                joinViewModel.verifyCode()
             }
         }
     }
-
 }
