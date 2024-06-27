@@ -1,6 +1,5 @@
 package com.minhoi.memento.ui.chat
 
-import android.app.AlertDialog
 import android.util.Log
 import androidx.activity.viewModels
 import androidx.fragment.app.DialogFragment
@@ -142,22 +141,6 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
                     }
                 })
             }.show(supportFragmentManager, "extendBottomSheet")
-        }
-
-        binding.mentoringExitBtn.setOnSingleClickListener {
-            AlertDialog.Builder(this)
-                .setTitle("상담 종료")
-                .setMessage("상담을 종료하시겠습니까?")
-                .setPositiveButton("예") { dialog, which ->
-                    // 예 버튼 클릭 시 실행할 코드
-                    finish() // 예시로 액티비티를 종료합니다.
-                }
-                .setNegativeButton("아니오") { dialog, which ->
-                    // 아니오 버튼 클릭 시 실행할 코드
-                    dialog.dismiss()
-                }
-                .create()
-                .show()
         }
     }
 
