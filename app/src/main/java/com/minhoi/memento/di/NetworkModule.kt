@@ -81,7 +81,7 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun providesJoinService(retrofit: Retrofit): JoinService =
+    fun providesJoinService(@WithoutInterceptor retrofit: Retrofit): JoinService =
         retrofit.create(JoinService::class.java)
 
     @Provides
