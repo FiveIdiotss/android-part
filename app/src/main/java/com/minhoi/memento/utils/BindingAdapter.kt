@@ -48,18 +48,17 @@ object BindingAdapter {
      * 프로필 이미지를 불러오는 동안은 placeholder를 보여주고, 성공적으로 불러왔으면 imageView에 표시하는 함수
      */
     @BindingAdapter("imageUrl", "placeholder")
-    @JvmStatic fun loadImage(imageView: ImageView, url: String?, placeholder: Drawable) {
-        if (url != null) {
-            Glide.with(imageView.context)
-                .load(url)
-                .placeholder(placeholder)
-                .error(placeholder)
-                .diskCacheStrategy(DiskCacheStrategy.NONE)
-                .apply(RequestOptions().fitCenter())
-                .into(imageView)
-        } else {
-            imageView.setImageDrawable(placeholder)
-        }
+    @JvmStatic
+    fun loadImage(imageView: ImageView, url: String?, placeholder: Drawable) {
+        if (url == null) return
+
+        Glide.with(imageView.context)
+            .load(url)
+            .placeholder(placeholder)
+            .error(placeholder)
+            .diskCacheStrategy(DiskCacheStrategy.NONE)
+            .apply(RequestOptions().fitCenter())
+            .into(imageView)
     }
 
     @BindingAdapter("likeStatus")
