@@ -106,7 +106,16 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         binding.bottomNavigationView.setupWithNavController(navController)
         addPostButton(navController)
 
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            if (destination.id == R.id.notificationListFragment) {
+                viewModel.resetUnreadNotificationCount()
+            }
+            if (destination.id == R.id.chatListFragment) {
+                viewModel.getChatRooms()
+            }
+        }
     }
+
     private fun showBoardPostModal() {
         PostSelectBottomSheetDialog().run {
             setStyle(DialogFragment.STYLE_NO_TITLE, R.style.AppBottomSheetDialogTheme)
