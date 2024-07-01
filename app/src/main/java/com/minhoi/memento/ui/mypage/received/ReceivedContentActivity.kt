@@ -24,6 +24,7 @@ import kotlinx.coroutines.launch
 class ReceivedContentActivity : BaseActivity<ActivityReceivedContentBinding>() {
     override val layoutResourceId: Int = R.layout.activity_received_content
     private val viewModel: MypageViewModel by viewModels()
+    private var rejectReasonBottomSheetDialog: InputRejectReasonBottomSheetDialog? = null
 
     override fun initView() {
         val intent = intent
@@ -59,7 +60,17 @@ class ReceivedContentActivity : BaseActivity<ActivityReceivedContentBinding>() {
             }
 
             rejectBtn.setOnSingleClickListener {
-                viewModel.rejectApply(receivedContent!!.applyId)
+                if (rejectReasonBottomSheetDialog == null) {
+                    rejectReasonBottomSheetDialog = InputRejectReasonBottomSheetDialog()
+                }
+                rejectReasonBottomSheetDialog!!.apply {
+                    setRejectReasonListener(object :
+                        InputRejectReasonBottomSheetDialog.RejectReasonListener {
+                        override fun onRejectReasonSubmit(reason: String) {
+                            viewModel.rejectApply(receivedContent!!.applyId, reason)
+                        }
+                    })
+                }
             }
         }
         observeApplyContent()

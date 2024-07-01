@@ -423,6 +423,8 @@ class MypageViewModel @Inject constructor(
             target = this.target,
             content = this.content,
             memberId = this.memberId,
+            memberImageUrl = this.memberImageUrl,
+            representImageUrl = this.representImageUrl,
             isBookmarked = this.isBookmarked,
             isExpanded = false // 기본값 설정
         )

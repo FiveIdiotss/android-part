@@ -1,7 +1,6 @@
 package com.minhoi.memento.data.dto
 
 import com.google.gson.annotations.SerializedName
-import com.minhoi.memento.data.model.BoardType
 
 data class BoardContentDto(
     @SerializedName("boardId")
@@ -33,6 +32,12 @@ data class BoardContentDto(
 
     @SerializedName("memberId")
     val memberId: Long,
+
+    @SerializedName("memberImageUrl")
+    val memberImageUrl: String,
+
+    @SerializedName("representImage")
+    val representImageUrl: String,
 
     @SerializedName("favorite")
     var isBookmarked: Boolean
