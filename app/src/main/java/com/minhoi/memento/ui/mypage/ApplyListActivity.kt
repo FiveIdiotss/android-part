@@ -17,6 +17,7 @@ import com.minhoi.memento.ui.adapter.ReceivedListAdapter
 import com.minhoi.memento.ui.board.BoardActivity
 import com.minhoi.memento.ui.mypage.received.ReceivedContentActivity
 import com.minhoi.memento.utils.hideLoading
+import com.minhoi.memento.utils.repeatOnStarted
 import com.minhoi.memento.utils.showLoading
 import com.minhoi.memento.utils.showToast
 import dagger.hilt.android.AndroidEntryPoint
@@ -43,7 +44,7 @@ class ApplyListActivity : BaseActivity<ActivityApplyListBinding>() {
         when (requestType) {
             TYPE_APPLY -> {
                 setupToolbar(APPLY_TITLE)
-//                viewModel.getApplyList()
+                viewModel.getApplyList()
                 applyListAdapter =
                     ApplyListAdapter(
                         onBoardClickListener = {
@@ -101,12 +102,9 @@ class ApplyListActivity : BaseActivity<ActivityApplyListBinding>() {
     }
 
     private fun observeApplyList() {
-        viewModel.applyList.observe(this) {
-            if (it.isNullOrEmpty()) {
-                binding.emptyApplyListLayout.visibility = View.VISIBLE
-            } else {
-                binding.emptyApplyListLayout.visibility = View.GONE
-                applyListAdapter.setList(it)
+        repeatOnStarted {
+            viewModel.applyContents.collect {
+                applyListAdapter.submitList(it)
             }
         }
     }

@@ -14,12 +14,12 @@ import com.minhoi.memento.data.dto.MentoringApplyDto
 import com.minhoi.memento.data.dto.MentoringApplyListDto
 import com.minhoi.memento.data.dto.MentoringMatchInfo
 import com.minhoi.memento.data.dto.MentoringReceivedDto
-import com.minhoi.memento.data.model.ApplyStatus
 import com.minhoi.memento.data.network.ApiResult
 import com.minhoi.memento.repository.board.BoardRepository
 import com.minhoi.memento.repository.member.MemberRepository
 import com.minhoi.memento.ui.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -29,6 +29,8 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -44,8 +46,14 @@ class MypageViewModel @Inject constructor(
 
     private var member = MentoApplication.memberPrefs.getMemberPrefs()
 
-    private val _applyList = MutableLiveData<List<Pair<MentoringApplyListDto, ApplyStatus>>>()
-    val applyList: LiveData<List<Pair<MentoringApplyListDto, ApplyStatus>>> = _applyList
+    private val applyList = MutableStateFlow<List<MentoringApplyListDto>>(emptyList())
+
+    private val _applyContents =
+        MutableStateFlow<List<Pair<MentoringApplyListDto, BoardContentDto>>>(
+            emptyList()
+        )
+    val applyContents: StateFlow<List<Pair<MentoringApplyListDto, BoardContentDto>>> =
+        _applyContents.asStateFlow()
 
     private val _applyContent = MutableStateFlow<UiState<MentoringApplyDto>>(UiState.Empty)
     val applyContent: StateFlow<UiState<MentoringApplyDto>> = _applyContent.asStateFlow()
@@ -85,7 +93,7 @@ class MypageViewModel @Inject constructor(
                         UiState.Error(Throwable("dasd"))
                     }
                     if (currentPage == boardsResult.value.pageInfo.totalPages) {
-                        _isLastPage.value = true
+                        isLastPage = true
                     }
 
                     val boards = boardsResult.value.content.map {
@@ -142,28 +150,45 @@ class MypageViewModel @Inject constructor(
 
     fun getApplyList() {
         viewModelScope.launch {
-            member.let { member ->
-                val applyStateIds = memberRepository.getMentorInfo(member.id).extractSuccess().map { it.applyId }
-                val response = memberRepository.getApplyList(member.id)
-                if (response.isSuccessful) {
-                    val applyList = response.body() ?: throw Exception("ApplyList is null")
-                    val applyListWithState = applyList.map { applyItem ->
-                        when (applyItem.applyState) {
-                            "HOLDING" -> Pair(applyItem, ApplyStatus.ACCEPTANCE_PENDING)
-                            else -> {
-                                if (applyItem.applyId in applyStateIds!!) {
-                                    Pair(applyItem, ApplyStatus.ACCEPTED)
-                                } else {
-                                    Pair(applyItem, ApplyStatus.REJECTED)
-                                }
-                            }
-                        }
-                    }
-                    _applyList.value = applyListWithState
-                }
+            memberRepository.getApplyList().collect {
+                it.handleResponse(
+                    onSuccess = { value ->
+                        applyList.update { value.data }
+                        getApplyBoardContent()
+                    },
+                    onError = {}
+                )
             }
         }
     }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun getApplyBoardContent() {
+        val combinedList = mutableListOf<Pair<MentoringApplyListDto, BoardContentDto>>()
+        viewModelScope.launch {
+            applyList.flatMapConcat { applyDataList ->
+                combine(
+                    applyDataList.map { applyData ->
+                        boardRepository.getBoardContent(applyData.boardId).map { result ->
+                            applyData to result
+                        }
+                    }
+                ) { results -> results.toList() }
+            }.collect { results ->
+                results.forEach { (applyData, boardContentResult) ->
+                    boardContentResult.handleResponse(
+                        onSuccess = { boardContent ->
+                            val combinedData = applyData to boardContent.data.boardDTO
+                            combinedList.add(combinedData)
+                        },
+                        onError = {}
+                    )
+                }
+                _applyContents.update { combinedList }
+            }
+        }
+    }
+
 
     fun getApplyInfo(applyId: Long) {
         viewModelScope.launch {
@@ -171,7 +196,7 @@ class MypageViewModel @Inject constructor(
             memberRepository.getApplyInfo(applyId).collectLatest {
                 it.handleResponse(
                     onSuccess = { applyInfo ->
-                        _applyContent.update { UiState.Success(applyInfo) }
+                        _applyContent.update { UiState.Success(applyInfo.data) }
                     },
                     onError = { error ->
                         _applyContent.update { UiState.Error(error.exception) }
