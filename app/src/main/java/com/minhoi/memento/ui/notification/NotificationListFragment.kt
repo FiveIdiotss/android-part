@@ -12,6 +12,7 @@ import com.minhoi.memento.data.model.NotificationListType
 import com.minhoi.memento.databinding.FragmentNotificationsBinding
 import com.minhoi.memento.ui.adapter.NotificationAdapter
 import com.minhoi.memento.ui.board.BoardActivity
+import com.minhoi.memento.ui.handleLoadState
 import com.minhoi.memento.ui.home.HomeViewModel
 import com.minhoi.memento.ui.question.QuestionInfoActivity
 import com.minhoi.memento.utils.setOnSingleClickListener
@@ -57,6 +58,21 @@ class NotificationListFragment : BaseFragment<FragmentNotificationsBinding>() {
         viewModel.getNotifications()
         observeNotificationList()
         observeExpandState()
+
+        notificationListAdapter.addLoadStateListener { combinedLoadState ->
+            handleLoadState(
+                adapter = notificationListAdapter,
+                loadState = combinedLoadState,
+                progressBar = binding.progressBar,
+                recyclerView = binding.notificationRv,
+                retryLayout = binding.retryLayout,
+                emptyLayout = binding.emptyNotificationLayout
+            )
+        }
+
+        binding.retryLayout.retryButton.setOnSingleClickListener {
+            notificationListAdapter.retry()
+        }
 
         binding.editNotificationBtn.setOnSingleClickListener {
             showDeleteNotificationButton()

@@ -15,6 +15,7 @@ import com.minhoi.memento.databinding.ActivityQuestionListBinding
 import com.minhoi.memento.ui.SelectBoardCategoryBottomSheetDialog
 import com.minhoi.memento.ui.adapter.BoardLoadStateAdapter
 import com.minhoi.memento.ui.adapter.question.QuestionRowAdapter
+import com.minhoi.memento.ui.handleLoadState
 import com.minhoi.memento.utils.setOnSingleClickListener
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -41,6 +42,21 @@ class QuestionListActivity : BaseActivity<ActivityQuestionListBinding>() {
             "wholeQuestion" -> setupToolbar("질문 글 목록")
             "myQuestion" -> setupToolbar("내가 작성한 질문")
             "likeQuestion" -> setupToolbar("좋아요 표시한 질문")
+        }
+
+        questionRowAdapter.addLoadStateListener { combinedLoadStates ->
+            handleLoadState(
+                adapter = questionRowAdapter,
+                loadState = combinedLoadStates,
+                progressBar = binding.progressBar,
+                recyclerView = binding.questionRv,
+                retryLayout = binding.retryLayout,
+                emptyLayout = binding.emptyLayout
+            )
+        }
+
+        binding.retryLayout.retryButton.setOnSingleClickListener {
+            questionRowAdapter.retry()
         }
 
         binding.questionRv.apply {
