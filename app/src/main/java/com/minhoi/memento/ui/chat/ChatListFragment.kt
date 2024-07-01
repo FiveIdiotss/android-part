@@ -57,6 +57,11 @@ class ChatListFragment : BaseFragment<FragmentChatListBinding>() {
                         }
                         is UiState.Success -> {
                             parentFragmentManager.hideLoading()
+                            if (state.data.isEmpty()) {
+                                binding.emptyChatLayout.root.visibility = android.view.View.VISIBLE
+                            } else {
+                                binding.emptyChatLayout.root.visibility = android.view.View.GONE
+                            }
                             Log.d("ChatRooms", "observeChatRooms: ${state.data}")
                             chatRoomListAdapter.setList(state.data)
                         }

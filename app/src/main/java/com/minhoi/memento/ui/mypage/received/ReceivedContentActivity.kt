@@ -70,7 +70,7 @@ class ReceivedContentActivity : BaseActivity<ActivityReceivedContentBinding>() {
                             viewModel.rejectApply(receivedContent!!.applyId, reason)
                         }
                     })
-                }
+                }.show(supportFragmentManager, rejectReasonBottomSheetDialog!!.tag)
             }
         }
         observeApplyContent()
