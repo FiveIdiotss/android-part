@@ -17,8 +17,7 @@ import com.minhoi.memento.utils.setOnSingleClickListener
 class ReceivedListAdapter(
     private val onBoardClickListener: (Long) -> Unit,
     private val onReceivedItemClickListener: (MentoringReceivedDto) -> Unit,
-) :
-    RecyclerView.Adapter<ReceivedListAdapter.ViewHolder>() {
+) : RecyclerView.Adapter<ReceivedListAdapter.ViewHolder>() {
 
     private val boardsWithReceivedMentoring =
         mutableListOf<Pair<BoardContentForReceived, List<MentoringReceivedDto>>>()
@@ -53,6 +52,8 @@ class ReceivedListAdapter(
                 boardContent.target,
                 boardContent.content,
                 boardContent.memberId,
+                boardContent.memberImageUrl,
+                boardContent.representImageUrl,
                 boardContent.isBookmarked
             )
             binding.applyListWithBoardRv.apply {

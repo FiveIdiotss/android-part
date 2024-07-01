@@ -1,6 +1,7 @@
 package com.minhoi.memento.repository.member
 
 import com.minhoi.memento.base.CommonResponse
+import com.minhoi.memento.data.dto.ApplyRejectRequest
 import com.minhoi.memento.data.dto.BoardListResponse
 import com.minhoi.memento.data.dto.MemberDTO
 import com.minhoi.memento.data.dto.MentoringApplyDto
@@ -21,7 +22,7 @@ interface MemberRepository {
 
     suspend fun getMemberInfo(memberId: Long): Response<CommonResponse<MemberDTO>>
 
-    suspend fun getApplyList(): Response<CommonResponse<List<MentoringApplyListDto>>>
+    suspend fun getApplyList(): Flow<ApiResult<CommonResponse<List<MentoringApplyListDto>>>>
 
     fun getApplyInfo(applyId: Long): Flow<ApiResult<CommonResponse<MentoringApplyDto>>>
 
@@ -33,7 +34,7 @@ interface MemberRepository {
 
     fun acceptApply(applyId: Long): Flow<ApiResult<CommonResponse<String>>>
 
-    fun rejectApply(applyId: Long): Flow<ApiResult<CommonResponse<String>>>
+    fun rejectApply(applyRejectRequest: ApplyRejectRequest): Flow<ApiResult<CommonResponse<String>>>
 
     fun uploadProfileImage(image: MultipartBody.Part): Flow<ApiResult<CommonResponse<String>>>
 

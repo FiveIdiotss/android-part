@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.minhoi.memento.MentoApplication
+import com.minhoi.memento.data.dto.ApplyRejectRequest
 import com.minhoi.memento.data.dto.BoardContentDto
 import com.minhoi.memento.data.dto.BoardContentForReceived
 import com.minhoi.memento.data.dto.BoardListResponse
@@ -227,9 +228,14 @@ class MypageViewModel @Inject constructor(
         }
     }
 
-    fun rejectApply(applyId: Long) {
+    fun rejectApply(applyId: Long, rejectReason: String) {
         viewModelScope.launch {
-            memberRepository.rejectApply(applyId).collect {
+            memberRepository.rejectApply(
+                ApplyRejectRequest(
+                    applyId,
+                    ApplyRejectRequest.RejectReason(rejectReason)
+                )
+            ).collect {
                 it.handleResponse(
                     onSuccess = {
                         mentoringEvent(MentoringEvent.Accept)
