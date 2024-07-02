@@ -35,7 +35,7 @@ class NotificationListFragment : BaseFragment<FragmentNotificationsBinding>() {
                         )
                     }
 
-                    NotificationListType.REPLY -> {
+                    NotificationListType.REPLY_QUEST -> {
                         startActivity(
                             Intent(
                                 requireContext(),
