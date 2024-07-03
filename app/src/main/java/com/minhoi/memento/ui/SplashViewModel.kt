@@ -21,7 +21,7 @@ class SplashViewModel @Inject constructor(
     private val _loginState = MutableStateFlow<LoginState>(LoginState.Loading)
     val loginState: StateFlow<LoginState> = _loginState.asStateFlow()
 
-    fun checkLoginState(onFailure: () -> Unit) {
+    fun checkLoginState(onSuccess: () -> Unit, onFailure: () -> Unit) {
         viewModelScope.launch {
             val refreshToken = MentoApplication.prefs.getRefreshToken("")
             if (refreshToken.isNullOrEmpty()) {
@@ -34,6 +34,7 @@ class SplashViewModel @Inject constructor(
                         MentoApplication.prefs.setAccessToken(it.data.accessToken)
                         MentoApplication.prefs.setRefreshToken(it.data.refreshToken)
                         _loginState.update { LoginState.Success }
+                        onSuccess()
                     },
                     onError = { error ->
                         Log.d(TAG, "checkLoginState: ${error.exception!!.message}")

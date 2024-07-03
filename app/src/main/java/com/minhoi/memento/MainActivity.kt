@@ -14,6 +14,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
@@ -29,9 +30,12 @@ import com.minhoi.memento.base.BaseActivity
 import com.minhoi.memento.databinding.ActivityMainBinding
 import com.minhoi.memento.ui.SplashViewModel
 import com.minhoi.memento.ui.UiState
+import com.minhoi.memento.ui.chat.ChatActivity
 import com.minhoi.memento.ui.home.HomeViewModel
 import com.minhoi.memento.ui.home.PostSelectBottomSheetDialog
-import com.minhoi.memento.ui.login.LoginActivity
+import com.minhoi.memento.ui.mypage.ApplyListActivity
+import com.minhoi.memento.ui.mypage.MyMentoringActivity
+import com.minhoi.memento.ui.question.QuestionInfoActivity
 import com.minhoi.memento.utils.repeatOnStarted
 import com.minhoi.memento.utils.showToast
 import dagger.hilt.android.AndroidEntryPoint
@@ -41,7 +45,7 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class MainActivity : BaseActivity<ActivityMainBinding>() {
     override val layoutResourceId: Int = R.layout.activity_main
-    private val viewModel by viewModels<HomeViewModel>()
+    private lateinit var viewModel: HomeViewModel
     private val splashViewModel by viewModels<SplashViewModel>()
 
     override fun initView() {
@@ -49,24 +53,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         splashScreen.setKeepOnScreenCondition {
             splashViewModel.loginState.value is SplashViewModel.LoginState.Loading
         }
-
         setUpSplashScreen()
-        observeLoginState()
-        observeBadgeCounts()
-        setBottomNavigation()
-        askNotificationPermission()
-        subscribeChatRooms()
-
-        FirebaseMessaging.getInstance().token
-            .addOnCompleteListener { task: Task<String> ->
-                if (!task.isSuccessful) {
-                    Log.d("MainActivity", "initView: success")
-                    return@addOnCompleteListener
-                }
-                val token = task.result
-                viewModel.saveFCMToken(token)
-                Log.d("FCMLog", "Current token: $token")
-            }
     }
 
     private fun setUpSplashScreen() {
@@ -135,16 +122,8 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         }
     }
 
-    private fun setUpSplashScreen() {
-        splashViewModel.checkLoginState(
-            onFailure = {
-                navigateToLoginActivity()
-            }
-        )
-    }
-
     private fun navigateToLoginActivity() {
-        val intent = Intent(this, LoginActivity::class.java)
+        val intent = Intent(this, IntroActivity::class.java)
         startActivity(intent)
         finish()
     }
@@ -290,5 +269,17 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
                 }
             }
         }
+    }
+
+    private fun saveFCMToken() {
+        FirebaseMessaging.getInstance().token
+            .addOnCompleteListener { task: Task<String> ->
+                if (!task.isSuccessful) {
+                    return@addOnCompleteListener
+                }
+                val token = task.result
+                viewModel.saveFCMToken(token)
+                Log.d("FCMLog", "Current token: $token")
+            }
     }
 }
