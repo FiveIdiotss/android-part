@@ -186,10 +186,20 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         ActivityResultContracts.RequestPermission(),
     ) { isGranted: Boolean ->
         if (isGranted) {
-            MentoApplication.notificationPermissionPrefs.setChatPermission(true)
+            MentoApplication.notificationPermissionPrefs.apply {
+                setChatPermission(true)
+                setMatchPermission(true)
+                setReplyPermission(true)
+                setApplyPermission(true)
+            }
             Toast.makeText(this, "알림 권한 승인", Toast.LENGTH_LONG).show()
         } else {
-            MentoApplication.notificationPermissionPrefs.setChatPermission(false)
+            MentoApplication.notificationPermissionPrefs.apply {
+                setChatPermission(false)
+                setMatchPermission(false)
+                setReplyPermission(false)
+                setApplyPermission(false)
+            }
             Toast.makeText(this, "알림 권한 실패", Toast.LENGTH_LONG).show()
         }
     }
