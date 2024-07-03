@@ -69,6 +69,15 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
             }
     }
 
+    private fun observeStompEvent() {
+        repeatOnStarted {
+            viewModel.connectEvent.collect {
+                Log.d("StompConnectionError", "error: ${it.exception}")
+                showToast(it.message)
+            }
+        }
+    }
+
     private fun observeLoginState() {
         repeatOnStarted {
             splashViewModel.loginState.collect {

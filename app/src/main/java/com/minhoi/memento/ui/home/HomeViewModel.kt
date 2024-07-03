@@ -59,15 +59,15 @@ class HomeViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val member = MentoApplication.memberPrefs.getMemberPrefs()
+    // Ui layer에는 에러 발생 여부만 전달
+    private val _connectEvent = MutableSharedFlow<StompManager.StompConnectionEvent.Error>()
+    val connectEvent: SharedFlow<StompManager.StompConnectionEvent.Error> = _connectEvent.asSharedFlow()
 
     private val _questionPreviewContents = MutableLiveData<List<QuestionContent>>()
     val questionPreviewContents: LiveData<List<QuestionContent>> = _questionPreviewContents
 
     private val _chatRooms = MutableStateFlow<UiState<List<Pair<ChatRoom, MemberDTO>>>>(UiState.Empty)
     val chatRooms: StateFlow<UiState<List<Pair<ChatRoom, MemberDTO>>>> = _chatRooms.asStateFlow()
-
-    private val _loginState = MutableStateFlow<UiState<Boolean>>(UiState.Loading)
-    val loginState: StateFlow<UiState<Boolean>> = _loginState.asStateFlow()
 
     private val _notifications = MutableStateFlow<PagingData<NotificationListDto>>(PagingData.empty())
     val notifications: StateFlow<PagingData<NotificationListDto>> = _notifications.asStateFlow()
@@ -83,11 +83,29 @@ class HomeViewModel @Inject constructor(
 
     init {
         StompManager.connectToSocket()
+        observeStompConnection()
         getPreviewBoards()
         getPreviewQuestions()
         getChatRooms()
         getUnreadNotificationCount()
-        subscribeNotification()
+    }
+
+    /** 소켓에 연결된 경우 구독, 에러 발생시 에러 이벤트 방출하는 함수 */
+    private fun observeStompConnection() {
+        viewModelScope.launch {
+            StompManager.connectionEvent.collect {
+                when (it) {
+                    is StompManager.StompConnectionEvent.Connected -> {
+                        subscribeNotification()
+                    }
+                    is StompManager.StompConnectionEvent.Error -> {
+                        launch {
+                            _connectEvent.emit(it)
+                        }
+                    }
+                }
+            }
+        }
     }
 
     fun getNotifications() = viewModelScope.launch {
