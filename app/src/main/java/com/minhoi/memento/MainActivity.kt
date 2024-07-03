@@ -69,6 +69,51 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
             }
     }
 
+    private fun setUpSplashScreen() {
+        splashViewModel.checkLoginState(
+            onSuccess = {
+                viewModel = ViewModelProvider(this)[HomeViewModel::class.java]
+                observeLoginState()
+                observeBadgeCounts()
+                setBottomNavigation()
+                askNotificationPermission()
+                subscribeChatRooms()
+                observeStompEvent()
+                handleFcmNotificationIntent()
+                saveFCMToken()
+            },
+            onFailure = {
+                navigateToLoginActivity()
+            }
+        )
+    }
+
+    private fun handleFcmNotificationIntent() {
+        try {
+            val type = intent.getStringExtra("type")
+            val otherPK = intent.getLongExtra("otherPK", -1)
+            val senderName = intent.getStringExtra("senderName")
+
+            val intent = when (type) {
+                "CHAT" -> Intent(this, ChatActivity::class.java).apply {
+                    putExtra("receiverName", senderName)
+                    putExtra("roomId", otherPK)
+                }
+                "REPLY_QUEST" -> Intent(this, QuestionInfoActivity::class.java).apply {
+                    putExtra("questionId", otherPK)
+                }
+                "APPLY" -> Intent(this, ApplyListActivity::class.java).apply {
+                    putExtra("requestType", "RECEIVE")
+                }
+                "MATCHING_COMPLETE","MATCHING_DECLINE" -> Intent(this, MyMentoringActivity::class.java)
+                else -> throw IllegalArgumentException("Invalid notification type")
+            }
+            startActivity(intent)
+        } catch (e: Exception) {
+            Log.e("MainActivity", "handleFcmNotificationIntent: ${e.message}")
+        }
+    }
+
     private fun observeStompEvent() {
         repeatOnStarted {
             viewModel.connectEvent.collect {
