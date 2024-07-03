@@ -15,12 +15,9 @@ import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import com.minhoi.memento.data.model.ChatNotification
-import com.minhoi.memento.data.model.PostNotification
+import com.minhoi.memento.data.model.FCMNotification
 import com.minhoi.memento.data.network.RetrofitClient
 import com.minhoi.memento.data.network.service.NotificationService
-import com.minhoi.memento.ui.chat.ChatActivity
-import okhttp3.internal.notify
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -43,24 +40,116 @@ class MementoFirebaseMessagingService : FirebaseMessagingService() {
         super.onMessageReceived(message)
 
         if (message.data.isNotEmpty()) {
-            Log.d(TAG, "onMessageReceived: ${message.data} ")
-            val type = message.data["type"]
-            when (type) {
-                "chat" -> {
-                    val notification = ChatNotification(
-                        message.data["senderId"]!!.toLong(),
-                        message.data["senderName"]!!,
-                        message.data["content"]!!,
-                        message.data["imageUrl"]!!
-                    )
-                    sendChatNotification(notification)
-                }
 
-                "post" -> {
-                    val notification = PostNotification(message.data["content"]!!)
-                    sendPostNotification(notification)
-                }
+            try {
+                Log.d(TAG, "onMessageReceived: ${message.data} ")
+                val type = message.data["type"]?.toNotificationType()
+                    ?: throw IllegalArgumentException("Invalid notification type")
+
+                val notification = FCMNotification(
+                    message.data["senderId"]?.toLongOrNull()
+                        ?: throw IllegalArgumentException("Invalid senderId"),
+                    message.data["otherPK"]?.toLongOrNull()
+                        ?: throw IllegalArgumentException("Invalid otherPK"),
+                    message.data["senderName"]
+                        ?: throw IllegalArgumentException("Invalid senderName"),
+                    message.data["content"]
+                        ?: throw IllegalArgumentException("Invalid content"),
+                    message.data["senderImageUrl"]
+                        ?: throw IllegalArgumentException("Invalid senderImageUrl")
+                )
+
+                sendNotification(notification, type)
+
+            } catch (e: IllegalArgumentException) {
+                Log.e(TAG, "Invalid notification data: ${e.message}")
+            } catch (e: Exception) {
+                Log.e(TAG, "${e.printStackTrace()}")
             }
+        }
+    }
+
+
+    private fun sendNotification(notification: FCMNotification, type: NotificationType) {
+        val permissionAllowed = when (type) {
+            NotificationType.CHAT -> MentoApplication.notificationPermissionPrefs.getChatPermission()
+            NotificationType.REPLY_QUEST -> MentoApplication.notificationPermissionPrefs.getReplyPermission()
+            NotificationType.APPLY -> MentoApplication.notificationPermissionPrefs.getApplyPermission()
+            NotificationType.MATCHING_COMPLETE, NotificationType.MATCHING_DECLINE -> MentoApplication.notificationPermissionPrefs.getMatchPermission()
+        }
+
+        if (!permissionAllowed) return
+
+        val intent = Intent(this, MainActivity::class.java).apply {
+            putExtra("type", type.name)
+            putExtra("otherPK", notification.otherPK)
+            putExtra("senderName", notification.senderName)
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+
+        val pendingIntent = PendingIntent.getActivity(
+            this,
+            notification.senderId.toInt(),
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val channelId = when (type) {
+            NotificationType.CHAT -> getString(R.string.channel_chat_id)
+            NotificationType.REPLY_QUEST -> getString(R.string.channel_reply_id)
+            NotificationType.APPLY -> getString(R.string.channel_apply_id)
+            NotificationType.MATCHING_COMPLETE, NotificationType.MATCHING_DECLINE -> getString(R.string.channel_matching_id)
+        }
+
+        val title = when (type) {
+            NotificationType.CHAT -> notification.senderName
+            NotificationType.REPLY_QUEST -> "${notification.senderName} 님이 답글을 작성하였습니다."
+            NotificationType.APPLY -> "${notification.senderName} 님이 멘토링을 신청하였습니다."
+            NotificationType.MATCHING_COMPLETE -> "${notification.senderName} 님과 멘토링이 성사되었습니다."
+            NotificationType.MATCHING_DECLINE -> "${notification.senderName} 님과 멘토링이 성사되지 않았습니다. 멘토링 지원 현황을 확인해주세요."
+        }
+
+        val notificationBuilder = NotificationCompat.Builder(this, channelId).apply {
+            setSmallIcon(R.drawable.round_corner_blue_filled)
+            setContentTitle(title)
+            setContentText(notification.content)
+            setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            setContentIntent(pendingIntent)
+            setAutoCancel(true)
+
+            if (type == NotificationType.CHAT) {
+                val person = Person.Builder().apply {
+                    setName(notification.senderName)
+                    convertUriToIconCompat(
+                        notification.profileUri,
+                        this@MementoFirebaseMessagingService
+                    ) { icon ->
+                        icon?.let { setIcon(it) }
+                    }
+                }.build()
+
+                setStyle(
+                    NotificationCompat.MessagingStyle(person)
+                        .addMessage(notification.content, System.currentTimeMillis(), person)
+                )
+                setGroup(CHAT_GROUP)
+            }
+        }
+
+        val notificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.notify(System.currentTimeMillis().toInt(), notificationBuilder.build())
+
+        if (type == NotificationType.CHAT) {
+            val summaryBuilder =
+                NotificationCompat.Builder(this, getString(R.string.channel_chat_id)).apply {
+                    setSmallIcon(R.drawable.chat)
+                    setAutoCancel(true)
+                    setOnlyAlertOnce(true)
+                    setGroup(CHAT_GROUP)
+                    setGroupSummary(true)
+                }
+            notificationManager.notify(0, summaryBuilder.build())
         }
     }
 
@@ -79,70 +168,6 @@ class MementoFirebaseMessagingService : FirebaseMessagingService() {
                 Log.e(TAG, "Error saving token to server: ${t.localizedMessage}")
             }
         })
-    }
-
-    private fun sendChatNotification(notification: ChatNotification) {
-        // 사용자가 채팅 알림을 off 한 경우 리턴
-        if (!MentoApplication.notificationPermissionPrefs.getChatPermission()) {
-            return
-        }
-
-        val person = Person.Builder().apply {
-            setName(notification.senderName)
-            convertUriToIconCompat(
-                notification.profileUri,
-                this@MementoFirebaseMessagingService
-            ) { icon ->
-                icon?.let {
-                    setIcon(it)
-                }
-            }
-        }.build()
-
-        // NotificationCompat.MessagingStyle을 사용하여 채팅 스타일의 알림 생성
-        val intent = Intent(this, ChatActivity::class.java).apply {
-            putExtra("receiverName", notification.senderName)
-            putExtra("receiverId", notification.senderId)
-        }
-
-        // roomId에 따라 pendingIntent 객체를 다르게 설정하기 위해 senderId를 requestCode로 사용
-        val pendingIntent = PendingIntent.getActivity(
-            this,
-            notification.senderId.toInt(),
-            intent,
-            PendingIntent.FLAG_IMMUTABLE
-        )
-        val notificationBuilder =
-            NotificationCompat.Builder(this, getString(R.string.channel_chat_id)).apply {
-                setSmallIcon(R.drawable.chat)
-                setContentIntent(pendingIntent)
-                setContentTitle(notification.senderName)
-                setStyle(
-                    NotificationCompat.MessagingStyle(person)
-                        .addMessage(notification.content, System.currentTimeMillis(), person)
-                )
-                setGroup(CHAT_GROUP)
-            }
-
-        val summaryBuilder =
-            NotificationCompat.Builder(this, getString(R.string.channel_chat_id)).apply {
-                setSmallIcon(R.drawable.chat)
-                setAutoCancel(true)
-                setOnlyAlertOnce(true)
-                setGroup(CHAT_GROUP)
-                setGroupSummary(true)
-            }
-
-        val notificationManager =
-            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.apply {
-            notify(System.currentTimeMillis().toInt(), notificationBuilder.build())
-            notify(0, summaryBuilder.build())
-        }
-    }
-
-    private fun sendPostNotification(notification: PostNotification) {
-
     }
 
     private fun convertUriToIconCompat(
@@ -171,9 +196,22 @@ class MementoFirebaseMessagingService : FirebaseMessagingService() {
             })
     }
 
+    enum class NotificationType {
+        CHAT, REPLY_QUEST, APPLY, MATCHING_COMPLETE, MATCHING_DECLINE;
+    }
+
     companion object {
         private const val TAG = "FCM"
         private const val CHAT_GROUP = "chat_group"
+        private fun String.toNotificationType(): NotificationType {
+            return when (this) {
+                "CHAT" -> NotificationType.CHAT
+                "REPLY_QUEST" -> NotificationType.REPLY_QUEST
+                "APPLY" -> NotificationType.APPLY
+                "MATCHING_COMPLETE" -> NotificationType.MATCHING_COMPLETE
+                "MATCHING_DECLINE" -> NotificationType.MATCHING_DECLINE
+                else -> throw IllegalArgumentException("Invalid notification type")
+            }
+        }
     }
-
 }
