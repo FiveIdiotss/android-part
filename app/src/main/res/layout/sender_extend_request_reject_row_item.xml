@@ -35,6 +35,7 @@
                     android:layout_width="0dp"
                     android:layout_height="40dp"
                     android:gravity="center"
+                    android:background="@drawable/round_corner_yellow_filled"
                     android:text="시스템"
                     android:textSize="17sp"
                     android:textStyle="bold"

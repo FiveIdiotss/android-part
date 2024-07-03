@@ -134,6 +134,17 @@ class ChatAdapter(
                 ReceiverMentoringExtendRejectViewHolder(binding)
             }
 
+            VIEW_TYPE_RECEIVER_EXTEND_COMPLETE -> {
+                val binding =
+                    ReceiverMentorExtendRequestRowItemBinding.inflate(inflater, parent, false)
+                ReceiverMentoringExtendRequestViewHolder(
+                    binding = binding,
+                    isCompleteRequest = true,
+                    onAcceptClickListener = {},
+                    onRejectClickListener = {}
+                )
+            }
+
             VIEW_TYPE_DATE -> {
                 val binding = ChatDateItemBinding.inflate(inflater, parent, false)
                 DateViewHolder(binding)
@@ -168,7 +179,7 @@ class ChatAdapter(
             is Sender -> when (item.type) {
                 ChatMessageType.TEXT -> VIEW_TYPE_SENDER_TEXT
                 ChatMessageType.IMAGE -> VIEW_TYPE_SENDER_IMAGE
-                ChatMessageType.CONSULT_EXTEND -> VIEW_TYPE_SENDER_EXTEND_REQUEST
+                ChatMessageType.CONSULT_EXTEND, ChatMessageType.CONSULT_EXTEND_COMPLETE -> VIEW_TYPE_SENDER_EXTEND_REQUEST
                 ChatMessageType.CONSULT_EXTEND_ACCEPT -> VIEW_TYPE_SENDER_EXTEND_ACCEPT
                 ChatMessageType.CONSULT_EXTEND_DECLINE -> VIEW_TYPE_SENDER_EXTEND_REJECT
                 else -> VIEW_TYPE_SENDER_FILE
@@ -180,6 +191,7 @@ class ChatAdapter(
                 ChatMessageType.CONSULT_EXTEND -> VIEW_TYPE_RECEIVER_EXTEND_REQUEST
                 ChatMessageType.CONSULT_EXTEND_ACCEPT -> VIEW_TYPE_RECEIVER_EXTEND_ACCEPT
                 ChatMessageType.CONSULT_EXTEND_DECLINE -> VIEW_TYPE_RECEIVER_EXTEND_REJECT
+                ChatMessageType.CONSULT_EXTEND_COMPLETE -> VIEW_TYPE_RECEIVER_EXTEND_COMPLETE
                 else -> VIEW_TYPE_RECEIVER_FILE
             }
 
@@ -201,7 +213,8 @@ class ChatAdapter(
         private const val VIEW_TYPE_RECEIVER_EXTEND_REQUEST = 9
         private const val VIEW_TYPE_RECEIVER_EXTEND_ACCEPT = 10
         private const val VIEW_TYPE_RECEIVER_EXTEND_REJECT = 11
-        private const val VIEW_TYPE_DATE = 12
+        private const val VIEW_TYPE_RECEIVER_EXTEND_COMPLETE = 12
+        private const val VIEW_TYPE_DATE = 13
 
     }
 

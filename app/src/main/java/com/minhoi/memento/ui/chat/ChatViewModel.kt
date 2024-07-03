@@ -60,6 +60,9 @@ class ChatViewModel @Inject constructor(
     private val _saveImageState = MutableStateFlow<UiState<Boolean>>(UiState.Empty)
     val saveImageState: StateFlow<UiState<Boolean>> = _saveImageState.asStateFlow()
 
+    private val _isMentorState = MutableStateFlow(false)
+    val isMentorState: StateFlow<Boolean> = _isMentorState.asStateFlow()
+
     private val stompClient = StompManager.stompClient
     private var subscription: Disposable? = null
 
@@ -83,7 +86,7 @@ class ChatViewModel @Inject constructor(
             StompHeader("chatRoomId", roomId.toString()),
             StompHeader("senderId", member.id.toString())
         )
-        subscription = stompClient!!.topic("/sub/chats/$roomId", headers).subscribe { message ->
+        subscription = stompClient?.topic("/sub/chats/$roomId", headers)?.subscribe { message ->
             handleMessage(message)
         }
     }
@@ -137,6 +140,7 @@ class ChatViewModel @Inject constructor(
                 result.handleResponse(
                     onSuccess = { data ->
                         _chatRoomState.update { UiState.Success(data.data) }
+                        if (data.data.mentorId == member.id) _isMentorState.update { true }
                         getMessageStream(roomId)
                         subscribeChatRoom(roomId)
                     },
@@ -162,6 +166,7 @@ class ChatViewModel @Inject constructor(
                         response.data.content.forEach {
                             updatedMessages.addFirst(getSenderOrReceiver(it))
                         }
+                        Log.d(TAG, "getMessageStream: $updatedMessages")
                         //TODO forEach 이외 방법
                         _messages.value = updatedMessages
                         currentPage++

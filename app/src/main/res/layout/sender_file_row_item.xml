@@ -17,35 +17,62 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="5dp">
 
-        <FrameLayout
+        <androidx.cardview.widget.CardView
             android:id="@+id/messageFrameLayout"
-            android:layout_width="wrap_content"
+            android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="10dp"
+            app:cardBackgroundColor="@android:color/white"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <TextView
-                android:id="@+id/senderFile"
-                android:layout_width="200dp"
-                android:layout_height="50dp"
-                android:layout_gravity="center"
-                android:background="@drawable/textview_gray_corner"
-                android:text="@{senderData.fileUrl}" />
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                app:layout_constraintBottom_toBottomOf="parent">
 
-        </FrameLayout>
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/fileTypeImageView"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:padding="5dp"
+                    app:layout_constraintBottom_toBottomOf="@+id/receiverFileName"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/receiverFileName" />
+
+                <TextView
+                    android:id="@+id/receiverFileName"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="5dp"
+                    android:padding="5dp"
+                    android:text="@{senderData.content}"
+                    android:textColor="@color/black"
+                    android:textSize="15sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toEndOf="@+id/fileTypeImageView"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.cardview.widget.CardView>
 
         <TextView
             android:id="@+id/isReadMessage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:visibility="@{senderData.readCount == 2 ? View.GONE : View.VISIBLE}"
             android:text="1"
             android:textColor="#999999"
             android:textSize="12sp"
+            android:visibility="@{senderData.readCount == 2 ? View.GONE : View.VISIBLE}"
             app:layout_constraintBottom_toBottomOf="@id/messageFrameLayout"
-            app:layout_constraintEnd_toStartOf="@id/senderDate"/>
+            app:layout_constraintEnd_toStartOf="@id/senderDate" />
 
         <TextView
             android:id="@+id/senderDate"
@@ -57,7 +84,6 @@
             android:visibility="@{senderData.showMinute ? View.VISIBLE : View.GONE}"
             app:layout_constraintBottom_toBottomOf="@+id/messageFrameLayout"
             app:layout_constraintEnd_toStartOf="@+id/messageFrameLayout" />
-
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

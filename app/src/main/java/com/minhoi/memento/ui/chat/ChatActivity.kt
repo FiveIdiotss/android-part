@@ -1,6 +1,7 @@
 package com.minhoi.memento.ui.chat
 
 import android.util.Log
+import android.view.View
 import androidx.activity.viewModels
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Lifecycle
@@ -107,6 +108,7 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
         observeChatMessages()
         observeHasNextPage()
         observePageLoadingState()
+        observeIsMentor()
     }
 
     private fun handleIntent() {
@@ -231,6 +233,17 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
     private fun observeHasNextPage() {
         viewModel.hasNextPage.observe(this) {
             hasNextPage = it
+        }
+    }
+
+    private fun observeIsMentor() {
+        repeatOnStarted {
+            viewModel.isMentorState.collect {
+                when (it) {
+                    true -> binding.extendLayout.visibility = View.GONE
+                    else -> binding.extendLayout.visibility = View.VISIBLE
+                }
+            }
         }
     }
 

@@ -59,6 +59,8 @@
                     android:layout_width="0dp"
                     android:layout_height="40dp"
                     android:gravity="center"
+                    android:background="@drawable/round_corner_yellow_filled"
+
                     android:text="시스템"
                     android:textSize="17sp"
                     android:textStyle="bold"
@@ -94,6 +96,17 @@
                         app:layout_constraintHorizontal_bias="0.5"
                         app:layout_constraintStart_toStartOf="@+id/textView57"
                         app:layout_constraintTop_toBottomOf="@+id/textView58" />
+                    <!-- New TextView for handling request status -->
+                    <TextView
+                        android:id="@+id/requestStatus"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:text="이미 처리한 연장 신청입니다"
+                        android:visibility="gone"
+                        android:textColor="@android:color/holo_red_dark"
+                        android:textStyle="bold"
+                        android:gravity="center" />
 
                     <androidx.appcompat.widget.AppCompatButton
                         android:id="@+id/extendAcceptBtn"
