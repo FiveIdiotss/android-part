@@ -1,7 +1,7 @@
 package com.minhoi.memento.ui.chat
 
 import android.util.Log
-import android.view.MenuItem
+import android.view.View
 import androidx.activity.viewModels
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Lifecycle
@@ -17,6 +17,7 @@ import com.minhoi.memento.databinding.ActivityChatBinding
 import com.minhoi.memento.ui.UiState
 import com.minhoi.memento.ui.adapter.ChatAdapter
 import com.minhoi.memento.utils.hideLoading
+import com.minhoi.memento.utils.repeatOnStarted
 import com.minhoi.memento.utils.setOnSingleClickListener
 import com.minhoi.memento.utils.showLoading
 import com.minhoi.memento.utils.showToast
@@ -32,17 +33,28 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
 
     @Inject
     lateinit var selectFileDialog: SelectFileDialog
+    private var extendBottomSheetDialog: MentoringExtendBottomSheetDialog? = null
 
-    private var receiverId = -1L
     private val chatAdapter: ChatAdapter by lazy {
-        ChatAdapter() {
-            val dialog = ChatImageViewerDialog.newInstance(it)
-            dialog.setStyle(
-                DialogFragment.STYLE_NO_TITLE,
-                android.R.style.Theme_NoTitleBar_Fullscreen
-            )
-            dialog.show(supportFragmentManager, "imageDialog")
-        }
+        ChatAdapter(
+            onImageClickListener = {
+                val dialog = ChatImageViewerDialog.newInstance(it)
+                dialog.setStyle(
+                    DialogFragment.STYLE_NO_TITLE,
+                    android.R.style.Theme_NoTitleBar_Fullscreen
+                )
+                dialog.show(supportFragmentManager, "imageDialog")
+            },
+            onFileClickListener = {
+                viewModel.downloadFile(it)
+            },
+            onExtendAcceptClickListener = {
+                viewModel.acceptExtendMentoringTime(it)
+            },
+            onExtendRejectClickListener = {
+                viewModel.rejectExtendMentoringTime(it)
+            }
+        )
     }
     private val viewModel by viewModels<ChatViewModel>()
     private var roomId = -1L
@@ -52,10 +64,11 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
     override fun initView() {
         handleIntent()
 
-        viewModel.getChatRoomId(receiverId)
+        viewModel.getChatRoomState(roomId)
 
         // viewModel roomId 관찰하여 roomId가 정상적으로 들어오면 소켓 연결
         connectSocket()
+        setBottomSheetDialog()
 
         binding.sendBtn.setOnSingleClickListener {
             sendMessage()
@@ -92,41 +105,44 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
             }
         })
 
-        setUpToolbar()
         observeChatMessages()
         observeHasNextPage()
         observePageLoadingState()
+        observeIsMentor()
     }
 
     private fun handleIntent() {
-        receiverId = intent.getLongExtra("receiverId", -1L)
+        roomId = intent.getLongExtra("roomId", -1L)
+        if (roomId == -1L) return
+        viewModel.setRoomId(roomId)
         val receiverName = intent.getStringExtra("receiverName")
         // 채팅방 이름 설정
-        binding.receiverName.text = receiverName
-    }
-
-    private fun setUpToolbar() {
-        setSupportActionBar(binding.chatToolbar)
-        supportActionBar?.apply {
-            setDisplayShowTitleEnabled(false)
-            setDisplayHomeAsUpEnabled(true)
-        }
-    }
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            android.R.id.home -> {
-                finish()
-                return true
-            }
-        }
-        return super.onOptionsItemSelected(item)
+        setupToolbar(receiverName!!)
     }
 
     private fun observeChatMessages() {
-        viewModel.messages.observe(this) {
-            val list = setShowProfileAndDate(it).toList()
-            Log.d(TAG, "observeChatMessages: ${list}")
-            chatAdapter.submitList(list)
+        repeatOnStarted {
+            viewModel.messages.collect {
+                val list = setShowProfileAndDate(it).toList()
+                Log.d(TAG, "observeChatMessages: ${list}")
+                chatAdapter.submitList(list)
+            }
+        }
+    }
+
+    private fun setBottomSheetDialog() {
+        binding.mentoringExtendBtn.setOnSingleClickListener {
+            if (extendBottomSheetDialog == null) {
+                extendBottomSheetDialog = MentoringExtendBottomSheetDialog()
+            }
+            extendBottomSheetDialog!!.apply {
+                setOnExtendClickedListener(object :
+                    MentoringExtendBottomSheetDialog.OnExtendClickedListener {
+                    override fun onExtendClicked() {
+                        viewModel.requestExtendMentoringTime()
+                    }
+                })
+            }.show(supportFragmentManager, "extendBottomSheet")
         }
     }
 
@@ -141,13 +157,13 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
 
         messages.forEachIndexed { index, currentMessage ->
             if (index == 0 || lastMessage!!.date.substring(0, 13) != currentMessage.date.substring(0, 13)) {
-                val chatDate = ChatDate(currentMessage.name, currentMessage.content, currentMessage.date, true, currentMessage.type, currentMessage.fileUrl, currentMessage.id)
+                val chatDate = ChatDate(currentMessage.chatId, currentMessage.name, currentMessage.content, currentMessage.date, true, currentMessage.type, currentMessage.fileUrl, currentMessage.senderId)
                 resultMessages.add(chatDate)
             }
 
             // 이전 메시지와 현재 메시지가 같은 날짜인지 확인 (분 단위까지 비교)
             val isSameDay = lastMessage?.date?.substring(14, 22) == currentMessage.date.substring(14, 22)
-            val isSameUser = lastMessage?.id == currentMessage.id
+            val isSameUser = lastMessage?.senderId == currentMessage.senderId
 
             currentMessage.showMinute = !isSameDay || !isSameUser
             resultMessages.add(currentMessage)
@@ -188,7 +204,7 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
     }
 
     /**
-     * viewModel에서 roomId를 성공적으로 가져올 경우에만 소켓 연결하고, 방의 채팅 목록 일부를 가져오는 함수
+     * viewModel에서 room을 성공적으로 가져올 경우에만 소켓 연결하고, 방의 채팅 목록 일부를 가져오는 함수
      */
     private fun connectSocket() {
         lifecycleScope.launch {
@@ -202,19 +218,10 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
                         is UiState.Success -> {
                             supportFragmentManager.hideLoading()
                             binding.sendBtn.isEnabled = true
-                            if (receiverId != -1L) {
-                                Log.d(TAG, "connectSocket: ${state.data}")
-                                roomId = state.data
-                                viewModel.subscribeChatRoom(state.data)
-                                viewModel.getMessageStream(state.data)
-                            } else {
-                                showToast(LOAD_ERROR_MESSAGE)
-                            }
                         }
                         is UiState.Error -> {
                             supportFragmentManager.hideLoading()
-                            Log.d(TAG, "connectSocket: Error")
-                            showToast(LOAD_ERROR_MESSAGE)
+                            showToast(state.error!!.message!!)
                         }
                         is UiState.Empty -> {}
                     }
@@ -229,9 +236,19 @@ class ChatActivity : BaseActivity<ActivityChatBinding>() {
         }
     }
 
+    private fun observeIsMentor() {
+        repeatOnStarted {
+            viewModel.isMentorState.collect {
+                when (it) {
+                    true -> binding.extendLayout.visibility = View.GONE
+                    else -> binding.extendLayout.visibility = View.VISIBLE
+                }
+            }
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
-//        viewModel.disconnect()
     }
 
     private val chatScrollListener = object : RecyclerView.OnScrollListener() {

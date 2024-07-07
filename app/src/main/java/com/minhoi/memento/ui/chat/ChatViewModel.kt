@@ -8,16 +8,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.minhoi.memento.MentoApplication
 import com.minhoi.memento.data.dto.chat.ChatMessage
+import com.minhoi.memento.data.dto.chat.ChatRoom
 import com.minhoi.memento.data.dto.chat.MessageDto
-import com.minhoi.memento.data.dto.chat.Receiver
-import com.minhoi.memento.data.dto.chat.Sender
-import com.minhoi.memento.data.model.ChatFileType
+import com.minhoi.memento.data.model.MentoringExtendStatus
+import com.minhoi.memento.data.network.GsonClient
 import com.minhoi.memento.data.network.SaveFileResult
 import com.minhoi.memento.data.network.socket.StompManager
 import com.minhoi.memento.repository.chat.ChatRepository
 import com.minhoi.memento.ui.UiState
 import com.minhoi.memento.utils.FileManager
-import com.minhoi.memento.utils.parseLocalDateTime
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.Dispatchers
@@ -49,12 +48,11 @@ class ChatViewModel @Inject constructor(
     private val _connectState = MutableStateFlow<UiState<Boolean>>(UiState.Empty)
     val connectState: StateFlow<UiState<Boolean>> = _connectState.asStateFlow()
 
-    private val _chatRoomState = MutableStateFlow<UiState<Long>>(UiState.Loading)
-    val chatRoomState: StateFlow<UiState<Long>> = _chatRoomState.asStateFlow()
+    private val _chatRoomState = MutableStateFlow<UiState<ChatRoom>>(UiState.Loading)
+    val chatRoomState: StateFlow<UiState<ChatRoom>> = _chatRoomState.asStateFlow()
 
-    private val _messages = MutableLiveData<ArrayDeque<ChatMessage>>()
-    val messages: LiveData<ArrayDeque<ChatMessage>> = _messages
-    private val tempMessages = ArrayDeque<ChatMessage>()
+    private val _messages = MutableStateFlow<ArrayDeque<ChatMessage>>(ArrayDeque())
+    val messages: StateFlow<ArrayDeque<ChatMessage>> = _messages.asStateFlow()
 
     private val _isPageLoading = MutableStateFlow<UiState<Boolean>>(UiState.Empty)
     val isPageLoading: StateFlow<UiState<Boolean>> = _isPageLoading.asStateFlow()
@@ -62,8 +60,15 @@ class ChatViewModel @Inject constructor(
     private val _saveImageState = MutableStateFlow<UiState<Boolean>>(UiState.Empty)
     val saveImageState: StateFlow<UiState<Boolean>> = _saveImageState.asStateFlow()
 
+    private val _isMentorState = MutableStateFlow(false)
+    val isMentorState: StateFlow<Boolean> = _isMentorState.asStateFlow()
+
     private val stompClient = StompManager.stompClient
     private var subscription: Disposable? = null
+
+    fun setRoomId(roomId: Long) {
+        this.roomId = roomId
+    }
 
     fun subscribeChatRoom(roomId: Long) {
         handleWebSocketOpened(roomId)
@@ -74,13 +79,14 @@ class ChatViewModel @Inject constructor(
      */
     @SuppressLint("CheckResult")
     private fun handleWebSocketOpened(roomId: Long) {
-        _connectState.update { UiState.Success(true) }
+        // 중복 구독 방지
+        if (subscription != null) return
         // 채팅방 구독
         val headers = listOf(
             StompHeader("chatRoomId", roomId.toString()),
             StompHeader("senderId", member.id.toString())
         )
-        subscription = stompClient!!.topic("/sub/chats/$roomId", headers).subscribe { message ->
+        subscription = stompClient?.topic("/sub/chats/$roomId", headers)?.subscribe { message ->
             handleMessage(message)
         }
     }
@@ -91,19 +97,12 @@ class ChatViewModel @Inject constructor(
 
     private fun handleMessage(message: StompMessage) {
         viewModelScope.launch(Dispatchers.Main) {
-            val json = JSONObject(message.payload)
-            Log.d(TAG, "handleMessage: $json")
-            val fileType = ChatFileType.toFileType(json.getString("fileType"))
-            val fileURL = json.getString("fileURL")
-            val senderId = json.getLong("senderId")
-            val senderName = json.getString("senderName")
-            val content: String? = json.getString("content")
-            val chatRoomId = json.getLong("chatRoomId")
-            val date = json.getString("localDateTime")
-            val messageObject =
-                MessageDto(fileType!!, fileURL, senderId, chatRoomId, content, date, senderName)
-            tempMessages.addLast(getSenderOrReceiver(messageObject))
-            _messages.value = tempMessages
+            val messageObject = GsonClient.instance.fromJson(message.payload, MessageDto::class.java)
+            val chatMessage = getSenderOrReceiver(messageObject)
+            Log.d(TAG, "handleMessage: ${chatMessage}")
+            val updatedMessages = ArrayDeque(_messages.value)
+            updatedMessages.addLast(chatMessage)
+            _messages.value = updatedMessages
         }
     }
 
@@ -123,16 +122,10 @@ class ChatViewModel @Inject constructor(
     }
 
     fun sendFile(file: MultipartBody.Part) {
-        if (roomId == -1L)
-            return
         viewModelScope.launch {
-            chatRepository.sendFile(file, roomId).collectLatest {
+            chatRepository.sendFile(file, roomId).collect {
                 it.handleResponse(
-                    onSuccess = {
-                        Log.d(TAG, "sendFile: $it   $file")
-                        // 라시이클러뷰에 추가
-                        //
-                    },
+                    onSuccess = {},
                     onError = {
                         Log.d(TAG, "sendFile: ${it.message} ${it.exception?.message}  $file")
                     }
@@ -141,13 +134,15 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    fun getChatRoomId(receiverId: Long) {
+    fun getChatRoomState(roomId: Long) {
         viewModelScope.launch {
-            chatRepository.getRoomId(receiverId).collectLatest { result ->
+            chatRepository.getChatRoom(roomId).collect { result ->
                 result.handleResponse(
                     onSuccess = { data ->
-                        roomId = data.data.id
-                        _chatRoomState.update { UiState.Success(data.data.id) }
+                        _chatRoomState.update { UiState.Success(data.data) }
+                        if (data.data.mentorId == member.id) _isMentorState.update { true }
+                        getMessageStream(roomId)
+                        subscribeChatRoom(roomId)
                     },
                     onError = { error ->
                         _chatRoomState.update { UiState.Error(error.exception) }
@@ -161,18 +156,19 @@ class ChatViewModel @Inject constructor(
         _isPageLoading.value = UiState.Loading
         viewModelScope.launch {
             chatRepository.getMessages(roomId, currentPage, 20).collectLatest { result ->
-                Log.d(TAG, "getMessagesPage: $currentPage")
                 result.handleResponse(
                     onSuccess = { response ->
                         _isPageLoading.value = UiState.Success(true)
-                        Log.d(TAG, "getMessages: $messages")
                         if (response.data.last) {
                             _hasNextPage.value = false
                         }
+                        val updatedMessages = ArrayDeque(_messages.value)
                         response.data.content.forEach {
-                            tempMessages.addFirst(getSenderOrReceiver(it))
+                            updatedMessages.addFirst(getSenderOrReceiver(it))
                         }
-                        _messages.value = tempMessages
+                        Log.d(TAG, "getMessageStream: $updatedMessages")
+                        //TODO forEach 이외 방법
+                        _messages.value = updatedMessages
                         currentPage++
                     },
                     onError = { error ->
@@ -187,12 +183,8 @@ class ChatViewModel @Inject constructor(
     // 메세지 보낸 멤버가 로그인 한 멤버인지 다른 멤버인지 구분하는 함수
     private fun getSenderOrReceiver(chatMessage: MessageDto): ChatMessage {
         return when (chatMessage.senderId) {
-            member.id -> {
-                Sender(chatMessage.senderName, chatMessage.content, parseLocalDateTime(chatMessage.date), chatMessage.fileType, chatMessage.fileURL, chatMessage.senderId)
-            }
-            else -> {
-                Receiver(chatMessage.senderName, chatMessage.content, parseLocalDateTime(chatMessage.date), chatMessage.fileType, chatMessage.fileURL, chatMessage.senderId)
-            }
+            member.id -> chatMessage.toSender()
+            else -> chatMessage.toReceiver()
         }
     }
 
@@ -207,9 +199,52 @@ class ChatViewModel @Inject constructor(
         }
     }
 
+    fun downloadFile(fileUrl: String) {
+        viewModelScope.launch {
+            fileManager.downloadFile(fileUrl)
+        }
+    }
+
+    fun requestExtendMentoringTime() {
+        viewModelScope.launch {
+            chatRepository.extendMentoringTime(roomId).collect {
+                it.handleResponse(
+                    onSuccess = {
+                        Log.d(TAG, "extendMentoringTime: success")
+                    },
+                    onError = {
+                        Log.d(TAG, "extendMentoringTime: ${it.exception!!.message}")
+                    }
+                )
+            }
+        }
+    }
+
+    fun acceptExtendMentoringTime(chatId: Long) {
+        viewModelScope.launch {
+            chatRepository.processExtendMentoringTime(
+                chatId,
+                MentoringExtendStatus.ACCEPT
+            ).collect {
+
+            }
+
+        }
+    }
+
+    fun rejectExtendMentoringTime(chatId: Long) {
+        viewModelScope.launch {
+            chatRepository.processExtendMentoringTime(
+                chatId,
+                MentoringExtendStatus.DECLINE
+            ).collect {
+
+            }
+        }
+    }
+
     override fun onCleared() {
         super.onCleared()
         subscription?.dispose()
     }
-
 }

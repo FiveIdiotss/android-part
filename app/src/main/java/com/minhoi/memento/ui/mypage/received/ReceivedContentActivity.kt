@@ -9,6 +9,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.minhoi.memento.R
 import com.minhoi.memento.base.BaseActivity
 import com.minhoi.memento.data.dto.MentoringReceivedDto
+import com.minhoi.memento.data.model.ApplyStatus
 import com.minhoi.memento.databinding.ActivityReceivedContentBinding
 import com.minhoi.memento.ui.UiState
 import com.minhoi.memento.ui.mypage.MypageViewModel
@@ -24,6 +25,7 @@ import kotlinx.coroutines.launch
 class ReceivedContentActivity : BaseActivity<ActivityReceivedContentBinding>() {
     override val layoutResourceId: Int = R.layout.activity_received_content
     private val viewModel: MypageViewModel by viewModels()
+    private var rejectReasonBottomSheetDialog: InputRejectReasonBottomSheetDialog? = null
 
     override fun initView() {
         val intent = intent
@@ -43,11 +45,11 @@ class ReceivedContentActivity : BaseActivity<ActivityReceivedContentBinding>() {
 
         // 신청서 상태에 따라 버튼 노출
         when (receivedContent?.applyState) {
-            "HOLDING" -> {
+            ApplyStatus.HOLDING -> {
                 binding.acceptOrDenyLayout.visibility = View.VISIBLE
                 binding.alreadyProcessedText.visibility = View.GONE
             }
-            "COMPLETE" -> {
+            else -> {
                 binding.alreadyProcessedText.visibility = View.VISIBLE
                 binding.acceptOrDenyLayout.visibility = View.GONE
             }
@@ -59,30 +61,28 @@ class ReceivedContentActivity : BaseActivity<ActivityReceivedContentBinding>() {
             }
 
             rejectBtn.setOnSingleClickListener {
-                viewModel.rejectApply(receivedContent!!.applyId)
-            }
-        }
-
-        observeAcceptState()
-        observeRejectState()
-        observeApplyContent()
-    }
-
-    private fun observeAcceptState() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.acceptState.collectLatest { state ->
-                    branchState(state)
+                if (rejectReasonBottomSheetDialog == null) {
+                    rejectReasonBottomSheetDialog = InputRejectReasonBottomSheetDialog()
                 }
+                rejectReasonBottomSheetDialog!!.apply {
+                    setRejectReasonListener(object :
+                        InputRejectReasonBottomSheetDialog.RejectReasonListener {
+                        override fun onRejectReasonSubmit(reason: String) {
+                            viewModel.rejectApply(receivedContent!!.applyId, reason)
+                        }
+                    })
+                }.show(supportFragmentManager, rejectReasonBottomSheetDialog!!.tag)
             }
         }
+        observeApplyContent()
+        observeMentoringEvent()
     }
 
-    private fun observeRejectState() {
+    private fun observeMentoringEvent() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.rejectState.collectLatest { state ->
-                    branchState(state)
+                viewModel.mentoringEvent.collect { event ->
+                    handleEvent(event)
                 }
             }
         }
@@ -111,24 +111,17 @@ class ReceivedContentActivity : BaseActivity<ActivityReceivedContentBinding>() {
         }
     }
 
-    private fun branchState(state: UiState<Boolean>) {
-        when (state) {
-            // do nothing
-            is UiState.Empty -> {}
-
-            is UiState.Success -> {
+    private fun handleEvent(event: MypageViewModel.MentoringEvent) {
+        when (event) {
+            is MypageViewModel.MentoringEvent.Accept -> {
                 showToast("수락 완료")
-                supportFragmentManager.hideLoading()
                 finish()
             }
-            is UiState.Loading -> {
-                supportFragmentManager.showLoading()
-            }
-            is UiState.Error -> {
-                supportFragmentManager.hideLoading()
-                showToast("일시적인 오류가 발생하였습니다. 다시 시도해주세요")
+            is MypageViewModel.MentoringEvent.Reject -> {
+                showToast("거절 완료")
                 finish()
             }
+            is MypageViewModel.MentoringEvent.Error -> showToast(event.exception.message!!)
         }
     }
 

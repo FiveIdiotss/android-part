@@ -1,7 +1,6 @@
 package com.minhoi.memento.ui.mypage
 
 import android.content.Intent
-import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -39,31 +38,13 @@ class BookmarkBoardListActivity : BaseActivity<ActivityBookmarkBoardListBinding>
     }
 
     override fun initView() {
-        setUpToolbar()
+        setupToolbar("북마크한 게시글")
         viewModel.getBookmarkBoards()
         binding.bookmarkBoardsRv.apply {
             adapter = bookmarkAdapter
             layoutManager = LinearLayoutManager(this@BookmarkBoardListActivity, LinearLayoutManager.VERTICAL, false)
         }
         observeBookmarkBoards()
-    }
-
-    private fun setUpToolbar() {
-        setSupportActionBar(binding.bookmarkBoardsToolbar)
-        supportActionBar?.apply {
-            setDisplayHomeAsUpEnabled(true)
-            setDisplayShowTitleEnabled(false)
-        }
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            android.R.id.home -> {
-                finish()
-                return true
-            }
-        }
-        return super.onOptionsItemSelected(item)
     }
 
     private fun observeBookmarkBoards() {

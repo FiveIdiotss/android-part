@@ -5,16 +5,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.minhoi.memento.data.dto.VerifyCodeRequest
+import com.minhoi.memento.data.dto.CreateMemberRequest
 import com.minhoi.memento.data.dto.EmailVerificationRequest
 import com.minhoi.memento.data.dto.MajorDto
-import com.minhoi.memento.data.dto.CreateMemberRequest
 import com.minhoi.memento.data.dto.SchoolDto
+import com.minhoi.memento.data.dto.VerifyCodeRequest
 import com.minhoi.memento.repository.join.JoinRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 private val TAG = JoinViewModel::class.simpleName
@@ -41,7 +39,7 @@ class JoinViewModel @Inject constructor(
 
     var year = MutableLiveData<String>()
 
-    private var _majorId = MutableLiveData<Int>()
+    private var _majorId = MutableLiveData<Int>(-1)
     val majorId: LiveData<Int> = _majorId
 
     private var _majors = MutableLiveData<List<MajorDto>>()
@@ -72,23 +70,28 @@ class JoinViewModel @Inject constructor(
 
     private fun getSchools() {
         viewModelScope.launch {
-            val schoolsData = joinRepository.getSchools()
-            when (schoolsData.isSuccessful) {
-                true -> _schools.value = schoolsData.body()
-                else -> {}
+            joinRepository.getSchools().collect {
+                it.handleResponse(
+                    onSuccess = { value ->
+                        _schools.value = value.data
+                    },
+                    onError = {
+
+                    }
+                )
             }
         }
     }
 
     fun getMajorsBySchool(name: String) {
         viewModelScope.launch {
-            val majorsData = joinRepository.getMajors(name)
-            when (majorsData.isSuccessful) {
-                true -> {
-                    _majors.value = majorsData.body()
-                }
-
-                else -> {}
+            joinRepository.getMajors(name).collect {
+                it.handleResponse(
+                    onSuccess = { value ->
+                        _majors.value = value.data
+                    },
+                    onError = {}
+                )
             }
         }
     }
@@ -104,14 +107,9 @@ class JoinViewModel @Inject constructor(
             _majorId.value!!
         )
 
-        Log.d("memberDto", "join: ${member.toString()} ")
-
         viewModelScope.launch {
-            val response = joinRepository.join(member)
-            if (response.isSuccessful) {
-                Log.d("hahahahaha", "${response.body()}")
-            } else {
-                Log.d("hahahahaha", "${response.body()}")
+            joinRepository.join(member).collect {
+
             }
         }
     }
@@ -123,28 +121,33 @@ class JoinViewModel @Inject constructor(
         )
 
         viewModelScope.launch {
-            val response = joinRepository.verifyEmail(request)
-            withContext(Dispatchers.Main) {
-                if (response.isSuccessful && !response.body()!!.contains("false")) {
-                    _emailAndSchoolVerificationState.value = true
-                }
+            joinRepository.verifyEmail(request).collect {
+                it.handleResponse(
+                    onSuccess = { value ->
+                        _emailAndSchoolVerificationState.value = true
+                    },
+                    onError = {
+                        Log.d(TAG, "verifySchoolAndEmail: {${it.exception!!.message}")
+                    }
+                )
             }
         }
     }
 
     fun verifyCode() {
-        val request = VerifyCodeRequest(
-            _email.value.toString(),
-            _school.value.toString(),
-            _verificationCode.value.toString().toInt()
-        )
-
         viewModelScope.launch {
-            val response = joinRepository.verifyCode(request)
-            withContext(Dispatchers.Main) {
-                if (response.isSuccessful && !response.body()!!.contains("false")) {
-                    _verificationState.value = true
-                }
+            val request = VerifyCodeRequest(
+                _email.value.toString(),
+                _school.value.toString(),
+                _verificationCode.value.toString().toInt()
+            )
+            joinRepository.verifyCode(request).collect {
+                it.handleResponse(
+                    onSuccess = { value ->
+                        _verificationState.value = true
+                    },
+                    onError = {}
+                )
             }
         }
     }

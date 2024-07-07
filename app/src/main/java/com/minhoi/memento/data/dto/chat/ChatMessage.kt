@@ -1,13 +1,15 @@
 package com.minhoi.memento.data.dto.chat
 
-import com.minhoi.memento.data.model.ChatFileType
+import com.minhoi.memento.data.model.ChatMessageType
 
 interface ChatMessage {
-    val type: ChatFileType
+    val chatId: Long
+    val type: ChatMessageType
     val fileUrl: String?
-    val id: Long
+    val senderId: Long
     val content: String?
     var date: String
     val name: String?
     var showMinute: Boolean
+    val readCount: Int
 }

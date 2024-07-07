@@ -2,14 +2,16 @@ package com.minhoi.memento.repository.member
 
 import com.minhoi.memento.base.CommonResponse
 import com.minhoi.memento.data.dto.BoardListResponse
+import com.minhoi.memento.data.dto.TokenDto
 import com.minhoi.memento.data.dto.notification.NotificationListResponse
 import com.minhoi.memento.data.model.BoardType
+import com.minhoi.memento.data.model.safeFlow
 import com.minhoi.memento.data.network.ApiResult
+import com.minhoi.memento.data.network.service.AuthService
 import com.minhoi.memento.data.network.service.BoardService
 import com.minhoi.memento.data.network.service.MatchingService
 import com.minhoi.memento.data.network.service.MemberService
 import com.minhoi.memento.data.network.service.NotificationService
-import com.minhoi.memento.utils.safeFlow
 import kotlinx.coroutines.flow.Flow
 import okhttp3.MultipartBody
 import javax.inject.Inject
@@ -18,8 +20,13 @@ class MemberRepositoryImpl @Inject constructor(
     private val memberService: MemberService,
     private val matchingService: MatchingService,
     private val notificationService: NotificationService,
-    private val boardService: BoardService
+    private val boardService: BoardService,
+    private val authService: AuthService
 ) : MemberRepository {
+
+    override fun checkLoginState(refreshToken: String): Flow<ApiResult<CommonResponse<TokenDto>>> = safeFlow {
+        authService.getAccessToken("Bearer $refreshToken")
+    }
 
     override suspend fun getMemberInfo(memberId: Long) = memberService.getMemberInfo(memberId)
 
@@ -41,9 +48,13 @@ class MemberRepositoryImpl @Inject constructor(
             matchingService.getMatchedMentoringInfo( BoardType.MENTOR)
         }
 
-    override suspend fun acceptApply(applyId: Long) = matchingService.acceptApply(applyId)
+    override fun acceptApply(applyId: Long): Flow<ApiResult<CommonResponse<String>>> = safeFlow {
+        matchingService.acceptApply(applyId)
+    }
 
-    override suspend fun rejectApply(applyId: Long) = matchingService.rejectApply(applyId)
+    override fun rejectApply(applyId: Long): Flow<ApiResult<CommonResponse<String>>> = safeFlow {
+        matchingService.rejectApply(applyId)
+    }
 
     override fun uploadProfileImage(image: MultipartBody.Part) = safeFlow {
         memberService.uploadProfileImage(image)
@@ -84,5 +95,9 @@ class MemberRepositoryImpl @Inject constructor(
     }
 
     override fun saveFCMToken(token: String) = notificationService.saveToken(token)
+
+    override fun signOut(): Flow<ApiResult<CommonResponse<String>>> = safeFlow {
+        memberService.signOut()
+    }
 
 }

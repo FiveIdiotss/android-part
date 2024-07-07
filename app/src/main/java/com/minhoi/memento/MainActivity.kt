@@ -2,6 +2,7 @@ package com.minhoi.memento
 
 import android.Manifest
 import android.app.AlertDialog
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.util.Log
@@ -10,7 +11,12 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
@@ -18,29 +24,108 @@ import androidx.navigation.ui.setupWithNavController
 import com.google.android.gms.tasks.Task
 import com.google.android.material.bottomnavigation.BottomNavigationItemView
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.messaging.FirebaseMessaging
 import com.minhoi.memento.base.BaseActivity
 import com.minhoi.memento.databinding.ActivityMainBinding
+import com.minhoi.memento.ui.SplashViewModel
+import com.minhoi.memento.ui.UiState
+import com.minhoi.memento.ui.chat.ChatActivity
 import com.minhoi.memento.ui.home.HomeViewModel
 import com.minhoi.memento.ui.home.PostSelectBottomSheetDialog
+import com.minhoi.memento.ui.mypage.ApplyListActivity
+import com.minhoi.memento.ui.mypage.MyMentoringActivity
+import com.minhoi.memento.ui.question.QuestionInfoActivity
+import com.minhoi.memento.utils.repeatOnStarted
+import com.minhoi.memento.utils.showToast
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class MainActivity : BaseActivity<ActivityMainBinding>() {
     override val layoutResourceId: Int = R.layout.activity_main
-    private val viewModel by viewModels<HomeViewModel>()
+    private lateinit var viewModel: HomeViewModel
+    private val splashViewModel by viewModels<SplashViewModel>()
 
     override fun initView() {
-        setBottomNavigation()
-        askNotificationPermission()
-        FirebaseMessaging.getInstance().token
-            .addOnCompleteListener { task: Task<String> ->
-                if (!task.isSuccessful) {
-                    Log.d("MainActivity", "initView: success")
-                    return@addOnCompleteListener
-                }
-                val token = task.result
-                viewModel.saveFCMToken(token)
-                Log.d("FCMLog", "Current token: $token")
+        val splashScreen = installSplashScreen()
+        splashScreen.setKeepOnScreenCondition {
+            splashViewModel.loginState.value is SplashViewModel.LoginState.Loading
+        }
+        setUpSplashScreen()
+    }
+
+    private fun setUpSplashScreen() {
+        splashViewModel.checkLoginState(
+            onSuccess = {
+                viewModel = ViewModelProvider(this)[HomeViewModel::class.java]
+                observeLoginState()
+                observeBadgeCounts()
+                setBottomNavigation()
+                askNotificationPermission()
+                subscribeChatRooms()
+                observeStompEvent()
+                handleFcmNotificationIntent()
+                saveFCMToken()
+            },
+            onFailure = {
+                navigateToLoginActivity()
             }
+        )
+    }
+
+    private fun handleFcmNotificationIntent() {
+        try {
+            val type = intent.getStringExtra("type")
+            val otherPK = intent.getLongExtra("otherPK", -1)
+            val senderName = intent.getStringExtra("senderName")
+
+            val intent = when (type) {
+                "CHAT" -> Intent(this, ChatActivity::class.java).apply {
+                    putExtra("receiverName", senderName)
+                    putExtra("roomId", otherPK)
+                }
+                "REPLY_QUEST" -> Intent(this, QuestionInfoActivity::class.java).apply {
+                    putExtra("questionId", otherPK)
+                }
+                "APPLY" -> Intent(this, ApplyListActivity::class.java).apply {
+                    putExtra("requestType", "RECEIVE")
+                }
+                "MATCHING_COMPLETE","MATCHING_DECLINE" -> Intent(this, MyMentoringActivity::class.java)
+                else -> throw IllegalArgumentException("Invalid notification type")
+            }
+            startActivity(intent)
+        } catch (e: Exception) {
+            Log.e("MainActivity", "handleFcmNotificationIntent: ${e.message}")
+        }
+    }
+
+    private fun observeStompEvent() {
+        repeatOnStarted {
+            viewModel.connectEvent.collect {
+                Log.d("StompConnectionError", "error: ${it.exception}")
+                showToast(it.message)
+            }
+        }
+    }
+
+    private fun observeLoginState() {
+        repeatOnStarted {
+            splashViewModel.loginState.collect {
+                when (it) {
+                    is SplashViewModel.LoginState.Loading, SplashViewModel.LoginState.Success -> {}
+                    is SplashViewModel.LoginState.Failure -> showToast("세션이 만료되었습니다. 로그인 창으로 이동합니다.")
+                    is SplashViewModel.LoginState.Error -> showToast("인터넷 연결을 확인해주세요.")
+                }
+            }
+        }
+    }
+
+    private fun navigateToLoginActivity() {
+        val intent = Intent(this, IntroActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 
     private fun setBottomNavigation() {
@@ -54,7 +139,16 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         binding.bottomNavigationView.setupWithNavController(navController)
         addPostButton(navController)
 
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            if (destination.id == R.id.notificationListFragment) {
+                viewModel.resetUnreadNotificationCount()
+            }
+            if (destination.id == R.id.chatListFragment) {
+                viewModel.getChatRooms()
+            }
+        }
     }
+
     private fun showBoardPostModal() {
         PostSelectBottomSheetDialog().run {
             setStyle(DialogFragment.STYLE_NO_TITLE, R.style.AppBottomSheetDialogTheme)
@@ -116,10 +210,20 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         ActivityResultContracts.RequestPermission(),
     ) { isGranted: Boolean ->
         if (isGranted) {
-            MentoApplication.notificationPermissionPrefs.setChatPermission(true)
+            MentoApplication.notificationPermissionPrefs.apply {
+                setChatPermission(true)
+                setMatchPermission(true)
+                setReplyPermission(true)
+                setApplyPermission(true)
+            }
             Toast.makeText(this, "알림 권한 승인", Toast.LENGTH_LONG).show()
         } else {
-            MentoApplication.notificationPermissionPrefs.setChatPermission(false)
+            MentoApplication.notificationPermissionPrefs.apply {
+                setChatPermission(false)
+                setMatchPermission(false)
+                setReplyPermission(false)
+                setApplyPermission(false)
+            }
             Toast.makeText(this, "알림 권한 실패", Toast.LENGTH_LONG).show()
         }
     }
@@ -151,5 +255,31 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
                 requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             }
         }
+    }
+
+    private fun subscribeChatRooms() {
+        repeatOnStarted {
+            viewModel.chatRooms.collect { state ->
+                when (state) {
+                    is UiState.Empty, UiState.Loading -> {}
+                    is UiState.Success -> viewModel.subscribeChatRooms(state.data.map { it.first })
+                    is UiState.Error -> {
+                        showToast("네트워크 오류가 발생하였습니다. 다시 시도해주세요")
+                    }
+                }
+            }
+        }
+    }
+
+    private fun saveFCMToken() {
+        FirebaseMessaging.getInstance().token
+            .addOnCompleteListener { task: Task<String> ->
+                if (!task.isSuccessful) {
+                    return@addOnCompleteListener
+                }
+                val token = task.result
+                viewModel.saveFCMToken(token)
+                Log.d("FCMLog", "Current token: $token")
+            }
     }
 }

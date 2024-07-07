@@ -20,7 +20,7 @@ class NotificationAdapter(
         fun bind(item: NotificationListDto) {
             binding.notification = item
             when (item.type) {
-                NotificationListType.REPLY -> {
+                NotificationListType.REPLY_QUEST -> {
                     binding.apply {
                         root.setOnSingleClickListener {
                             onItemClickListener(item)

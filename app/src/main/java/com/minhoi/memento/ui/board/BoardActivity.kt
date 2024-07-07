@@ -1,15 +1,17 @@
 package com.minhoi.memento.ui.board
 
 import android.content.Intent
-import android.view.MenuItem
 import androidx.activity.viewModels
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.viewpager2.widget.ViewPager2
 import com.minhoi.memento.R
 import com.minhoi.memento.base.BaseActivity
 import com.minhoi.memento.databinding.ActivityBoardBinding
 import com.minhoi.memento.ui.UiState
+import com.minhoi.memento.ui.adapter.board.BoardImagePagerAdapter
 import com.minhoi.memento.utils.hideLoading
 import com.minhoi.memento.utils.setOnSingleClickListener
 import com.minhoi.memento.utils.showLoading
@@ -23,15 +25,18 @@ class BoardActivity : BaseActivity<ActivityBoardBinding>() {
     private val viewModel by viewModels<BoardViewModel>()
     private var boardId: Long = -1
     override val layoutResourceId: Int = R.layout.activity_board
+    private val boardImagePagerAdapter: BoardImagePagerAdapter by lazy { BoardImagePagerAdapter() }
 
     override fun initView() {
         boardId = intent.getLongExtra("boardId", -1L)
         binding.viewModel = viewModel
         getBoardContent(boardId)
-        setSupportActionBar(binding.boardToolbar)
-        supportActionBar?.apply {
-            setDisplayHomeAsUpEnabled(true)
-            setDisplayShowTitleEnabled(false)
+        setupToolbar("")
+
+        binding.boardImagesViewPager.apply {
+            adapter = boardImagePagerAdapter
+            orientation = ViewPager2.ORIENTATION_HORIZONTAL
+            binding.boardImageDotsIndicator.attachTo(this)
         }
 
         binding.mentorApplyBtn.setOnSingleClickListener {
@@ -44,18 +49,10 @@ class BoardActivity : BaseActivity<ActivityBoardBinding>() {
         binding.bookmarkBtn.setOnSingleClickListener {
             viewModel.boardBookmarkState.value?.let { viewModel.executeBookmark(boardId, it) }
         }
+
         observeBoardContent()
         observeBookmarkState()
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            android.R.id.home -> {
-                finish()
-                return true
-            }
-        }
-        return super.onOptionsItemSelected(item)
+        observeIsMyPost()
     }
 
     private fun getBoardContent(boardId: Long) {
@@ -79,8 +76,9 @@ class BoardActivity : BaseActivity<ActivityBoardBinding>() {
                         }
                         is UiState.Success -> {
                             supportFragmentManager.hideLoading()
-                            binding.boardContent = it.data
-                            viewModel.setBookmarkState(it.data.isBookmarked)
+                            binding.boardContent = it.data.boardDTO
+                            viewModel.setBookmarkState(it.data.boardDTO.isBookmarked)
+                            boardImagePagerAdapter.submitList(it.data.boardImageUrls)
                         }
                         is UiState.Error -> {
                             supportFragmentManager.hideLoading()
@@ -98,6 +96,22 @@ class BoardActivity : BaseActivity<ActivityBoardBinding>() {
                 binding.bookmarkBtn.setImageResource(R.drawable.heart_filled)
             } else {
                 binding.bookmarkBtn.setImageResource(R.drawable.heart_empty)
+            }
+        }
+    }
+
+    private fun observeIsMyPost() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.isMyPost.collectLatest {
+                    if (it) {
+                        binding.mentorApplyBtn.apply {
+                            text = "내가 작성한 모집 글"
+                            isClickable = false
+                            background = ContextCompat.getDrawable(context, R.drawable.round_corner_gray_filled)
+                        }
+                    }
+                }
             }
         }
     }

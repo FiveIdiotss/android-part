@@ -11,5 +11,6 @@ data class BoardContentResponse(
     @SerializedName("times")
     val timeTable: List<TimeTableDto>,
     @SerializedName("availableDays")
-    val availableDays: List<DayOfWeek>
+    val availableDays: List<DayOfWeek>,
+    val boardImageUrls: List<BoardImage>
 )

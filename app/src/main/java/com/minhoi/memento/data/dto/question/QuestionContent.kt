@@ -14,5 +14,5 @@ data class QuestionContent(
     val writeTime: String,
     val likeCount: Int,
     val replyCount: Int,
-    val like: Boolean
+    @SerializedName("like") val isLike: Boolean
 )

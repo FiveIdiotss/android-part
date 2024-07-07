@@ -2,7 +2,6 @@ package com.minhoi.memento.ui.mypage
 
 import android.content.Intent
 import android.util.Log
-import android.view.MenuItem
 import android.view.View
 import androidx.activity.viewModels
 import androidx.lifecycle.Lifecycle
@@ -18,6 +17,7 @@ import com.minhoi.memento.ui.adapter.ReceivedListAdapter
 import com.minhoi.memento.ui.board.BoardActivity
 import com.minhoi.memento.ui.mypage.received.ReceivedContentActivity
 import com.minhoi.memento.utils.hideLoading
+import com.minhoi.memento.utils.repeatOnStarted
 import com.minhoi.memento.utils.showLoading
 import com.minhoi.memento.utils.showToast
 import dagger.hilt.android.AndroidEntryPoint
@@ -43,15 +43,15 @@ class ApplyListActivity : BaseActivity<ActivityApplyListBinding>() {
         }
         when (requestType) {
             TYPE_APPLY -> {
-                binding.toolbarText.text = APPLY_TITLE
-//                viewModel.getApplyList()
+                setupToolbar(APPLY_TITLE)
+                viewModel.getApplyList()
                 applyListAdapter =
                     ApplyListAdapter(
                         onBoardClickListener = {
                             // onClickListener
                             // 선택한 신청서 내용 Activity에 전달
                             startActivity(Intent(this, BoardActivity::class.java).apply {
-                                putExtra("applyDto", it)
+                                putExtra("boardId", it)
                             })
                         },
                         onShowApplyContentListener = {
@@ -69,7 +69,7 @@ class ApplyListActivity : BaseActivity<ActivityApplyListBinding>() {
             }
 
             TYPE_RECEIVE -> {
-                binding.toolbarText.text = RECEIVE_TITLE
+                setupToolbar(RECEIVE_TITLE)
                 viewModel.getMemberBoards()
                 viewModel.getReceivedMentoring()
                 receivedListAdapter = ReceivedListAdapter(
@@ -101,23 +101,16 @@ class ApplyListActivity : BaseActivity<ActivityApplyListBinding>() {
 
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            android.R.id.home -> {
-                finish()
-                return true
-            }
-        }
-        return super.onOptionsItemSelected(item)
-    }
-
     private fun observeApplyList() {
-        viewModel.applyList.observe(this) {
-            if (it.isNullOrEmpty()) {
-                binding.emptyApplyListLayout.visibility = View.VISIBLE
-            } else {
-                binding.emptyApplyListLayout.visibility = View.GONE
-                applyListAdapter.setList(it)
+        repeatOnStarted {
+            viewModel.applyContents.collect {
+                if (it.isEmpty()) {
+                    binding.emptyApplyListLayout.visibility = View.VISIBLE
+                } else {
+                    binding.emptyApplyListLayout.visibility = View.GONE
+                }
+                Log.d("ApplyListActivity", "observeApplyList: $it ")
+                applyListAdapter.submitList(it)
             }
         }
     }

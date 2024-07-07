@@ -4,9 +4,9 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.minhoi.memento.MentoApplication
+import com.minhoi.memento.data.dto.ApplyRejectRequest
 import com.minhoi.memento.data.dto.BoardContentDto
 import com.minhoi.memento.data.dto.BoardContentForReceived
 import com.minhoi.memento.data.dto.BoardListResponse
@@ -15,18 +15,23 @@ import com.minhoi.memento.data.dto.MentoringApplyDto
 import com.minhoi.memento.data.dto.MentoringApplyListDto
 import com.minhoi.memento.data.dto.MentoringMatchInfo
 import com.minhoi.memento.data.dto.MentoringReceivedDto
-import com.minhoi.memento.ui.UiState
-import com.minhoi.memento.data.model.ApplyStatus
 import com.minhoi.memento.data.network.ApiResult
 import com.minhoi.memento.repository.board.BoardRepository
 import com.minhoi.memento.repository.member.MemberRepository
+import com.minhoi.memento.ui.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -42,17 +47,20 @@ class MypageViewModel @Inject constructor(
 
     private var member = MentoApplication.memberPrefs.getMemberPrefs()
 
-    private val _applyList = MutableLiveData<List<Pair<MentoringApplyListDto, ApplyStatus>>>()
-    val applyList: LiveData<List<Pair<MentoringApplyListDto, ApplyStatus>>> = _applyList
+    private val applyList = MutableStateFlow<List<MentoringApplyListDto>>(emptyList())
+
+    private val _applyContents =
+        MutableStateFlow<List<Pair<MentoringApplyListDto, BoardContentDto>>>(
+            emptyList()
+        )
+    val applyContents: StateFlow<List<Pair<MentoringApplyListDto, BoardContentDto>>> =
+        _applyContents.asStateFlow()
 
     private val _applyContent = MutableStateFlow<UiState<MentoringApplyDto>>(UiState.Empty)
     val applyContent: StateFlow<UiState<MentoringApplyDto>> = _applyContent.asStateFlow()
 
-    private val _acceptState = MutableStateFlow<UiState<Boolean>>(UiState.Empty)
-    val acceptState: StateFlow<UiState<Boolean>> = _acceptState.asStateFlow()
-
-    private val _rejectState = MutableStateFlow<UiState<Boolean>>(UiState.Empty)
-    val rejectState: StateFlow<UiState<Boolean>> = _acceptState.asStateFlow()
+    private val _mentoringEvent = MutableSharedFlow<MentoringEvent>()
+    val mentoringEvent: SharedFlow<MentoringEvent> = _mentoringEvent.asSharedFlow()
 
     private val _mentorInfo = MutableStateFlow<UiState<List<MentoringMatchInfo>>>(UiState.Empty)
     val mentorInfo: StateFlow<UiState<List<MentoringMatchInfo>>> = _mentorInfo.asStateFlow()
@@ -86,7 +94,7 @@ class MypageViewModel @Inject constructor(
                         UiState.Error(Throwable("dasd"))
                     }
                     if (currentPage == boardsResult.value.pageInfo.totalPages) {
-                        _isLastPage.value = true
+                        isLastPage = true
                     }
 
                     val boards = boardsResult.value.content.map {
@@ -143,28 +151,45 @@ class MypageViewModel @Inject constructor(
 
     fun getApplyList() {
         viewModelScope.launch {
-            member.let { member ->
-                val applyStateIds = memberRepository.getMentorInfo(member.id).extractSuccess().map { it.applyId }
-                val response = memberRepository.getApplyList(member.id)
-                if (response.isSuccessful) {
-                    val applyList = response.body() ?: throw Exception("ApplyList is null")
-                    val applyListWithState = applyList.map { applyItem ->
-                        when (applyItem.applyState) {
-                            "HOLDING" -> Pair(applyItem, ApplyStatus.ACCEPTANCE_PENDING)
-                            else -> {
-                                if (applyItem.applyId in applyStateIds!!) {
-                                    Pair(applyItem, ApplyStatus.ACCEPTED)
-                                } else {
-                                    Pair(applyItem, ApplyStatus.REJECTED)
-                                }
-                            }
-                        }
-                    }
-                    _applyList.value = applyListWithState
-                }
+            memberRepository.getApplyList().collect {
+                it.handleResponse(
+                    onSuccess = { value ->
+                        applyList.update { value.data }
+                        getApplyBoardContent()
+                    },
+                    onError = {}
+                )
             }
         }
     }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun getApplyBoardContent() {
+        val combinedList = mutableListOf<Pair<MentoringApplyListDto, BoardContentDto>>()
+        viewModelScope.launch {
+            applyList.flatMapConcat { applyDataList ->
+                combine(
+                    applyDataList.map { applyData ->
+                        boardRepository.getBoardContent(applyData.boardId).map { result ->
+                            applyData to result
+                        }
+                    }
+                ) { results -> results.toList() }
+            }.collect { results ->
+                results.forEach { (applyData, boardContentResult) ->
+                    boardContentResult.handleResponse(
+                        onSuccess = { boardContent ->
+                            val combinedData = applyData to boardContent.data.boardDTO
+                            combinedList.add(combinedData)
+                        },
+                        onError = {}
+                    )
+                }
+                _applyContents.update { combinedList }
+            }
+        }
+    }
+
 
     fun getApplyInfo(applyId: Long) {
         viewModelScope.launch {
@@ -172,7 +197,7 @@ class MypageViewModel @Inject constructor(
             memberRepository.getApplyInfo(applyId).collectLatest {
                 it.handleResponse(
                     onSuccess = { applyInfo ->
-                        _applyContent.update { UiState.Success(applyInfo) }
+                        _applyContent.update { UiState.Success(applyInfo.data) }
                     },
                     onError = { error ->
                         _applyContent.update { UiState.Error(error.exception) }
@@ -182,26 +207,43 @@ class MypageViewModel @Inject constructor(
         }
     }
 
+    private fun mentoringEvent(event: MentoringEvent) {
+        viewModelScope.launch {
+            _mentoringEvent.emit(event)
+        }
+    }
+
     fun acceptApply(applyId: Long) {
         viewModelScope.launch {
-            _acceptState.update { UiState.Loading }
-            val response = memberRepository.acceptApply(applyId)
-            if (response.isSuccessful) {
-                _acceptState.update { UiState.Success(true) }
-            } else {
-                _acceptState.update { UiState.Error(null) }
+            memberRepository.acceptApply(applyId).collect {
+                it.handleResponse(
+                    onSuccess = {
+                        mentoringEvent(MentoringEvent.Accept)
+                    },
+                    onError = { error ->
+                        mentoringEvent(MentoringEvent.Error(error.exception!!))
+                    }
+                )
             }
         }
     }
 
-    fun rejectApply(applyId: Long) {
-        _rejectState.update { UiState.Loading }
+    fun rejectApply(applyId: Long, rejectReason: String) {
         viewModelScope.launch {
-            val response = memberRepository.rejectApply(applyId)
-            if (response.isSuccessful) {
-                _rejectState.update { UiState.Success(true) }
-            } else {
-                _rejectState.update { UiState.Error(null) }
+            memberRepository.rejectApply(
+                ApplyRejectRequest(
+                    applyId,
+                    ApplyRejectRequest.RejectReason(rejectReason)
+                )
+            ).collect {
+                it.handleResponse(
+                    onSuccess = {
+                        mentoringEvent(MentoringEvent.Accept)
+                    },
+                    onError = { error ->
+                        mentoringEvent(MentoringEvent.Error(error.exception!!))
+                    }
+                )
             }
         }
     }
@@ -355,6 +397,26 @@ class MypageViewModel @Inject constructor(
             }
         }
     }
+
+    fun signOut() {
+        viewModelScope.launch {
+            memberRepository.signOut().collect {
+                it.handleResponse(
+                    onSuccess = {
+                        launch {
+                            _signOutEvent.emit(true)
+                        }
+                    },
+                    onError = {
+                        launch {
+                            _signOutEvent.emit(false)
+                        }
+                    }
+                )
+            }
+        }
+    }
+
     fun BoardContentDto.toBoardContentForReceived(): BoardContentForReceived {
         return BoardContentForReceived(
             boardId = this.boardId,
@@ -367,9 +429,16 @@ class MypageViewModel @Inject constructor(
             target = this.target,
             content = this.content,
             memberId = this.memberId,
+            memberImageUrl = this.memberImageUrl,
+            representImageUrl = this.representImageUrl,
             isBookmarked = this.isBookmarked,
             isExpanded = false // 기본값 설정
         )
     }
 
+    sealed class MentoringEvent {
+        object Accept : MentoringEvent()
+        object Reject : MentoringEvent()
+        data class Error(val exception: Throwable) : MentoringEvent()
+    }
 }

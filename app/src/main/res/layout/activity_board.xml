@@ -30,15 +30,29 @@
                 app:expandedTitleTextAppearance="@android:color/transparent"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
-                <ImageView
+                <FrameLayout
                     android:layout_width="match_parent"
                     android:layout_height="300dp"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/tempbackground"
-                    app:layout_collapseMode="parallax" />
+                    app:layout_collapseMode="parallax">
+
+                    <androidx.viewpager2.widget.ViewPager2
+                        android:id="@+id/boardImagesViewPager"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+
+                    <com.tbuonomo.viewpagerdotsindicator.DotsIndicator
+                        android:id="@+id/boardImageDotsIndicator"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center|bottom"
+                        android:layout_marginBottom="16dp"
+                        app:dotsColor="#E1E0E0"
+                        app:selectedDotColor="@color/colorPrimary"
+                        app:dotsSize="9dp"/>
+                </FrameLayout>
 
                 <androidx.appcompat.widget.Toolbar
-                    android:id="@+id/boardToolbar"
+                    android:id="@+id/toolbar"
                     android:layout_width="match_parent"
                     android:layout_height="?actionBarSize"
                     app:layout_collapseMode="pin">
@@ -305,7 +319,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
-                    android:text="@{boardContent.introduction}"
+                    app:htmlText="@{boardContent.introduction}"
                     android:textColor="@color/black"
                     android:textSize="16sp"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -333,7 +347,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
-                    android:text="@{boardContent.target}"
+                    app:htmlText="@{boardContent.target}"
                     android:textColor="@color/black"
                     android:textSize="16sp"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -361,7 +375,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
-                    android:text="@{boardContent.content}"
+                    app:htmlText="@{boardContent.content}"
                     android:textColor="@color/black"
                     android:textSize="16sp"
                     app:layout_constraintEnd_toEndOf="parent"

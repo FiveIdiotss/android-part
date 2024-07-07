@@ -6,7 +6,10 @@
 
     <data>
         <variable
-            name="board"
+            name="applyItem"
+            type="com.minhoi.memento.data.dto.MentoringApplyListDto" />
+        <variable
+            name="boardContent"
             type="com.minhoi.memento.data.dto.BoardContentDto" />
     </data>
 
@@ -29,7 +32,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            bind:board="@{board}" />
+            bind:board="@{boardContent}" />
 
         <ImageView
             android:id="@+id/imageView5"
@@ -56,23 +59,23 @@
 
         <TextView
             android:id="@+id/applyStatus"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="10dp"
-            android:gravity="center"
+            android:layout_marginTop="10dp"
             android:text="State"
-            android:textSize="17dp"
+            android:textSize="17sp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/showApplyContent" />
+            app:layout_constraintStart_toStartOf="@+id/imageView5"
+            app:layout_constraintTop_toBottomOf="@+id/showApplyContent" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/applyCancelLayout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="10dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imageView5">
+            app:layout_constraintTop_toBottomOf="@+id/applyStatus">
 
             <View
                 android:id="@+id/cancelIndicator"

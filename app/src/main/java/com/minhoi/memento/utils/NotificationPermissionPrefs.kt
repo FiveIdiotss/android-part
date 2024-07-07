@@ -11,6 +11,21 @@ class NotificationPermissionPrefs(context: Context) {
         sharedPreference.edit().putBoolean("chat", isEnabled).apply()
     }
 
+    fun setApplyPermission(isEnabled: Boolean) {
+        sharedPreference.edit().putBoolean("apply", isEnabled).apply()
+    }
+
+    fun setReplyPermission(isEnabled: Boolean) {
+        sharedPreference.edit().putBoolean("reply", isEnabled).apply()
+    }
+
+    fun setMatchPermission(isEnabled: Boolean) {
+        sharedPreference.edit().putBoolean("match", isEnabled).apply()
+    }
+
     fun getChatPermission() = sharedPreference.getBoolean("chat", false)
+    fun getApplyPermission() = sharedPreference.getBoolean("apply", false)
+    fun getReplyPermission() = sharedPreference.getBoolean("reply", false)
+    fun getMatchPermission() = sharedPreference.getBoolean("match", false)
 
 }

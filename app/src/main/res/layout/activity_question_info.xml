@@ -19,7 +19,7 @@
         tools:context=".ui.question.QuestionInfoActivity">
 
         <androidx.appcompat.widget.Toolbar
-            android:id="@+id/questionInfoToolbar"
+            android:id="@+id/toolbar"
             android:layout_width="0dp"
             android:layout_height="?actionBarSize"
             app:layout_constraintEnd_toEndOf="parent"
@@ -35,7 +35,7 @@
             android:layout_marginTop="10dp"
             android:src="@drawable/defaultimage"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/questionInfoToolbar" />
+            app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
         <TextView
             android:id="@+id/questionerName"
