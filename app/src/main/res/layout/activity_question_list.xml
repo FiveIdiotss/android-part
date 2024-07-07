@@ -117,7 +117,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:visibility="invisible"
-            bind:emptyText="{`아직 질문이 없어요. \n첫 번째 질문을 올려보세요!`}"
+            bind:emptyText="@{`아직 질문이 없어요.\n첫 번째 질문을 올려보세요!`}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"

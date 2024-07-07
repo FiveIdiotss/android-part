@@ -70,7 +70,7 @@
             android:layout_marginEnd="15dp"
             android:background="@drawable/textview_gray_corner"
             android:padding="10dp"
-            android:text="nickname"
+            android:text="@{member.name}"
             android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/textView23"
@@ -114,7 +114,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
-                android:text="서경대학교"
+                android:text="@{member.schoolName}"
                 android:textColor="@color/black"
                 android:textSize="17sp"
                 app:layout_constraintStart_toEndOf="@+id/imageView4"
@@ -125,8 +125,9 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:text="컴퓨터공학과 | 2018학번"
+                android:text="@{member.majorName + ` | ` + String.valueOf(member.year) + `학번`}"
                 android:textColor="#999999"
+                android:textSize="15sp"
                 app:layout_constraintStart_toStartOf="@+id/schoolName"
                 app:layout_constraintTop_toBottomOf="@+id/schoolName" />
 
