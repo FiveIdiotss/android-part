@@ -51,7 +51,7 @@ class ApplyListActivity : BaseActivity<ActivityApplyListBinding>() {
                             // onClickListener
                             // 선택한 신청서 내용 Activity에 전달
                             startActivity(Intent(this, BoardActivity::class.java).apply {
-                                putExtra("applyDto", it)
+                                putExtra("boardId", it)
                             })
                         },
                         onShowApplyContentListener = {
@@ -104,6 +104,12 @@ class ApplyListActivity : BaseActivity<ActivityApplyListBinding>() {
     private fun observeApplyList() {
         repeatOnStarted {
             viewModel.applyContents.collect {
+                if (it.isEmpty()) {
+                    binding.emptyApplyListLayout.visibility = View.VISIBLE
+                } else {
+                    binding.emptyApplyListLayout.visibility = View.GONE
+                }
+                Log.d("ApplyListActivity", "observeApplyList: $it ")
                 applyListAdapter.submitList(it)
             }
         }

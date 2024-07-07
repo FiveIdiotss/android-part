@@ -24,12 +24,14 @@ class ApplyListAdapter(
                 onShowApplyContentListener(currentList[bindingAdapterPosition].first)
             }
 
-            binding.root.setOnSingleClickListener {
+            binding.applyBoardLayout.root.setOnSingleClickListener {
                 onBoardClickListener(currentList[bindingAdapterPosition].second.boardId)
             }
         }
 
         fun bind(item: Pair<MentoringApplyListDto, BoardContentDto>) {
+            binding.applyItem = item.first
+            binding.boardContent = item.second
             when (item.first.applyState) {
                 ApplyStatus.HOLDING -> {
                     binding.applyStatus.text = "신청 대기중"
