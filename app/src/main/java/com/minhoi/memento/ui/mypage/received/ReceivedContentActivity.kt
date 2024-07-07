@@ -9,6 +9,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.minhoi.memento.R
 import com.minhoi.memento.base.BaseActivity
 import com.minhoi.memento.data.dto.MentoringReceivedDto
+import com.minhoi.memento.data.model.ApplyStatus
 import com.minhoi.memento.databinding.ActivityReceivedContentBinding
 import com.minhoi.memento.ui.UiState
 import com.minhoi.memento.ui.mypage.MypageViewModel
@@ -44,11 +45,11 @@ class ReceivedContentActivity : BaseActivity<ActivityReceivedContentBinding>() {
 
         // 신청서 상태에 따라 버튼 노출
         when (receivedContent?.applyState) {
-            "HOLDING" -> {
+            ApplyStatus.HOLDING -> {
                 binding.acceptOrDenyLayout.visibility = View.VISIBLE
                 binding.alreadyProcessedText.visibility = View.GONE
             }
-            "COMPLETE" -> {
+            else -> {
                 binding.alreadyProcessedText.visibility = View.VISIBLE
                 binding.acceptOrDenyLayout.visibility = View.GONE
             }
