@@ -11,14 +11,33 @@ class NotificationSettingActivity : BaseActivity<ActivityNotificationSettingBind
     override fun initView() {
         setupToolbar("알림 설정")
 
-        binding.chatNotificationSwitch.isChecked =
-            when (MentoApplication.notificationPermissionPrefs.getChatPermission()) {
-                true -> true
-                false -> false
+        binding.apply {
+            chatNotificationSwitch.isChecked =
+                MentoApplication.notificationPermissionPrefs.getChatPermission()
+            matchingNotificationSwitch.isChecked =
+                MentoApplication.notificationPermissionPrefs.getMatchPermission()
+            replyNotificationSwitch.isChecked =
+                MentoApplication.notificationPermissionPrefs.getReplyPermission()
+            applyNotificationSwitch.isChecked =
+                MentoApplication.notificationPermissionPrefs.getApplyPermission()
+        }
+
+        binding.apply {
+            chatNotificationSwitch.setOnCheckedChangeListener { _, isChecked ->
+                MentoApplication.notificationPermissionPrefs.setChatPermission(isChecked)
             }
 
-        binding.chatNotificationSwitch.setOnCheckedChangeListener { _, isChecked ->
-            MentoApplication.notificationPermissionPrefs.setChatPermission(isChecked)
+            matchingNotificationSwitch.setOnCheckedChangeListener { _, isChecked ->
+                MentoApplication.notificationPermissionPrefs.setMatchPermission(isChecked)
+            }
+
+            replyNotificationSwitch.setOnCheckedChangeListener { _, isChecked ->
+                MentoApplication.notificationPermissionPrefs.setReplyPermission(isChecked)
+            }
+
+            applyNotificationSwitch.setOnCheckedChangeListener { _, isChecked ->
+                MentoApplication.notificationPermissionPrefs.setApplyPermission(isChecked)
+            }
         }
     }
 }
