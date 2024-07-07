@@ -1,10 +1,12 @@
 package com.minhoi.memento.ui.adapter
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.minhoi.memento.data.dto.BoardContentDto
 import com.minhoi.memento.data.dto.MentoringApplyListDto
 import com.minhoi.memento.data.model.ApplyStatus
 import com.minhoi.memento.databinding.ApplyListRowItemBinding
@@ -13,51 +15,35 @@ import com.minhoi.memento.utils.setOnSingleClickListener
 class ApplyListAdapter(
     private val onBoardClickListener: (Long) -> Unit,
     private val onShowApplyContentListener: (MentoringApplyListDto) -> Unit
-) : RecyclerView.Adapter<com.minhoi.memento.ui.adapter.ApplyListAdapter.ViewHolder>() {
-
-    private val applies = mutableListOf<Pair<MentoringApplyListDto, ApplyStatus>>()
+) : ListAdapter<Pair<MentoringApplyListDto, BoardContentDto>, ApplyListAdapter.ViewHolder>(DiffCallback()) {
 
     inner class ViewHolder(private val binding: ApplyListRowItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
         init {
             binding.showApplyContent.setOnSingleClickListener {
-                onShowApplyContentListener(applies[bindingAdapterPosition].first)
+                onShowApplyContentListener(currentList[bindingAdapterPosition].first)
             }
 
-            binding.root.setOnSingleClickListener {
-                onBoardClickListener(applies[bindingAdapterPosition].first.boardId)
+            binding.applyBoardLayout.root.setOnSingleClickListener {
+                onBoardClickListener(currentList[bindingAdapterPosition].second.boardId)
             }
         }
 
-        fun bind(item: Pair<MentoringApplyListDto, ApplyStatus>) {
-            Log.d("ApplyListAdapter", "bind: ${item.first}")
-//            binding.board = BoardContentDto(
-//                    item.first.boardId,
-//                    item.first.otherMemberName,
-//                    item.first.boardTitle,
-//                    "가천대학교",
-//                    "컴퓨터공학과",
-//                0,
-//                "",
-//                "",
-//                "",
-//                item.first.otherMemberId
-//            )
-
-            when (item.second) {
-                ApplyStatus.ACCEPTANCE_PENDING -> {
+        fun bind(item: Pair<MentoringApplyListDto, BoardContentDto>) {
+            binding.applyItem = item.first
+            binding.boardContent = item.second
+            when (item.first.applyState) {
+                ApplyStatus.HOLDING -> {
                     binding.applyStatus.text = "신청 대기중"
                     binding.applyCancelLayout.visibility = View.VISIBLE
-                    binding.applyStatus.setTextColor(binding.root.context.getColor(android.R.color.holo_blue_light))
                 }
-                ApplyStatus.ACCEPTED -> {
-                    binding.applyStatus.text = "멘토링 매칭중"
+                ApplyStatus.COMPLETE -> {
+                    binding.applyStatus.text = "멘토링 신청이 수락되었습니다. 채팅 목록을 확인해주세요!"
                     binding.applyCancelLayout.visibility = View.GONE
-                    binding.applyStatus.setTextColor(binding.root.context.getColor(android.R.color.holo_green_light))
                 }
-                ApplyStatus.REJECTED -> {
-                    binding.applyStatus.text = "승인 거절"
-                    binding.applyStatus.setTextColor(binding.root.context.getColor(android.R.color.holo_red_light))
+                ApplyStatus.REJECT -> {
+                    binding.applyStatus.text = "신청이 거절되었습니다. 아래의 거절 사유를 확인해주세요."
+                    binding.applyCancelLayout.visibility = View.GONE
                 }
             }
         }
@@ -68,15 +54,18 @@ class ApplyListAdapter(
         return ViewHolder(binding)
     }
 
-    override fun getItemCount(): Int = applies.size
 
     override fun onBindViewHolder(holder: ApplyListAdapter.ViewHolder, position: Int) {
-        holder.bind(applies[position])
+        holder.bind(getItem(position))
     }
 
-    fun setList(contents: List<Pair<MentoringApplyListDto, ApplyStatus>>) {
-        applies.clear()
-        applies.addAll(contents)
-        notifyDataSetChanged()
+    private class DiffCallback() : DiffUtil.ItemCallback<Pair<MentoringApplyListDto, BoardContentDto>>() {
+        override fun areItemsTheSame(oldItem: Pair<MentoringApplyListDto, BoardContentDto>, newItem: Pair<MentoringApplyListDto, BoardContentDto>): Boolean {
+            return oldItem.first.applyId == newItem.first.applyId
+        }
+
+        override fun areContentsTheSame(oldItem: Pair<MentoringApplyListDto, BoardContentDto>, newItem: Pair<MentoringApplyListDto, BoardContentDto>): Boolean {
+            return oldItem == newItem
+        }
     }
 }

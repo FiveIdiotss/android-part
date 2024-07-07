@@ -49,7 +49,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
             startActivity(Intent(requireContext(), BoardListActivity::class.java))
         }
         binding.toMenteeBoard.setOnSingleClickListener {
-            startActivity(Intent(requireContext(), QuestionListActivity::class.java))
+            startActivity(Intent(requireContext(), QuestionListActivity::class.java).putExtra("type", "wholeQuestion"))
         }
 
         binding.mentorBoardRv.apply {

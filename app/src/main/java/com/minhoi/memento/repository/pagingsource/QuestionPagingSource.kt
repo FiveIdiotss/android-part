@@ -11,8 +11,11 @@ import kotlinx.coroutines.flow.first
 class QuestionPagingSource(
     private val questionRepository: QuestionRepository,
     private val schoolFilter: Boolean = false,
+    private val likeFilter: Boolean = false,
     private val boardCategory: String? = null,
-    private val searchKeyWord: String? = null
+    private val searchKeyWord: String? = null,
+    private val memberFilter: Boolean = false,
+    private val memberId: Long = -1
 ) : PagingSource<Int, QuestionContent>() {
 
     override fun getRefreshKey(state: PagingState<Int, QuestionContent>): Int? {
@@ -24,13 +27,20 @@ class QuestionPagingSource(
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, QuestionContent> {
         val page = params.key ?: STARTING_KEY
-        val loadData = questionRepository.getQuestions(
-            page,
-            params.loadSize,
-            schoolFilter,
-            boardCategory,
-            searchKeyWord
-        ).filterNot { it is ApiResult.Loading }.first()
+        val loadData =
+            if (memberFilter) {
+                questionRepository.getMyQuestions(page, params.loadSize, memberId)
+                    .filterNot { it is ApiResult.Loading }.first()
+            } else {
+                questionRepository.getQuestions(
+                    page,
+                    params.loadSize,
+                    schoolFilter,
+                    likeFilter,
+                    boardCategory,
+                    searchKeyWord
+                ).filterNot { it is ApiResult.Loading }.first()
+            }
 
         return when (loadData) {
             is ApiResult.Success -> {

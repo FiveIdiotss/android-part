@@ -40,21 +40,24 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
+                android:layout_marginEnd="10dp"
                 android:text="@{chatRoom.startDate + ` ` + chatRoom.startTime.substring(0,5) + ` 상담 예정`}"
                 android:textColor="#999999"
                 android:textSize="16sp"
+                app:layout_constraintEnd_toStartOf="@+id/latestSentTime"
                 app:layout_constraintStart_toStartOf="@+id/mentoringName"
                 app:layout_constraintTop_toBottomOf="@+id/mentoringName" />
 
             <TextView
                 android:id="@+id/latestSentMessage"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:maxLines="1"
-                android:text="@{chatRoom.latestMessage.hasImage ? `사진을 보냈습니다` : chatRoom.latestMessage.content}"
+                android:layout_marginEnd="10dp"
+                android:text="@{chatRoom.latestMessage.content}"
                 android:textColor="@color/black"
                 android:textSize="15sp"
+                app:layout_constraintEnd_toStartOf="@+id/latestSentTime"
                 app:layout_constraintStart_toStartOf="@+id/startDateTime"
                 app:layout_constraintTop_toBottomOf="@+id/startDateTime" />
 
@@ -102,7 +105,6 @@
                 app:layout_constraintStart_toEndOf="@+id/profileImage"
                 app:layout_constraintTop_toTopOf="@+id/profileImage" />
 
-
             <TextView
                 android:id="@+id/latestSentTime"
                 android:layout_width="wrap_content"
@@ -113,6 +115,22 @@
                 app:formatChatRoomDate="@{chatRoom.latestMessage.localDateTime}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/latestSentMessage" />
+
+            <TextView
+                android:id="@+id/unreadMessageCount"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginEnd="10dp"
+                android:gravity="center"
+                android:background="@drawable/unread_chatmessage_circle_background"
+                android:padding="5dp"
+                android:text="@{String.valueOf(chatRoom.unreadMessageCount)}"
+                android:textColor="@android:color/white"
+                android:textSize="14sp"
+                app:layout_constraintBottom_toBottomOf="@+id/profileImage"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/profileImage" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 

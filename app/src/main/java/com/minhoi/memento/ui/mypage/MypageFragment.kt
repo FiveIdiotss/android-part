@@ -5,6 +5,9 @@ import androidx.fragment.app.viewModels
 import com.minhoi.memento.R
 import com.minhoi.memento.base.BaseFragment
 import com.minhoi.memento.databinding.FragmentMypageBinding
+import com.minhoi.memento.ui.login.LoginActivity
+import com.minhoi.memento.ui.question.QuestionListActivity
+import com.minhoi.memento.utils.repeatOnStarted
 import com.minhoi.memento.utils.setOnSingleClickListener
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -16,6 +19,7 @@ class MypageFragment : BaseFragment<FragmentMypageBinding>() {
 
     override fun initView() {
         observeMemberInfo()
+        observeSignOutEvent()
 
         binding.apply {
             applyListBtn.setOnSingleClickListener {
@@ -43,12 +47,32 @@ class MypageFragment : BaseFragment<FragmentMypageBinding>() {
             notificationSettingBtn.setOnSingleClickListener {
                 startActivity(Intent(requireContext(), NotificationSettingActivity::class.java))
             }
+            myQuestionBtn.setOnSingleClickListener {
+                startActivity(Intent(requireContext(), QuestionListActivity::class.java).putExtra("type", "myQuestion"))
+            }
+            likeQuestionsBtn.setOnSingleClickListener {
+                startActivity(Intent(requireContext(), QuestionListActivity::class.java).putExtra("type", "likeQuestion"))
+            }
+            signOutBtn.setOnSingleClickListener {
+                viewModel.signOut()
+            }
         }
     }
 
     private fun observeMemberInfo() {
         viewModel.memberInfo.observe(viewLifecycleOwner) {
             binding.member = it
+        }
+    }
+
+    private fun observeSignOutEvent() {
+        repeatOnStarted {
+            viewModel.signOutEvent.collect {
+                if (it) {
+                    startActivity(Intent(requireActivity(), LoginActivity::class.java))
+                    requireActivity().finish()
+                }
+            }
         }
     }
 

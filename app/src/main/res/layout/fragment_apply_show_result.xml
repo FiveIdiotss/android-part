@@ -154,11 +154,11 @@
                 <TextView
                     android:id="@+id/textView44"
                     android:layout_width="0dp"
-                    android:layout_height="200dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
                     android:background="@drawable/round_corner_blue_color"
                     android:padding="10dp"
-                    android:text="2024.02.02 11:30 상담 예정"
+                    android:text="@{viewModel.mentoringApplyMessage}"
                     android:textColor="@color/black"
                     android:textSize="17sp"
                     app:layout_constraintEnd_toEndOf="parent"

@@ -29,14 +29,13 @@ class ChatListFragment : BaseFragment<FragmentChatListBinding>() {
         ChatRoomListAdapter {
             // onCLickListener
             startActivity(Intent(requireContext(), ChatActivity::class.java).apply {
-                putExtra("receiverId", it.receiverId)
+                putExtra("roomId", it.id)
                 putExtra("receiverName", it.receiverName)
             })
         }
     }
 
     override fun initView() {
-        viewModel.getChatRooms()
         observeChatRooms()
         binding.chatRoomRv.apply {
             adapter = chatRoomListAdapter
@@ -58,6 +57,11 @@ class ChatListFragment : BaseFragment<FragmentChatListBinding>() {
                         }
                         is UiState.Success -> {
                             parentFragmentManager.hideLoading()
+                            if (state.data.isEmpty()) {
+                                binding.emptyChatLayout.root.visibility = android.view.View.VISIBLE
+                            } else {
+                                binding.emptyChatLayout.root.visibility = android.view.View.GONE
+                            }
                             Log.d("ChatRooms", "observeChatRooms: ${state.data}")
                             chatRoomListAdapter.setList(state.data)
                         }
@@ -69,5 +73,10 @@ class ChatListFragment : BaseFragment<FragmentChatListBinding>() {
                 }
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.getChatRooms()
     }
 }

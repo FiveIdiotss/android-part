@@ -3,16 +3,20 @@ package com.minhoi.memento.ui.question
 import android.annotation.SuppressLint
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.MenuItem
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.minhoi.memento.R
 import com.minhoi.memento.base.BaseActivity
 import com.minhoi.memento.databinding.ActivityQuestionPostBinding
+import com.minhoi.memento.ui.SelectBoardCategoryBottomSheetDialog
 import com.minhoi.memento.ui.UiState
+import com.minhoi.memento.ui.adapter.AddPhotoAdapter
 import com.minhoi.memento.utils.hideLoading
 import com.minhoi.memento.utils.setOnSingleClickListener
 import com.minhoi.memento.utils.showLoading
@@ -26,11 +30,34 @@ class QuestionPostActivity : BaseActivity<ActivityQuestionPostBinding>() {
     override val layoutResourceId: Int = R.layout.activity_question_post
     private val viewModel by viewModels<QuestionViewModel>()
 
-    override fun initView() {
-        setUpToolbar()
-        observePostQuestionState()
+    private val addPhotoAdapter: AddPhotoAdapter by lazy {
+        AddPhotoAdapter(onDeleteClickListener = {
+            viewModel.removePostImageAt(it)
+        })
+    }
 
+    override fun initView() {
+        setupToolbar("질문 작성")
+        observePostQuestionState()
+        observePostImages()
         binding.inputQuestionContent.addTextChangedListener(questionLengthTextWatcher)
+
+        binding.selectCategoryLayout.setOnSingleClickListener {
+            SelectBoardCategoryBottomSheetDialog().apply {
+                selectCategory(object :
+                    SelectBoardCategoryBottomSheetDialog.OnCategorySelectedListener {
+                    override fun onCategorySelected(category: String) {
+                        binding.mentoringCategory.text = category
+                        viewModel.selectQuestionCategory(category)
+                    }
+                })
+            }.show(supportFragmentManager, "selectCategoryFragment")
+        }
+
+        binding.imageRv.apply {
+            adapter = addPhotoAdapter
+            layoutManager = LinearLayoutManager(this@QuestionPostActivity, LinearLayoutManager.HORIZONTAL, false)
+        }
 
         binding.postQuestionBtn.setOnSingleClickListener {
             if (!checkQuestionTitle()) {
@@ -39,30 +66,24 @@ class QuestionPostActivity : BaseActivity<ActivityQuestionPostBinding>() {
             }
 
             if (!checkQuestionContent()) {
-                showToast("질문 내용을 입력해주세요")
+                showToast("질문 내용을 10자 이상 입력해주세요")
                 return@setOnSingleClickListener
             }
 
             postQuestion()
         }
-    }
 
-    private fun setUpToolbar() {
-        setSupportActionBar(binding.questionPostToolbar)
-        supportActionBar?.apply {
-            setDisplayHomeAsUpEnabled(true)
-            setDisplayShowTitleEnabled(false)
-        }
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            android.R.id.home -> {
-                finish()
-                return true
+        val pickImageContract =
+            registerForActivityResult(ActivityResultContracts.PickMultipleVisualMedia(10)) { uris ->
+                if (uris.isNotEmpty() && uris != null) {
+                    viewModel.addPostImages(uris)
+                }
             }
+
+        binding.addImageBtn.setOnSingleClickListener {
+            pickImageContract.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
         }
-        return super.onOptionsItemSelected(item)
+
     }
 
     private fun postQuestion() {
@@ -73,11 +94,23 @@ class QuestionPostActivity : BaseActivity<ActivityQuestionPostBinding>() {
     }
 
     private fun checkQuestionTitle(): Boolean {
-        return binding.inputQuestionTitle.text.length > 2
+        return binding.inputQuestionTitle.text.isNotEmpty()
     }
 
     private fun checkQuestionContent(): Boolean {
         return binding.inputQuestionContent.text.length > 10
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun observePostImages() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.postImages.collect { images ->
+                    binding.imageCount.text = "${images.count()}/10"
+                    addPhotoAdapter.submitList(images.map { it.toString() })
+                }
+            }
+        }
     }
 
     private fun observePostQuestionState() {
@@ -135,7 +168,7 @@ class QuestionPostActivity : BaseActivity<ActivityQuestionPostBinding>() {
                     )
                     binding.inputQuestionContent.background = ContextCompat.getDrawable(
                         this@QuestionPostActivity,
-                        R.drawable.round_corner_black_color
+                        R.drawable.round_corner_blue_color
                     )
                 }
             }

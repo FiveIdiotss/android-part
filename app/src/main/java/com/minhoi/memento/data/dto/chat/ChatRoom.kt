@@ -16,5 +16,7 @@ data class ChatRoom(
     @SerializedName("date")
     val startDate: String,
     val startTime: String,
+    val consultTime: Int,
+    val mentorId: Long,
     val unreadMessageCount: Int
 )

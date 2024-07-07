@@ -1,7 +1,6 @@
 package com.minhoi.memento.ui.mypage
 
 import android.content.Intent
-import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -41,7 +40,7 @@ class MyMentoringActivity : BaseActivity<ActivityMyMentoringBinding>() {
     }
 
     override fun initView() {
-        setUpToolbar()
+        setupToolbar("내 멘토/멘티")
 
         viewModel.getMentorInfo()
         viewModel.getMenteeInfo()
@@ -110,24 +109,6 @@ class MyMentoringActivity : BaseActivity<ActivityMyMentoringBinding>() {
                 }
             }
         }
-    }
-
-    private fun setUpToolbar() {
-        setSupportActionBar(binding.myMentoringToolbar)
-        supportActionBar?.apply {
-            setDisplayHomeAsUpEnabled(true)
-            setDisplayShowTitleEnabled(false)
-        }
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            android.R.id.home -> {
-                finish()
-                return true
-            }
-        }
-        return super.onOptionsItemSelected(item)
     }
 
     private suspend fun getOtherMemberInfo(list: List<MentoringMatchInfo>): List<Pair<MentoringMatchInfo, MemberDTO>> {

@@ -10,6 +10,7 @@ import com.minhoi.memento.R
 import com.minhoi.memento.data.dto.BoardContentDto
 import com.minhoi.memento.data.dto.BoardContentForReceived
 import com.minhoi.memento.data.dto.MentoringReceivedDto
+import com.minhoi.memento.data.model.ApplyStatus
 import com.minhoi.memento.databinding.ReceivedListInBoardRowItemBinding
 import com.minhoi.memento.databinding.ReceivedListRowItemBinding
 import com.minhoi.memento.utils.setOnSingleClickListener
@@ -17,8 +18,7 @@ import com.minhoi.memento.utils.setOnSingleClickListener
 class ReceivedListAdapter(
     private val onBoardClickListener: (Long) -> Unit,
     private val onReceivedItemClickListener: (MentoringReceivedDto) -> Unit,
-) :
-    RecyclerView.Adapter<ReceivedListAdapter.ViewHolder>() {
+) : RecyclerView.Adapter<ReceivedListAdapter.ViewHolder>() {
 
     private val boardsWithReceivedMentoring =
         mutableListOf<Pair<BoardContentForReceived, List<MentoringReceivedDto>>>()
@@ -42,6 +42,16 @@ class ReceivedListAdapter(
         fun bind(item: Pair<BoardContentForReceived, List<MentoringReceivedDto>>) {
             Log.d("ReceivedListAdapter", "binds: $item")
             val boardContent = item.first
+            val unProcessMentoringCount = item.second.count {
+                it.applyState == ApplyStatus.HOLDING
+            }
+            if (unProcessMentoringCount == 0) {
+                binding.applyCount.visibility = View.GONE
+
+            } else {
+                binding.applyCount.visibility = View.VISIBLE
+                binding.applyCount.text = unProcessMentoringCount.toString()
+            }
             binding.board = BoardContentDto(
                 boardContent.boardId,
                 boardContent.memberName,
@@ -53,6 +63,8 @@ class ReceivedListAdapter(
                 boardContent.target,
                 boardContent.content,
                 boardContent.memberId,
+                boardContent.memberImageUrl,
+                boardContent.representImageUrl,
                 boardContent.isBookmarked
             )
             binding.applyListWithBoardRv.apply {

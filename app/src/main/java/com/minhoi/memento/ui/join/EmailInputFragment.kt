@@ -1,10 +1,10 @@
 package com.minhoi.memento.ui.join
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -56,7 +56,6 @@ class EmailInputFragment : Fragment() {
                             true -> {
                                 findNavController().navigate(R.id.action_emailInputFragment_to_emailVerifyCodeInputFragment)
                             }
-
                             else -> {
                                 binding.emailVerificationHint.text = "유효하지 않은 대학교 이메일입니다. 다시 입력해주세요"
                             }
@@ -73,12 +72,20 @@ class EmailInputFragment : Fragment() {
                 binding.apply {
                     emailVerificationHint.text = INVALID_EMAIL_FORMAT_TEXT
                     inputEmail.setBackgroundResource(R.drawable.round_corner_red_color)
+                    verifyBtn.apply {
+                        isEnabled = false
+                        setBackgroundResource(R.drawable.round_corner_gray_filled)
+                    }
                 }
                 regularEmailState = false
             } else {
                 binding.apply {
                     binding.emailVerificationHint.text = VALID_INPUT_TEXT      //에러 메세지 제거
-                    binding.inputEmail.setBackgroundResource(R.drawable.round_corner_purple_color)
+                    binding.inputEmail.setBackgroundResource(R.drawable.round_corner_blue_color)
+                    verifyBtn.apply {
+                        isEnabled = true
+                        setBackgroundResource(R.drawable.round_corner_blue_filled)
+                    }
                 }
                 regularEmailState = true
             }

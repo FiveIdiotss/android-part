@@ -1,12 +1,14 @@
 package com.minhoi.memento.repository.member
 
 import com.minhoi.memento.base.CommonResponse
+import com.minhoi.memento.data.dto.ApplyRejectRequest
 import com.minhoi.memento.data.dto.BoardListResponse
 import com.minhoi.memento.data.dto.MemberDTO
 import com.minhoi.memento.data.dto.MentoringApplyDto
 import com.minhoi.memento.data.dto.MentoringApplyListDto
 import com.minhoi.memento.data.dto.MentoringMatchInfo
 import com.minhoi.memento.data.dto.MentoringReceivedDto
+import com.minhoi.memento.data.dto.TokenDto
 import com.minhoi.memento.data.dto.notification.NotificationListResponse
 import com.minhoi.memento.data.network.ApiResult
 import kotlinx.coroutines.flow.Flow
@@ -16,9 +18,11 @@ import retrofit2.Response
 
 interface MemberRepository {
 
+    fun checkLoginState(refreshToken: String): Flow<ApiResult<CommonResponse<TokenDto>>>
+
     suspend fun getMemberInfo(memberId: Long): Response<CommonResponse<MemberDTO>>
 
-    suspend fun getApplyList(): Response<CommonResponse<List<MentoringApplyListDto>>>
+    suspend fun getApplyList(): Flow<ApiResult<CommonResponse<List<MentoringApplyListDto>>>>
 
     fun getApplyInfo(applyId: Long): Flow<ApiResult<CommonResponse<MentoringApplyDto>>>
 
@@ -28,9 +32,9 @@ interface MemberRepository {
 
     fun getMenteeInfo(): Flow<ApiResult<CommonResponse<List<MentoringMatchInfo>>>>
 
-    suspend fun acceptApply(applyId: Long): Response<CommonResponse<String>>
+    fun acceptApply(applyId: Long): Flow<ApiResult<CommonResponse<String>>>
 
-    suspend fun rejectApply(applyId: Long): Response<CommonResponse<String>>
+    fun rejectApply(applyRejectRequest: ApplyRejectRequest): Flow<ApiResult<CommonResponse<String>>>
 
     fun uploadProfileImage(image: MultipartBody.Part): Flow<ApiResult<CommonResponse<String>>>
 
@@ -47,4 +51,6 @@ interface MemberRepository {
     fun deleteNotification(notificationId: Long): Flow<ApiResult<CommonResponse<String>>>
 
     fun saveFCMToken(token: String): Call<String>
+
+    fun signOut(): Flow<ApiResult<CommonResponse<String>>>
 }

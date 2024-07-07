@@ -11,6 +11,8 @@ data class BoardContentForReceived(
     val target: String,
     val content: String,
     val memberId: Long,
+    val memberImageUrl: String,
+    val representImageUrl: String,
     var isBookmarked: Boolean = false,
     var isExpanded: Boolean = false,
 )

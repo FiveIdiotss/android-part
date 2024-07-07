@@ -14,36 +14,47 @@
         android:layout_height="match_parent"
         tools:context=".ui.mypage.EditProfileActivity">
 
-        <TextView
-            android:id="@+id/textView22"
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:gravity="center"
-            android:text="프로필 수정"
-            android:textSize="20sp"
-            android:textColor="@color/black"
+            android:layout_height="?actionBarSize"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/toolbarText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_gravity="center"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.appcompat.widget.Toolbar>
+
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/editImageBtn"
             android:layout_width="120dp"
             android:layout_height="120dp"
-            android:layout_marginTop="40dp"
-            app:placeholder="@{@drawable/ic_launcher_foreground}"
+            android:layout_marginTop="15dp"
             app:imageUrl="@{member.profileImageUrl}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView22" />
+            app:layout_constraintTop_toBottomOf="@+id/toolbar"
+            app:placeholder="@{@drawable/ic_launcher_foreground}" />
 
         <TextView
             android:id="@+id/textView23"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
             android:layout_marginStart="15dp"
+            android:layout_marginTop="30dp"
             android:text="닉네임"
             android:textColor="@color/black"
             android:textStyle="bold"
@@ -59,11 +70,11 @@
             android:layout_marginEnd="15dp"
             android:background="@drawable/textview_gray_corner"
             android:padding="10dp"
-            android:text="nickname"
+            android:text="@{member.name}"
             android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/textView23"
-            app:layout_constraintTop_toBottomOf="@+id/textView23"/>
+            app:layout_constraintTop_toBottomOf="@+id/textView23" />
 
         <TextView
             android:id="@+id/textView24"
@@ -92,8 +103,8 @@
                 android:id="@+id/imageView4"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:layout_marginTop="10dp"
                 android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
                 android:src="@drawable/school"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -103,7 +114,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
-                android:text="서경대학교"
+                android:text="@{member.schoolName}"
                 android:textColor="@color/black"
                 android:textSize="17sp"
                 app:layout_constraintStart_toEndOf="@+id/imageView4"
@@ -113,9 +124,10 @@
                 android:id="@+id/schoolMajorYear"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="컴퓨터공학과 | 2018학번"
-                android:textColor="#999999"
                 android:layout_marginTop="5dp"
+                android:text="@{member.majorName + ` | ` + String.valueOf(member.year) + `학번`}"
+                android:textColor="#999999"
+                android:textSize="15sp"
                 app:layout_constraintStart_toStartOf="@+id/schoolName"
                 app:layout_constraintTop_toBottomOf="@+id/schoolName" />
 

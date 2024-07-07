@@ -2,11 +2,11 @@ package com.minhoi.memento.ui.join
 
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -112,8 +112,9 @@ class SchoolInfoFragment : Fragment(), YearPickerDialogFragment.YearPickerDialog
 
     private fun observeSchoolInput() {
         joinViewModel.school.observe(viewLifecycleOwner) { input ->
+            updateNextButton()
             if (!input.isNullOrBlank()) {
-                binding.inputSchoolName.setBackgroundResource(R.drawable.round_corner_purple_color)
+                binding.inputSchoolName.setBackgroundResource(R.drawable.round_corner_blue_color)
                 binding.schoolHint.text = ""
             }
         }
@@ -121,10 +122,18 @@ class SchoolInfoFragment : Fragment(), YearPickerDialogFragment.YearPickerDialog
 
     private fun observeYearInput() {
         joinViewModel.year.observe(viewLifecycleOwner) { input ->
+            updateNextButton()
             if (!input.isNullOrBlank()) {
-                binding.inputYear.setBackgroundResource(R.drawable.round_corner_purple_color)
+                binding.inputYear.setBackgroundResource(R.drawable.round_corner_blue_color)
                 binding.yearHint.text = ""
             }
+        }
+    }
+
+    private fun updateNextButton() {
+        binding.infoNextBtn.apply {
+            isEnabled = !isSchoolBlank() && !isYearBlank()
+            setBackgroundResource(if (isEnabled) R.drawable.round_corner_blue_filled else R.drawable.round_corner_gray_filled)
         }
     }
 

@@ -31,8 +31,8 @@ class EditProfileActivity : BaseActivity<ActivityEditProfileBinding>(),
     private var imageUri: Uri? = null
 
     override fun initView() {
+        setupToolbar("프로필 수정")
         observeMemberInfo()
-
         binding.editImageBtn.setOnSingleClickListener {
             EditProfileImageBottomSheetDialog().show(supportFragmentManager, "editProfileImage")
         }

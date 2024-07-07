@@ -114,16 +114,29 @@
                     app:layout_constraintTop_toBottomOf="@id/frameLayout" />
 
                 <EditText
+                    android:id="@+id/inputMessage"
                     android:layout_width="0dp"
                     android:layout_height="200dp"
                     android:layout_marginTop="10dp"
+                    android:maxLength="200"
                     android:padding="10dp"
                     android:textSize="16sp"
-                    android:hint="멘토님에게 남길 메세지를 작성해주세요"
+                    android:hint="멘토님에게 남길 메세지를 작성해주세요 (쵀대 200자)"
                     android:background="@drawable/round_corner_blue_color"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/textView21" />
+
+                <TextView
+                    android:id="@+id/inputQuestionContentLength"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5dp"
+                    android:text="0 / 200"
+                    android:textColor="#999999"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="@+id/inputMessage"
+                    app:layout_constraintTop_toBottomOf="@+id/inputMessage" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </ScrollView>

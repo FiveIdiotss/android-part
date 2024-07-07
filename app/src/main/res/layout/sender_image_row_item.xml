@@ -40,6 +40,16 @@
 
         </FrameLayout>
         <TextView
+            android:id="@+id/isReadMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="@{senderData.readCount == 2 ? View.GONE : View.VISIBLE}"
+            android:text="1"
+            android:textColor="#999999"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="@id/messageFrameLayout"
+            app:layout_constraintEnd_toStartOf="@id/senderDate"/>
+        <TextView
             android:id="@+id/senderDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

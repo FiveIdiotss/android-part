@@ -4,7 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
+        <variable
+            name="viewModel"
+            type="com.minhoi.memento.ui.question.QuestionViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -14,7 +16,7 @@
         tools:context=".ui.question.QuestionPostActivity">
 
         <androidx.appcompat.widget.Toolbar
-            android:id="@+id/questionPostToolbar"
+            android:id="@+id/toolbar"
             android:layout_width="0dp"
             android:layout_height="?actionBarSize"
             app:layout_constraintEnd_toEndOf="parent"
@@ -22,10 +24,10 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <TextView
+                android:id="@+id/toolbarText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="질문 작성"
                 android:textColor="@color/black"
                 android:textSize="18sp" />
         </androidx.appcompat.widget.Toolbar>
@@ -40,7 +42,7 @@
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/questionPostToolbar"
+            app:layout_constraintTop_toBottomOf="@+id/toolbar"
             app:layout_constraintWidth_percent="0.9" />
 
         <EditText
@@ -48,7 +50,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:background="@drawable/round_corner_black_color"
+            android:background="@drawable/round_corner_blue_color"
             android:hint="제목 입력"
             android:padding="10dp"
             app:layout_constraintEnd_toEndOf="@+id/textView17"
@@ -72,7 +74,7 @@
             android:layout_width="0dp"
             android:layout_height="200dp"
             android:layout_marginTop="10dp"
-            android:background="@drawable/round_corner_black_color"
+            android:background="@drawable/round_corner_blue_color"
             android:hint="자유롭게 질문을 입력해주세요"
             android:maxLength="200"
             android:padding="10dp"
@@ -89,6 +91,107 @@
             android:textColor="#999999"
             app:layout_constraintStart_toStartOf="@+id/inputQuestionContent"
             app:layout_constraintTop_toBottomOf="@+id/inputQuestionContent" />
+
+        <TextView
+            android:id="@+id/textView22"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:text="카테고리 선택"
+            android:textColor="@color/black"
+            android:textSize="17sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="@+id/inputQuestionContent"
+            app:layout_constraintTop_toBottomOf="@+id/inputQuestionContentLength" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/selectCategoryLayout"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_margin="15dp"
+            android:background="@drawable/round_corner_blue_color"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView22">
+
+            <TextView
+                android:id="@+id/mentoringCategory"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:text="카테고리 선택"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginEnd="10dp"
+                android:src="@drawable/blackarrow"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <TextView
+            android:id="@+id/textView34"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:text="사진 등록"
+            android:textColor="@color/black"
+            android:textSize="17sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="@+id/selectCategoryLayout"
+            app:layout_constraintTop_toBottomOf="@+id/selectCategoryLayout" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/addImageBtn"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/round_corner_gray_filled"
+            app:layout_constraintStart_toStartOf="@+id/selectCategoryLayout"
+            app:layout_constraintTop_toBottomOf="@+id/textView34">
+
+            <ImageView
+                android:id="@+id/imageView10"
+                android:layout_width="30dp"
+                android:layout_height="20dp"
+                android:layout_marginTop="10dp"
+                android:src="@drawable/camera"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/imageCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="0/10"
+                android:textSize="12sp"
+                android:textColor="@color/black"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/imageView10" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/imageRv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            app:layout_constraintBottom_toBottomOf="@+id/addImageBtn"
+            app:layout_constraintEnd_toEndOf="@+id/selectCategoryLayout"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/addImageBtn"
+            app:layout_constraintTop_toTopOf="@+id/addImageBtn" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/postQuestionBtn"

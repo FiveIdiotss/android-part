@@ -17,8 +17,8 @@
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/userProfileImage"
-            android:layout_width="55dp"
-            android:layout_height="55dp"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
             android:layout_margin="10dp"
             app:placeholder="@{@drawable/defaultimage}"
             app:imageUrl="@{notification.senderImageUrl}"
@@ -33,7 +33,7 @@
             android:layout_marginEnd="15dp"
             android:text="title"
             android:textColor="@color/black"
-            android:textSize="17sp"
+            android:textSize="16sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toStartOf="@+id/deleteBtn"
             app:layout_constraintStart_toEndOf="@+id/userProfileImage"
@@ -48,7 +48,7 @@
             android:maxLines="2"
             android:text="content"
             android:textColor="@color/black"
-            android:textSize="16sp"
+            android:textSize="15sp"
             app:layout_constraintEnd_toEndOf="@+id/notificationTitle"
             app:layout_constraintStart_toStartOf="@id/notificationTitle"
             app:layout_constraintTop_toBottomOf="@+id/notificationTitle" />
@@ -66,8 +66,8 @@
 
         <ImageView
             android:id="@+id/deleteBtn"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
             android:layout_marginEnd="15dp"
             android:src="@drawable/close"
             android:visibility="@{notification.isExpanded ? View.VISIBLE : View.GONE}"

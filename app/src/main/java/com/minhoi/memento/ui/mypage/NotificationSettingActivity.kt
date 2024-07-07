@@ -1,6 +1,5 @@
 package com.minhoi.memento.ui.mypage
 
-import android.view.MenuItem
 import com.minhoi.memento.MentoApplication
 import com.minhoi.memento.R
 import com.minhoi.memento.base.BaseActivity
@@ -10,34 +9,35 @@ class NotificationSettingActivity : BaseActivity<ActivityNotificationSettingBind
     override val layoutResourceId: Int = R.layout.activity_notification_setting
 
     override fun initView() {
-        setUpToolbar()
+        setupToolbar("알림 설정")
 
-        binding.chatNotificationSwitch.isChecked =
-            when (MentoApplication.notificationPermissionPrefs.getChatPermission()) {
-                true -> true
-                false -> false
+        binding.apply {
+            chatNotificationSwitch.isChecked =
+                MentoApplication.notificationPermissionPrefs.getChatPermission()
+            matchingNotificationSwitch.isChecked =
+                MentoApplication.notificationPermissionPrefs.getMatchPermission()
+            replyNotificationSwitch.isChecked =
+                MentoApplication.notificationPermissionPrefs.getReplyPermission()
+            applyNotificationSwitch.isChecked =
+                MentoApplication.notificationPermissionPrefs.getApplyPermission()
+        }
+
+        binding.apply {
+            chatNotificationSwitch.setOnCheckedChangeListener { _, isChecked ->
+                MentoApplication.notificationPermissionPrefs.setChatPermission(isChecked)
             }
 
-        binding.chatNotificationSwitch.setOnCheckedChangeListener { _, isChecked ->
-            MentoApplication.notificationPermissionPrefs.setChatPermission(isChecked)
-        }
-    }
+            matchingNotificationSwitch.setOnCheckedChangeListener { _, isChecked ->
+                MentoApplication.notificationPermissionPrefs.setMatchPermission(isChecked)
+            }
 
-    private fun setUpToolbar() {
-        setSupportActionBar(binding.notificationSettingToolbar)
-        supportActionBar?.apply {
-            setDisplayHomeAsUpEnabled(true)
-            setDisplayShowTitleEnabled(false)
-        }
-    }
+            replyNotificationSwitch.setOnCheckedChangeListener { _, isChecked ->
+                MentoApplication.notificationPermissionPrefs.setReplyPermission(isChecked)
+            }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            android.R.id.home -> {
-                finish()
-                return true
+            applyNotificationSwitch.setOnCheckedChangeListener { _, isChecked ->
+                MentoApplication.notificationPermissionPrefs.setApplyPermission(isChecked)
             }
         }
-        return super.onOptionsItemSelected(item)
     }
 }

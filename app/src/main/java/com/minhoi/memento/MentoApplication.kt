@@ -6,6 +6,7 @@ import android.app.NotificationManager
 import android.content.Context
 import com.google.firebase.FirebaseApp
 import com.minhoi.memento.utils.MemberPrefs
+import com.minhoi.memento.utils.NotificationPermissionPrefs
 import com.minhoi.memento.utils.TokenPrefs
 import dagger.hilt.android.HiltAndroidApp
 
@@ -40,17 +41,33 @@ class MentoApplication : Application() {
         ).apply {
             description = getString(R.string.channel_chat_description)
         }
-        val postChannel = NotificationChannel(
-            getString(R.string.channel_post_id),
-            getString(R.string.channel_post_name),
+        val replyChannel = NotificationChannel(
+            getString(R.string.channel_reply_id),
+            getString(R.string.channel_reply_name),
             NotificationManager.IMPORTANCE_HIGH
         ).apply {
-            description = getString(R.string.channel_post_description)
+            description = getString(R.string.channel_reply_description)
+        }
+        val applyChannel = NotificationChannel(
+            getString(R.string.channel_apply_id),
+            getString(R.string.channel_apply_name),
+            NotificationManager.IMPORTANCE_HIGH
+        ).apply {
+            description = getString(R.string.channel_apply_description)
+        }
+        val matchingChannel = NotificationChannel(
+            getString(R.string.channel_matching_id),
+            getString(R.string.channel_matching_name),
+            NotificationManager.IMPORTANCE_HIGH
+        ).apply {
+            description = getString(R.string.channel_matching_description)
         }
 
         val channels = listOf(
             chatChannel,
-            postChannel
+            replyChannel,
+            applyChannel,
+            matchingChannel
         )
         notificationManager.createNotificationChannels(channels)
     }

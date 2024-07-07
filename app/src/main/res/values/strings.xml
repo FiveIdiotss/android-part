@@ -12,8 +12,16 @@
     <string name="channel_chat_name">채팅 알림</string>
     <string name="channel_chat_description">새로운 채팅 메시지를 알려줍니다.</string>
 
-    <string name="channel_post_id">CHANNEL_POST</string>
-    <string name="channel_post_name">게시글 알림</string>
-    <string name="channel_post_description">새로운 게시글이 있을 때 알려줍니다.</string>
+    <string name="channel_reply_id">CHANNEL_REPLY</string>
+    <string name="channel_reply_name">질문글 댓글 알림</string>
+    <string name="channel_reply_description">새로운 댓글이 있을 때 알려줍니다.</string>
+
+    <string name="channel_apply_id">CHANNEL_APPLY</string>
+    <string name="channel_apply_name">멘토링 지원 알림</string>
+    <string name="channel_apply_description">멘토링 지원이 있을 때 알려줍니다.</string>
+
+    <string name="channel_matching_id">CHANNEL_MENTORING</string>
+    <string name="channel_matching_name">멘토링 매칭 알림</string>
+    <string name="channel_matching_description">멘토링 매칭이 수락/거절 되었을 때 알려줍니다.</string>
 
 </resources>

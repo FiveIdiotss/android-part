@@ -19,7 +19,7 @@
         tools:context=".ui.board.BoardListActivity">
 
         <androidx.appcompat.widget.Toolbar
-            android:id="@+id/boardListToolbar"
+            android:id="@+id/toolbar"
             android:layout_width="0dp"
             android:layout_height="?actionBarSize"
             app:layout_constraintEnd_toEndOf="parent"
@@ -27,23 +27,23 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <TextView
+                android:id="@+id/toolbarText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="멘토링 모집 게시글"
                 android:textColor="@color/black"
                 android:textSize="18sp" />
         </androidx.appcompat.widget.Toolbar>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/linearLayout6"
+            android:id="@+id/filterLayout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/boardListToolbar">
+            app:layout_constraintTop_toBottomOf="@+id/toolbar">
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/filterCategoryBtn"
@@ -84,7 +84,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/linearLayout6" />
+            app:layout_constraintTop_toBottomOf="@+id/filterLayout" />
 
         <ProgressBar
             android:id="@+id/progressBar"

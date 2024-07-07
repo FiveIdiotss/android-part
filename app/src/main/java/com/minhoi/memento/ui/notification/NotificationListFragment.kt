@@ -10,14 +10,12 @@ import com.minhoi.memento.R
 import com.minhoi.memento.base.BaseFragment
 import com.minhoi.memento.data.model.NotificationListType
 import com.minhoi.memento.databinding.FragmentNotificationsBinding
-import com.minhoi.memento.ui.UiState
-import com.minhoi.memento.ui.adapter.NotificationListAdapter
+import com.minhoi.memento.ui.adapter.NotificationAdapter
 import com.minhoi.memento.ui.board.BoardActivity
+import com.minhoi.memento.ui.handleLoadState
 import com.minhoi.memento.ui.home.HomeViewModel
 import com.minhoi.memento.ui.question.QuestionInfoActivity
-import com.minhoi.memento.utils.BottomInfiniteScrollListener
-import com.minhoi.memento.utils.hideLoading
-import com.minhoi.memento.utils.showToast
+import com.minhoi.memento.utils.setOnSingleClickListener
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -37,7 +35,7 @@ class NotificationListFragment : BaseFragment<FragmentNotificationsBinding>() {
                         )
                     }
 
-                    NotificationListType.REPLY -> {
+                    NotificationListType.REPLY_QUEST -> {
                         startActivity(
                             Intent(
                                 requireContext(),
@@ -46,30 +44,64 @@ class NotificationListFragment : BaseFragment<FragmentNotificationsBinding>() {
                         )
                     }
 
-                NotificationListType.MATCHING_DECLINE -> {}
-                NotificationListType.MATCHING_COMPLETE -> {}
-            }
-        }
                     NotificationListType.MATCHING_DECLINE -> {}
                     NotificationListType.MATCHING_COMPLETE -> {}
                 }
             },
+            onDeleteClickListener = {
+                viewModel.deleteNotification(it)
+            }
+        )
     }
 
     override fun initView() {
         viewModel.getNotifications()
         observeNotificationList()
+        observeExpandState()
+
+        notificationListAdapter.addLoadStateListener { combinedLoadState ->
+            handleLoadState(
+                adapter = notificationListAdapter,
+                loadState = combinedLoadState,
+                progressBar = binding.progressBar,
+                recyclerView = binding.notificationRv,
+                retryLayout = binding.retryLayout,
+                emptyLayout = binding.emptyNotificationLayout
+            )
+        }
+
+        binding.retryLayout.retryButton.setOnSingleClickListener {
+            notificationListAdapter.retry()
+        }
+
+        binding.editNotificationBtn.setOnSingleClickListener {
+            showDeleteNotificationButton()
+        }
 
         binding.notificationRv.apply {
             val linearLayoutManager = LinearLayoutManager(requireContext())
             layoutManager = linearLayoutManager
             adapter = notificationListAdapter
-            addOnScrollListener(BottomInfiniteScrollListener(
-                layoutManager = linearLayoutManager,
-                isLoading = { viewModel.notificationList.value is UiState.Loading },
-                isLastPage = { viewModel.isLastPage },
-                loadMore = { viewModel.getNotificationList() }
-            ))
+        }
+    }
+
+    private fun showDeleteNotificationButton() {
+        when (viewModel.expandState.value) {
+            true -> viewModel.unExpandNotifications()
+            false -> viewModel.expandNotifications()
+        }
+    }
+
+    private fun observeExpandState() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.expandState.collectLatest {
+                    when (it) {
+                        true -> binding.editNotificationBtn.text = "완료"
+                        false -> binding.editNotificationBtn.text = "편집"
+                    }
+                }
+            }
         }
     }
 
