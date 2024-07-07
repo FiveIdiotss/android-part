@@ -30,8 +30,8 @@ interface ChatService {
         @Query("chatRoomId") roomId: Long
     ): Response<CommonResponse<String>>
 
-    @POST("api/chat/extend/{chatRoomId}")
-    suspend fun extendMentoringTime(@Path("chatRoomId") roomId: Long): Response<CommonResponse<String>>
+    @POST("api/chat/extend/request/{chatRoomId}")
+    suspend fun requestExtendMentoringTime(@Path("chatRoomId") roomId: Long): Response<CommonResponse<String>>
 
     @POST("api/chat/extend/{chatId}")
     suspend fun processExtendMentoringTime(@Path("chatId") chatId: Long, @Query("status") status: MentoringExtendStatus): Response<CommonResponse<String>>

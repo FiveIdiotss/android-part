@@ -31,7 +31,7 @@ class ChatRepositoryImpl @Inject constructor(
     }
 
     override fun extendMentoringTime(roomId: Long): Flow<ApiResult<CommonResponse<String>>> = safeFlow {
-        chatService.extendMentoringTime(roomId)
+        chatService.requestExtendMentoringTime(roomId)
     }
 
     override fun processExtendMentoringTime(
