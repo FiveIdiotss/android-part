@@ -1,9 +1,9 @@
 package com.minhoi.memento.data.network.service
 
 import com.minhoi.memento.base.CommonResponse
-import com.minhoi.memento.data.dto.LoginRequest
-import com.minhoi.memento.data.dto.LoginResponse
-import com.minhoi.memento.data.dto.TokenDto
+import com.minhoi.memento.data.dto.login.LoginRequest
+import com.minhoi.memento.data.dto.login.LoginResponse
+import com.minhoi.memento.data.dto.member.TokenDto
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET

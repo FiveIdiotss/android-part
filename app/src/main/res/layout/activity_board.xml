@@ -10,7 +10,7 @@
 
         <variable
             name="boardContent"
-            type="com.minhoi.memento.data.dto.BoardContentDto" />
+            type="com.minhoi.memento.data.dto.board.BoardContentDto" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout

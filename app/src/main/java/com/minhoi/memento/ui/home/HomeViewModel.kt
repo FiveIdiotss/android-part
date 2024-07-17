@@ -13,8 +13,8 @@ import androidx.paging.cachedIn
 import androidx.paging.filter
 import androidx.paging.map
 import com.minhoi.memento.MentoApplication
-import com.minhoi.memento.data.dto.BoardContentDto
-import com.minhoi.memento.data.dto.MemberDTO
+import com.minhoi.memento.data.dto.board.BoardContentDto
+import com.minhoi.memento.data.dto.member.MemberDTO
 import com.minhoi.memento.data.dto.chat.ChatRoom
 import com.minhoi.memento.data.dto.chat.LatestMessageDto
 import com.minhoi.memento.data.dto.notification.NotificationListDto

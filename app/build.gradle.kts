@@ -5,12 +5,13 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("dagger.hilt.android.plugin")
     id("kotlin-parcelize")
+    id("com.google.gms.google-services")
     kotlin("kapt")
 }
 
 android {
     namespace = "com.minhoi.memento"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.minhoi.memento"
@@ -53,9 +54,23 @@ fun getServerIp(propertyKey: String): String {
 
 dependencies {
 
+    implementation("androidx.core:core-splashscreen:1.0.0")
+    implementation(platform("com.google.firebase:firebase-bom:32.8.1"))
+    implementation("com.google.firebase:firebase-analytics")
+
+    implementation ("com.google.firebase:firebase-messaging:23.4.1")
+
+    // indicator animation
+    implementation("com.tbuonomo:dotsindicator:5.0")
+
+    implementation("androidx.viewpager2:viewpager2:1.0.0")
+
     implementation ("de.hdodenhof:circleimageview:3.1.0")
     implementation ("com.github.bumptech.glide:glide:4.16.0")
+    kapt ("com.github.bumptech.glide:compiler:4.12.0")
     implementation("com.github.bishoybasily:stomp:2.0.5")
+    implementation ("com.github.NaikSoftware:StompProtocolAndroid:1.6.6")
+    implementation("androidx.activity:activity:1.8.0")
     //paging3
     val paging_version = "3.1.1"
     implementation("androidx.paging:paging-runtime:$paging_version")

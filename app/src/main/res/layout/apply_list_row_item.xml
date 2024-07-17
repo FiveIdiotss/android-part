@@ -7,10 +7,10 @@
     <data>
         <variable
             name="applyItem"
-            type="com.minhoi.memento.data.dto.MentoringApplyListDto" />
+            type="com.minhoi.memento.data.dto.mentoring.MentoringApplyListDto" />
         <variable
             name="boardContent"
-            type="com.minhoi.memento.data.dto.BoardContentDto" />
+            type="com.minhoi.memento.data.dto.board.BoardContentDto" />
     </data>
 
     <com.google.android.material.card.MaterialCardView

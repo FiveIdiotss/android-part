@@ -4,7 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.minhoi.memento.MentoApplication
-import com.minhoi.memento.data.dto.LoginRequest
+import com.minhoi.memento.data.dto.login.LoginRequest
 import com.minhoi.memento.repository.login.LoginRepository
 import com.minhoi.memento.ui.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel

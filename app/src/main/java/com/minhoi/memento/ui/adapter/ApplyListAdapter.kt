@@ -6,8 +6,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.minhoi.memento.data.dto.BoardContentDto
-import com.minhoi.memento.data.dto.MentoringApplyListDto
+import com.minhoi.memento.data.dto.board.BoardContentDto
+import com.minhoi.memento.data.dto.mentoring.MentoringApplyListDto
 import com.minhoi.memento.data.model.ApplyStatus
 import com.minhoi.memento.databinding.ApplyListRowItemBinding
 import com.minhoi.memento.utils.setOnSingleClickListener

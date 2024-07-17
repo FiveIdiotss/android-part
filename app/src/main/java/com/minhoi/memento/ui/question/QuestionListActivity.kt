@@ -12,10 +12,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.minhoi.memento.R
 import com.minhoi.memento.base.BaseActivity
 import com.minhoi.memento.databinding.ActivityQuestionListBinding
-import com.minhoi.memento.ui.SelectBoardCategoryBottomSheetDialog
+import com.minhoi.memento.ui.common.dialog.SelectBoardCategoryBottomSheetDialog
 import com.minhoi.memento.ui.adapter.BoardLoadStateAdapter
 import com.minhoi.memento.ui.adapter.question.QuestionRowAdapter
-import com.minhoi.memento.ui.handleLoadState
+import com.minhoi.memento.ui.common.handleLoadState
 import com.minhoi.memento.utils.setOnSingleClickListener
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest

@@ -7,7 +7,7 @@
         android:id="@+id/applyMentoringLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.board.ApplyMentoringActivity">
+        tools:context=".ui.board.apply.ApplyMentoringActivity">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/applyToolbar"

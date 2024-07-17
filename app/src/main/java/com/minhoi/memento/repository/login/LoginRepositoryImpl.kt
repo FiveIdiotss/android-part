@@ -1,6 +1,6 @@
 package com.minhoi.memento.repository.login
 
-import com.minhoi.memento.data.dto.LoginRequest
+import com.minhoi.memento.data.dto.login.LoginRequest
 import com.minhoi.memento.data.model.safeFlow
 import com.minhoi.memento.data.network.RetrofitClient
 import com.minhoi.memento.data.network.service.AuthService

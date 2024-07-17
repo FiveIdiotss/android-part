@@ -36,6 +36,7 @@ class MentoringExtendBottomSheetDialog : BottomSheetDialogFragment() {
 
         binding.extendBtn.setOnSingleClickListener {
             extendClickedListener?.onExtendClicked()
+            dismiss()
         }
     }
 

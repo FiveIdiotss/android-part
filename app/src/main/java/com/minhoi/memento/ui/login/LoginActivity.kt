@@ -2,6 +2,7 @@ package com.minhoi.memento.ui.login
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.lifecycle.Lifecycle
@@ -12,7 +13,6 @@ import com.minhoi.memento.R
 import com.minhoi.memento.base.BaseActivity
 import com.minhoi.memento.databinding.ActivityLoginBinding
 import com.minhoi.memento.ui.UiState
-import com.minhoi.memento.utils.ProgressDialog
 import com.minhoi.memento.utils.hideLoading
 import com.minhoi.memento.utils.showLoading
 import com.minhoi.memento.utils.showToast
@@ -26,7 +26,6 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>() {
     override val layoutResourceId: Int = R.layout.activity_login
 
     private val viewModel by viewModels<LoginViewModel>()
-    private val progressDialog: ProgressDialog by lazy { ProgressDialog() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,6 +54,7 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>() {
                         }
                         is UiState.Error -> {
                             supportFragmentManager.hideLoading()
+                            Log.d("LoginActivity", "initView: ${it.error}")
                             showToast(it.error!!.message!!)
                         }
                     }
@@ -79,14 +79,6 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>() {
             }
         }
         return super.onOptionsItemSelected(item)
-    }
-
-    private fun showLoading() {
-        progressDialog.show(supportFragmentManager, "progress")
-    }
-
-    private fun hideLoading() {
-        progressDialog.dismiss()
     }
 
 }

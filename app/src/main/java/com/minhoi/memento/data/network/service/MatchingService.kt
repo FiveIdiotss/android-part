@@ -1,10 +1,10 @@
 package com.minhoi.memento.data.network.service
 
 import com.minhoi.memento.base.CommonResponse
-import com.minhoi.memento.data.dto.ApplyRejectRequest
-import com.minhoi.memento.data.dto.MentoringApplyListDto
-import com.minhoi.memento.data.dto.MentoringMatchInfo
-import com.minhoi.memento.data.dto.MentoringReceivedDto
+import com.minhoi.memento.data.dto.chat.ApplyRejectRequest
+import com.minhoi.memento.data.dto.mentoring.MentoringApplyListDto
+import com.minhoi.memento.data.dto.mentoring.MentoringMatchInfo
+import com.minhoi.memento.data.dto.mentoring.MentoringReceivedDto
 import com.minhoi.memento.data.model.BoardType
 import retrofit2.Response
 import retrofit2.http.Body

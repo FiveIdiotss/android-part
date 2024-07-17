@@ -38,6 +38,9 @@ class BoardListViewModel @Inject constructor(
             Pair(filter,search)
         }
 
+    /** combine 한 Flow를 flatten 하는 이유는 combine은 최신 값을
+     * 방출하지만, 최소 한 쌍이 방출되지 않으면 합쳐서 방출이 되지 않음 (ex -> 사용자가 boardCategory만 고른 경우).
+     * 또한 둘 중 하나라도 변경되면 새로운 게시글을 가져와야 하기 때문 */
     @OptIn(ExperimentalCoroutinesApi::class)
     fun getFilterBoardBySearch() =
         combineSearchAndFilterFlow.flatMapLatest { (filter, search) ->

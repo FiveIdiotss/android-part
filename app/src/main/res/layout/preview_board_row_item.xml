@@ -5,7 +5,7 @@
     <data>
         <variable
             name="boardContent"
-            type="com.minhoi.memento.data.dto.BoardContentDto" />
+            type="com.minhoi.memento.data.dto.board.BoardContentDto" />
     </data>
 
     <androidx.cardview.widget.CardView

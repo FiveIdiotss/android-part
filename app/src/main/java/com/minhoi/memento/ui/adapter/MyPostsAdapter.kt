@@ -1,18 +1,19 @@
 package com.minhoi.memento.ui.adapter
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.minhoi.memento.data.dto.BoardContentDto
+import com.minhoi.memento.data.dto.board.BoardContentDto
 import com.minhoi.memento.databinding.BoardRowItemBinding
 import com.minhoi.memento.utils.setOnSingleClickListener
 
 class MyPostsAdapter(
     private val onItemClickListener: (Long) -> Unit,
     private val onBookmarkClickListener: (BoardContentDto, Int) -> Unit,
-    private val onSettingClickListener: (Long) -> Unit
+    private val onSettingClickListener: (Long) -> Unit,
 ) : ListAdapter<BoardContentDto, RecyclerView.ViewHolder>(DiffCallback()) {
 
     inner class ViewHolder(private val binding: BoardRowItemBinding) :
@@ -31,6 +32,7 @@ class MyPostsAdapter(
 
         fun bind(item: BoardContentDto) {
             binding.board = item
+            binding.settingBtn.visibility = View.VISIBLE
             when (item.isBookmarked) {
                 true -> binding.bookmarkBtn.setImageResource(com.minhoi.memento.R.drawable.heart_filled)
                 false -> binding.bookmarkBtn.setImageResource(com.minhoi.memento.R.drawable.heart_empty)

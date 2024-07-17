@@ -1,8 +1,8 @@
 package com.minhoi.memento.repository.board
 
 import com.minhoi.memento.base.CommonResponse
-import com.minhoi.memento.data.dto.BoardListResponse
-import com.minhoi.memento.data.dto.MentoringApplyRequest
+import com.minhoi.memento.data.dto.board.BoardListResponse
+import com.minhoi.memento.data.dto.mentoring.MentoringApplyRequest
 import com.minhoi.memento.data.model.safeFlow
 import com.minhoi.memento.data.network.ApiResult
 import com.minhoi.memento.data.network.service.BoardService

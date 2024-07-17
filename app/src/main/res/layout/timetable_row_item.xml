@@ -6,7 +6,7 @@
     <data>
         <variable
             name="timetable"
-            type="com.minhoi.memento.data.dto.TimeTableDto" />
+            type="com.minhoi.memento.data.dto.board.TimeTableDto" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"

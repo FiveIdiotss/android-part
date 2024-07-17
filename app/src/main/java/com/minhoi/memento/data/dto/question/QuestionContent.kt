@@ -14,5 +14,6 @@ data class QuestionContent(
     val writeTime: String,
     val likeCount: Int,
     val replyCount: Int,
+    @SerializedName("representImage") val thumbnailUrl: String,
     @SerializedName("like") val isLike: Boolean
 )

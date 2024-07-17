@@ -7,13 +7,13 @@
     <data>
         <variable
             name="recievedDto"
-            type="com.minhoi.memento.data.dto.MentoringReceivedDto" />
+            type="com.minhoi.memento.data.dto.mentoring.MentoringReceivedDto" />
         <variable
             name="applyInfo"
-            type="com.minhoi.memento.data.dto.MentoringApplyDto" />
+            type="com.minhoi.memento.data.dto.mentoring.MentoringApplyDto" />
         <variable
             name="board"
-            type="com.minhoi.memento.data.dto.BoardContentDto" />
+            type="com.minhoi.memento.data.dto.board.BoardContentDto" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

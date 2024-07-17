@@ -5,11 +5,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.minhoi.memento.data.dto.CreateMemberRequest
-import com.minhoi.memento.data.dto.EmailVerificationRequest
-import com.minhoi.memento.data.dto.MajorDto
-import com.minhoi.memento.data.dto.SchoolDto
-import com.minhoi.memento.data.dto.VerifyCodeRequest
+import com.minhoi.memento.data.dto.join.CreateMemberRequest
+import com.minhoi.memento.data.dto.join.EmailVerificationRequest
+import com.minhoi.memento.data.dto.join.MajorDto
+import com.minhoi.memento.data.dto.join.SchoolDto
+import com.minhoi.memento.data.dto.join.VerifyCodeRequest
 import com.minhoi.memento.repository.join.JoinRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch

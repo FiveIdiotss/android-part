@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.minhoi.memento.R
 import com.minhoi.memento.databinding.FragmentSchoolMajorBinding
 import com.minhoi.memento.ui.adapter.MajorAdapter
-import com.minhoi.memento.utils.MajorItemDecoration
+import com.minhoi.memento.ui.common.MajorItemDecoration
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

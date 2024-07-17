@@ -1,14 +1,14 @@
 package com.minhoi.memento.repository.member
 
 import com.minhoi.memento.base.CommonResponse
-import com.minhoi.memento.data.dto.ApplyRejectRequest
-import com.minhoi.memento.data.dto.BoardListResponse
-import com.minhoi.memento.data.dto.MemberDTO
-import com.minhoi.memento.data.dto.MentoringApplyDto
-import com.minhoi.memento.data.dto.MentoringApplyListDto
-import com.minhoi.memento.data.dto.MentoringMatchInfo
-import com.minhoi.memento.data.dto.MentoringReceivedDto
-import com.minhoi.memento.data.dto.TokenDto
+import com.minhoi.memento.data.dto.chat.ApplyRejectRequest
+import com.minhoi.memento.data.dto.board.BoardListResponse
+import com.minhoi.memento.data.dto.member.MemberDTO
+import com.minhoi.memento.data.dto.mentoring.MentoringApplyDto
+import com.minhoi.memento.data.dto.mentoring.MentoringApplyListDto
+import com.minhoi.memento.data.dto.mentoring.MentoringMatchInfo
+import com.minhoi.memento.data.dto.mentoring.MentoringReceivedDto
+import com.minhoi.memento.data.dto.member.TokenDto
 import com.minhoi.memento.data.dto.notification.NotificationListResponse
 import com.minhoi.memento.data.network.ApiResult
 import kotlinx.coroutines.flow.Flow
