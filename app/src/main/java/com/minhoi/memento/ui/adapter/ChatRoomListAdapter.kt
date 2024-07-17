@@ -3,7 +3,7 @@ package com.minhoi.memento.ui.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.minhoi.memento.data.dto.MemberDTO
+import com.minhoi.memento.data.dto.member.MemberDTO
 import com.minhoi.memento.data.dto.chat.ChatRoom
 import com.minhoi.memento.databinding.ChatroomListRowItemBinding
 import com.minhoi.memento.utils.setOnSingleClickListener

@@ -6,13 +6,13 @@
     <data>
         <variable
             name="member"
-            type="com.minhoi.memento.data.dto.MemberDTO" />
+            type="com.minhoi.memento.data.dto.member.MemberDTO" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.mypage.EditProfileActivity">
+        tools:context=".ui.mypage.edit.EditProfileActivity">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"

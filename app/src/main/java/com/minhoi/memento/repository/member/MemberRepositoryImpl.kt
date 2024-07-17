@@ -1,8 +1,10 @@
 package com.minhoi.memento.repository.member
 
 import com.minhoi.memento.base.CommonResponse
-import com.minhoi.memento.data.dto.BoardListResponse
-import com.minhoi.memento.data.dto.TokenDto
+import com.minhoi.memento.data.dto.chat.ApplyRejectRequest
+import com.minhoi.memento.data.dto.board.BoardListResponse
+import com.minhoi.memento.data.dto.mentoring.MentoringApplyListDto
+import com.minhoi.memento.data.dto.member.TokenDto
 import com.minhoi.memento.data.dto.notification.NotificationListResponse
 import com.minhoi.memento.data.model.BoardType
 import com.minhoi.memento.data.model.safeFlow
@@ -30,7 +32,9 @@ class MemberRepositoryImpl @Inject constructor(
 
     override suspend fun getMemberInfo(memberId: Long) = memberService.getMemberInfo(memberId)
 
-    override suspend fun getApplyList() = matchingService.getMyApply("SEND")
+    override suspend fun getApplyList(): Flow<ApiResult<CommonResponse<List<MentoringApplyListDto>>>> = safeFlow {
+        matchingService.getMyApply("SEND")
+    }
 
     override fun getApplyInfo(applyId: Long) = safeFlow {
         memberService.getApplyInfo(applyId)
@@ -52,8 +56,8 @@ class MemberRepositoryImpl @Inject constructor(
         matchingService.acceptApply(applyId)
     }
 
-    override fun rejectApply(applyId: Long): Flow<ApiResult<CommonResponse<String>>> = safeFlow {
-        matchingService.rejectApply(applyId)
+    override fun rejectApply(applyRejectRequest: ApplyRejectRequest): Flow<ApiResult<CommonResponse<String>>> = safeFlow {
+        matchingService.rejectApply(applyRejectRequest.reason, applyRejectRequest.applyId)
     }
 
     override fun uploadProfileImage(image: MultipartBody.Part) = safeFlow {

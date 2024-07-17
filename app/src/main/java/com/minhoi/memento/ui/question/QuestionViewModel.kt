@@ -173,9 +173,15 @@ class QuestionViewModel @Inject constructor(
         }
     }
 
-    fun executeLike(questionId: Long, isLike: Boolean) {
+    fun executeLike(questionId: Long) {
         viewModelScope.launch {
-            when (isLike) {
+            val likeState = if (_questionContentState.value is UiState.Success) {
+                (_questionContentState.value as UiState.Success<QuestionResponse>).data.questionContent.isLike
+            } else {
+                return@launch
+            }
+
+            when (likeState) {
                 true -> questionRepository.unExecuteLike(questionId)
                 false -> questionRepository.executeLike(questionId)
             }.collectLatest {

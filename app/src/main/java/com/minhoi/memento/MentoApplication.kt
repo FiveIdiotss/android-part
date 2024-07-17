@@ -5,9 +5,9 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import com.google.firebase.FirebaseApp
-import com.minhoi.memento.utils.MemberPrefs
-import com.minhoi.memento.utils.NotificationPermissionPrefs
-import com.minhoi.memento.utils.TokenPrefs
+import com.minhoi.memento.utils.prefs.MemberPrefs
+import com.minhoi.memento.utils.prefs.NotificationPermissionPrefs
+import com.minhoi.memento.utils.prefs.TokenPrefs
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp

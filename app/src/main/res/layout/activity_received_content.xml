@@ -6,10 +6,10 @@
     <data>
         <variable
             name="receivedDto"
-            type="com.minhoi.memento.data.dto.MentoringReceivedDto" />
+            type="com.minhoi.memento.data.dto.mentoring.MentoringReceivedDto" />
         <variable
             name="applyInfo"
-            type="com.minhoi.memento.data.dto.MentoringApplyDto" />
+            type="com.minhoi.memento.data.dto.mentoring.MentoringApplyDto" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

@@ -8,7 +8,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.minhoi.memento.R
 import com.minhoi.memento.base.BaseActivity
-import com.minhoi.memento.data.dto.MentoringReceivedDto
+import com.minhoi.memento.data.dto.mentoring.MentoringReceivedDto
 import com.minhoi.memento.data.model.ApplyStatus
 import com.minhoi.memento.databinding.ActivityReceivedContentBinding
 import com.minhoi.memento.ui.UiState

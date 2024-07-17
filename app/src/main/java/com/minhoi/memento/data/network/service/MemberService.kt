@@ -1,10 +1,10 @@
 package com.minhoi.memento.data.network.service
 
 import com.minhoi.memento.base.CommonResponse
-import com.minhoi.memento.data.dto.BoardContentDto
-import com.minhoi.memento.data.dto.BoardListResponse
-import com.minhoi.memento.data.dto.MemberDTO
-import com.minhoi.memento.data.dto.MentoringApplyDto
+import com.minhoi.memento.data.dto.board.BoardContentDto
+import com.minhoi.memento.data.dto.board.BoardListResponse
+import com.minhoi.memento.data.dto.member.MemberDTO
+import com.minhoi.memento.data.dto.mentoring.MentoringApplyDto
 import com.minhoi.memento.data.dto.notification.NotificationListResponse
 import okhttp3.MultipartBody
 import retrofit2.Response

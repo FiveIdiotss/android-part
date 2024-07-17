@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.minhoi.memento.data.dto.BoardContentDto
+import com.minhoi.memento.data.dto.board.BoardContentDto
 import com.minhoi.memento.databinding.BoardRowItemBinding
 import com.minhoi.memento.utils.setOnSingleClickListener
 

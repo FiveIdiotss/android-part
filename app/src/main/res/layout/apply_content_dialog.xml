@@ -7,7 +7,7 @@
 
         <variable
             name="applyContent"
-            type="com.minhoi.memento.data.dto.MentoringApplyDto" />
+            type="com.minhoi.memento.data.dto.mentoring.MentoringApplyDto" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

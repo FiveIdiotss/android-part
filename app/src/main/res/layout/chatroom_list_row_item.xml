@@ -8,7 +8,7 @@
             type="com.minhoi.memento.data.dto.chat.ChatRoom" />
         <variable
             name="member"
-            type="com.minhoi.memento.data.dto.MemberDTO" />
+            type="com.minhoi.memento.data.dto.member.MemberDTO" />
     </data>
 
     <androidx.cardview.widget.CardView

@@ -1,11 +1,11 @@
 package com.minhoi.memento.data.network.service
 
 import com.minhoi.memento.base.CommonResponse
-import com.minhoi.memento.data.dto.CreateMemberRequest
-import com.minhoi.memento.data.dto.EmailVerificationRequest
-import com.minhoi.memento.data.dto.MajorDto
-import com.minhoi.memento.data.dto.SchoolDto
-import com.minhoi.memento.data.dto.VerifyCodeRequest
+import com.minhoi.memento.data.dto.join.CreateMemberRequest
+import com.minhoi.memento.data.dto.join.EmailVerificationRequest
+import com.minhoi.memento.data.dto.join.MajorDto
+import com.minhoi.memento.data.dto.join.SchoolDto
+import com.minhoi.memento.data.dto.join.VerifyCodeRequest
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET

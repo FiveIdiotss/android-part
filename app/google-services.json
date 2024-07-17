@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "633641803786",
+    "project_id": "menteetor-c278e",
+    "storage_bucket": "menteetor-c278e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:633641803786:android:3a437bb46b58ce4afcbff3",
+        "android_client_info": {
+          "package_name": "com.minhoi.memento"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBZUJusvusUaDhsG87uwDTyy_Mle_jSByM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

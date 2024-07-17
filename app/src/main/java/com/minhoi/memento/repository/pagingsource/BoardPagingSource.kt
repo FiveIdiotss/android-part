@@ -2,7 +2,7 @@ package com.minhoi.memento.repository.pagingsource
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.minhoi.memento.data.dto.BoardContentDto
+import com.minhoi.memento.data.dto.board.BoardContentDto
 import com.minhoi.memento.data.network.ApiResult
 import com.minhoi.memento.repository.board.BoardRepository
 import kotlinx.coroutines.flow.filterNot

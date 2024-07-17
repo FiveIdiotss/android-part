@@ -12,6 +12,7 @@ import com.minhoi.memento.base.BaseActivity
 import com.minhoi.memento.databinding.ActivityBoardBinding
 import com.minhoi.memento.ui.UiState
 import com.minhoi.memento.ui.adapter.board.BoardImagePagerAdapter
+import com.minhoi.memento.ui.board.apply.ApplyMentoringActivity
 import com.minhoi.memento.utils.hideLoading
 import com.minhoi.memento.utils.setOnSingleClickListener
 import com.minhoi.memento.utils.showLoading
