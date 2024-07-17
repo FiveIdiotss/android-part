@@ -2,10 +2,9 @@ package com.minhoi.memento.data.network.interceptor
 
 import android.util.Log
 import com.minhoi.memento.MentoApplication
-import com.minhoi.memento.data.dto.TokenDto
+import com.minhoi.memento.data.dto.member.TokenDto
 import com.minhoi.memento.data.network.RetrofitClient
 import com.minhoi.memento.data.network.service.AuthService
-import com.minhoi.memento.data.network.service.JoinService
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.Request
@@ -57,7 +56,7 @@ class AuthInterceptor() : Interceptor {
         return runBlocking {
             val response = retrofitClient.getAccessToken("Bearer ${getRefreshToken()}")
             if (response.isSuccessful) {
-                return@runBlocking response.body()
+                return@runBlocking response.body()!!.data
             }
             return@runBlocking null
         }

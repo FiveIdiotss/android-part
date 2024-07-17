@@ -6,7 +6,7 @@
 
     <fragment
         android:id="@+id/applySelectDateFragment"
-        android:name="com.minhoi.memento.ui.board.ApplySelectDateFragment"
+        android:name="com.minhoi.memento.ui.board.apply.ApplySelectDateFragment"
         android:label="상담 시간 선택(1/2)">
         <action
             android:id="@+id/action_applySelectDateFragment_to_applyShowResultFragment"
@@ -14,7 +14,7 @@
     </fragment>
     <fragment
         android:id="@+id/applyShowResultFragment"
-        android:name="com.minhoi.memento.ui.board.ApplyShowResultFragment"
+        android:name="com.minhoi.memento.ui.board.apply.ApplyShowResultFragment"
         android:label="신청 정보 확인(2/2)" >
         <action
             android:id="@+id/action_applyShowResultFragment_to_applySelectDateFragment"

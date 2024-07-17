@@ -12,15 +12,13 @@ import android.widget.TimePicker
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
-import com.google.gson.Gson
-import com.minhoi.memento.base.CommonResponse
-import com.minhoi.memento.data.network.ApiResult
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.onStart
-import retrofit2.Response
-import java.net.ConnectException
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import com.minhoi.memento.ui.common.dialog.ProgressDialog
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatterBuilder
@@ -34,7 +32,7 @@ const val MINUTES_MAX = 60
 
 @SuppressLint("PrivateApi", "DiscouragedApi")
 fun TimePicker.setTimeInterval(
-    timeInterval: Int = DEFAULT_INTERVAL
+    timeInterval: Int = DEFAULT_INTERVAL,
 ) {
     try {
         val fieldId: Int = if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
@@ -58,7 +56,7 @@ fun TimePicker.setTimeInterval(
 }
 
 private fun getDisplayedValue(
-    timeInterval: Int = DEFAULT_INTERVAL
+    timeInterval: Int = DEFAULT_INTERVAL,
 ): Array<String> {
     val minutesArray = ArrayList<String>()
     for (i in 0 until MINUTES_MAX step timeInterval) {
@@ -124,27 +122,35 @@ fun Context.dialogFragmentResize(dialogFragment: DialogFragment, width: Float, h
 /**
  * Retrofit API 호출 시, flow로 변환하고 성공, 실패, 빈 응답에 대한 처리를 위한 함수
  */
-fun <T> safeFlow(apiFunc: suspend () -> Response<CommonResponse<T>>): Flow<ApiResult<CommonResponse<T>>> =
-    flow {
-        val response = apiFunc()
-
-        if (response.isSuccessful) {
-            val body = response.body() ?: throw NullPointerException("서버와 통신에 오류가 발생하였습니다.")
-            emit(ApiResult.Success(body))
-        } else {
-            val body = response.errorBody() ?: throw NullPointerException("서버와 통신에 오류가 발생하였습니다.")
-            val s = Gson().fromJson(body.charStream(), CommonResponse::class.java) ?: throw NullPointerException("서버와 통신에 오류가 발생하였습니다.")
-            emit(ApiResult.Error(Throwable(s.message)))
-        }
-    }.onStart {
-        emit(ApiResult.Loading)
-    }.catch { e ->
-        when (e) {
-            is NullPointerException -> emit(ApiResult.Error(e, e.message))
-            is ConnectException -> emit(ApiResult.Error(e, "네트워크 오류가 발생했습니다. 인터넷 연결을 확인해주세요."))
-            else -> emit(ApiResult.Error(e, "네트워크 오류가 발생했습니다. 인터넷 연결을 확인해주세요."))
-        }
-    }
+//fun <T> safeFlow(apiFunc: suspend () -> Response<CommonResponse<T>>): Flow<ApiResult<CommonResponse<T>>> =
+//    flow {
+//        val response = apiFunc()
+//
+//        if (response.isSuccessful) {
+//            val body = response.body() ?: throw NullPointerException("서버와 통신에 오류가 발생하였습니다.")
+//            emit(ApiResult.Success(body))
+//        } else {
+//            val body = response.errorBody() ?: throw NullPointerException("서버와 통신에 오류가 발생하였습니다.")
+//            val s = Gson().fromJson(body.charStream(), CommonResponse::class.java)
+//                ?: throw NullPointerException("서버와 통신에 오류가 발생하였습니다.")
+//            emit(ApiResult.Error(Throwable(s.message)))
+//        }
+//    }.onStart {
+//        emit(ApiResult.Loading)
+//    }.retryWhen { cause, attempt ->
+//        if (cause is IOException && attempt < 3) {
+//            delay(3000L)
+//            true
+//        } else {
+//            false
+//        }
+//    }.catch { e ->
+//        when (e) {
+//            is NullPointerException -> emit(ApiResult.Error(e, e.message))
+//            is ConnectException -> emit(ApiResult.Error(e, "네트워크 오류가 발생했습니다. 인터넷 연결을 확인해주세요."))
+//            else -> emit(ApiResult.Error(e, "네트워크 오류가 발생했습니다. 인터넷 연결을 확인해주세요."))
+//        }
+//    }.flowOn(Dispatchers.IO)
 
 fun parseLocalDateTime(localDateTimeString: String): String {
     // 문자열을 LocalDateTime으로 파싱
@@ -158,6 +164,7 @@ fun parseLocalDateTime(localDateTimeString: String): String {
 }
 
 private const val PROGRESS_DIALOG_TAG = "progress_dialog"
+
 // FragmentManager 확장 함수로 ProgressDialog의 표시 여부를 확인
 private val FragmentManager.isProgressDialogShowing: Boolean
     get() = findFragmentByTag(PROGRESS_DIALOG_TAG) != null
@@ -177,7 +184,8 @@ fun FragmentManager.hideLoading() {
 
 // View 확장 함수로 키보드 숨기기 기능 구현
 fun View.hideKeyboard() {
-    val inputMethodManager = context.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+    val inputMethodManager =
+        context.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
     inputMethodManager?.hideSoftInputFromWindow(windowToken, 0)
 }
 
@@ -201,4 +209,11 @@ fun String.toRelativeTime(): String {
         else -> "${daysDiff}일 전"
     }
 }
+
+fun LifecycleOwner.repeatOnStarted(block: suspend CoroutineScope.() -> Unit) {
+    lifecycleScope.launch {
+        lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED, block)
+    }
+}
+
 

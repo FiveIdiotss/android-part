@@ -8,11 +8,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import com.minhoi.memento.MentoApplication
-import com.minhoi.memento.data.dto.BoardContentResponse
-import com.minhoi.memento.data.dto.BoardImage
-import com.minhoi.memento.data.dto.MentorBoardPostDto
-import com.minhoi.memento.data.dto.MentoringApplyRequest
-import com.minhoi.memento.data.dto.TimeTableDto
+import com.minhoi.memento.data.dto.board.BoardContentResponse
+import com.minhoi.memento.data.dto.board.BoardImage
+import com.minhoi.memento.data.dto.board.MentorBoardPostDto
+import com.minhoi.memento.data.dto.mentoring.MentoringApplyRequest
+import com.minhoi.memento.data.dto.board.TimeTableDto
 import com.minhoi.memento.data.model.DayOfWeek
 import com.minhoi.memento.repository.board.BoardRepository
 import com.minhoi.memento.ui.UiState

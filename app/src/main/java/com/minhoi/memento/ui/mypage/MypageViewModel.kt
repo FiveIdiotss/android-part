@@ -6,15 +6,15 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.minhoi.memento.MentoApplication
-import com.minhoi.memento.data.dto.ApplyRejectRequest
-import com.minhoi.memento.data.dto.BoardContentDto
-import com.minhoi.memento.data.dto.BoardContentForReceived
-import com.minhoi.memento.data.dto.BoardListResponse
-import com.minhoi.memento.data.dto.MemberDTO
-import com.minhoi.memento.data.dto.MentoringApplyDto
-import com.minhoi.memento.data.dto.MentoringApplyListDto
-import com.minhoi.memento.data.dto.MentoringMatchInfo
-import com.minhoi.memento.data.dto.MentoringReceivedDto
+import com.minhoi.memento.data.dto.chat.ApplyRejectRequest
+import com.minhoi.memento.data.dto.board.BoardContentDto
+import com.minhoi.memento.data.dto.board.BoardContentForReceived
+import com.minhoi.memento.data.dto.board.BoardListResponse
+import com.minhoi.memento.data.dto.member.MemberDTO
+import com.minhoi.memento.data.dto.mentoring.MentoringApplyDto
+import com.minhoi.memento.data.dto.mentoring.MentoringApplyListDto
+import com.minhoi.memento.data.dto.mentoring.MentoringMatchInfo
+import com.minhoi.memento.data.dto.mentoring.MentoringReceivedDto
 import com.minhoi.memento.data.network.ApiResult
 import com.minhoi.memento.repository.board.BoardRepository
 import com.minhoi.memento.repository.member.MemberRepository
@@ -80,6 +80,9 @@ class MypageViewModel @Inject constructor(
     private val _memberInfo = MutableLiveData<MemberDTO>()
     val memberInfo: LiveData<MemberDTO> = _memberInfo
 
+    private val _signOutEvent = MutableSharedFlow<Boolean>()
+    val signOutEvent: SharedFlow<Boolean> = _signOutEvent.asSharedFlow()
+
     // 요청받은 멘토링 목록의 상태를 저장하고있는 Flow
     private val memberBoardsFlow = MutableStateFlow<ApiResult<BoardListResponse>>(ApiResult.Empty)
     private val mentoringRequests = MutableStateFlow<ApiResult<List<MentoringReceivedDto>>>(ApiResult.Empty)
@@ -133,7 +136,7 @@ class MypageViewModel @Inject constructor(
         viewModelScope.launch {
             val response = memberRepository.getMemberInfo(member.id)
             if (response.isSuccessful) {
-                _memberInfo.value = response.body()!!
+                _memberInfo.value = response.body()!!.data
             }
         }
     }
@@ -142,7 +145,7 @@ class MypageViewModel @Inject constructor(
         val response = memberRepository.getMemberInfo(memberId)
         return if (response.isSuccessful) {
             Log.d("memberInfo", "getMemberInfo: ${response.body()} ")
-            response.body()
+            response.body()!!.data
         } else {
             Log.d("memberInfo", "getMemberInfo: ${response.message() + response.code()}")
             null
@@ -238,7 +241,7 @@ class MypageViewModel @Inject constructor(
             ).collect {
                 it.handleResponse(
                     onSuccess = {
-                        mentoringEvent(MentoringEvent.Accept)
+                        mentoringEvent(MentoringEvent.Reject)
                     },
                     onError = { error ->
                         mentoringEvent(MentoringEvent.Error(error.exception!!))
@@ -248,12 +251,12 @@ class MypageViewModel @Inject constructor(
         }
     }
 
-    suspend fun getMentorInfo() {
+    fun getMentorInfo() {
         viewModelScope.launch {
-            memberRepository.getMentorInfo(member.id).collectLatest { result ->
+            memberRepository.getMentorInfo().collectLatest { result ->
                 result.handleResponse(
                     onSuccess = { matchedMentoringList ->
-                        _mentorInfo.update { UiState.Success(matchedMentoringList) }
+                        _mentorInfo.update { UiState.Success(matchedMentoringList.data) }
                     },
                     onError = {
                         _mentorInfo.update { UiState.Error(Throwable(it.toString())) }
@@ -263,12 +266,12 @@ class MypageViewModel @Inject constructor(
         }
     }
 
-    suspend fun getMenteeInfo() {
+    fun getMenteeInfo() {
         viewModelScope.launch {
-            memberRepository.getMenteeInfo(member.id).collectLatest { result ->
+            memberRepository.getMenteeInfo().collectLatest { result ->
                 result.handleResponse(
                     onSuccess = { matchedMentoringList ->
-                        _menteeInfo.update { UiState.Success(matchedMentoringList) }
+                        _menteeInfo.update { UiState.Success(matchedMentoringList.data) }
                     },
                     onError = {
                         _menteeInfo.update { UiState.Error(Throwable(it.toString())) }

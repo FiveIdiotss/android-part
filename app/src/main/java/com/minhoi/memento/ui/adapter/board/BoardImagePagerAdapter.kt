@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.minhoi.memento.data.dto.BoardImage
+import com.minhoi.memento.data.dto.board.BoardImage
 import com.minhoi.memento.databinding.BoardImagePagerItemBinding
 
 class BoardImagePagerAdapter : ListAdapter<BoardImage, BoardImagePagerAdapter.ViewHolder>(ImageDiffCallback()) {

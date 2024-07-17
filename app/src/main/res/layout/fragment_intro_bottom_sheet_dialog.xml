@@ -7,7 +7,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        tools:context=".IntroBottomSheetDialog">
+        tools:context=".ui.intro.IntroBottomSheetDialog">
 
         <include
             layout="@layout/bottom_sheet_handle_layout"

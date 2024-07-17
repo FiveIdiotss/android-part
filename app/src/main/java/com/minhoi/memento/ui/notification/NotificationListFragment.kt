@@ -12,7 +12,7 @@ import com.minhoi.memento.data.model.NotificationListType
 import com.minhoi.memento.databinding.FragmentNotificationsBinding
 import com.minhoi.memento.ui.adapter.NotificationAdapter
 import com.minhoi.memento.ui.board.BoardActivity
-import com.minhoi.memento.ui.handleLoadState
+import com.minhoi.memento.ui.common.handleLoadState
 import com.minhoi.memento.ui.home.HomeViewModel
 import com.minhoi.memento.ui.question.QuestionInfoActivity
 import com.minhoi.memento.utils.setOnSingleClickListener

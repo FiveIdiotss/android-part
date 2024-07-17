@@ -28,13 +28,14 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.messaging.FirebaseMessaging
 import com.minhoi.memento.base.BaseActivity
 import com.minhoi.memento.databinding.ActivityMainBinding
-import com.minhoi.memento.ui.SplashViewModel
+import com.minhoi.memento.ui.home.SplashViewModel
 import com.minhoi.memento.ui.UiState
 import com.minhoi.memento.ui.chat.ChatActivity
 import com.minhoi.memento.ui.home.HomeViewModel
 import com.minhoi.memento.ui.home.PostSelectBottomSheetDialog
-import com.minhoi.memento.ui.mypage.ApplyListActivity
-import com.minhoi.memento.ui.mypage.MyMentoringActivity
+import com.minhoi.memento.ui.intro.IntroActivity
+import com.minhoi.memento.ui.mypage.apply.ApplyListActivity
+import com.minhoi.memento.ui.mypage.mentoring.MyMentoringActivity
 import com.minhoi.memento.ui.question.QuestionInfoActivity
 import com.minhoi.memento.utils.repeatOnStarted
 import com.minhoi.memento.utils.showToast

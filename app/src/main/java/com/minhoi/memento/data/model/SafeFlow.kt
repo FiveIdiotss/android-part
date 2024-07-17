@@ -1,8 +1,8 @@
 package com.minhoi.memento.data.model
 
-import com.google.gson.Gson
 import com.minhoi.memento.base.CommonResponse
 import com.minhoi.memento.data.network.ApiResult
+import com.minhoi.memento.data.network.GsonClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -24,7 +24,7 @@ fun <T> safeFlow(apiFunc: suspend () -> Response<CommonResponse<T>>): Flow<ApiRe
             emit(ApiResult.Success(body))
         } else {
             val body = response.errorBody() ?: throw NullPointerException(NETWORK_ERROR)
-            val errorResponse = Gson().fromJson(body.charStream(), CommonResponse::class.java)
+            val errorResponse = GsonClient.instance.fromJson(body.charStream(), CommonResponse::class.java)
                 ?: throw NullPointerException(NETWORK_ERROR)
             emit(ApiResult.Error(Throwable(errorResponse.message)))
         }
@@ -32,7 +32,7 @@ fun <T> safeFlow(apiFunc: suspend () -> Response<CommonResponse<T>>): Flow<ApiRe
         emit(ApiResult.Loading)
     }.retryWhen { cause, attempt ->
         if (cause is IOException && attempt < 3) {
-            delay(3000L)
+            delay(2000L)
             true
         } else {
             false

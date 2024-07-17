@@ -1,8 +1,8 @@
 package com.minhoi.memento.data.dto.chat
 
 import com.google.gson.annotations.SerializedName
-import com.minhoi.memento.data.dto.Pageable
-import com.minhoi.memento.data.dto.Sort
+import com.minhoi.memento.data.dto.paging.Pageable
+import com.minhoi.memento.data.dto.paging.Sort
 
 data class AllChatMessageResponse(
     @SerializedName("size") val size: Int,

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 체크 됐을 때의 상태 -->
+    <item android:state_checked="false" android:drawable="@drawable/round_corner_whitegray_filed" />
+    <!-- 체크 안 됐을 때의 상태 -->
+    <item android:state_checked="true" android:drawable="@drawable/round_corner_purple_filed" />
+</selector>

@@ -10,12 +10,12 @@ import com.minhoi.memento.R
 import com.minhoi.memento.base.BaseFragment
 import com.minhoi.memento.databinding.FragmentHomeBinding
 import com.minhoi.memento.ui.adapter.BoardAdapter
-import com.minhoi.memento.ui.adapter.QuestionPreviewAdapter
+import com.minhoi.memento.ui.adapter.question.QuestionPreviewAdapter
 import com.minhoi.memento.ui.board.BoardActivity
 import com.minhoi.memento.ui.board.BoardListActivity
 import com.minhoi.memento.ui.question.QuestionInfoActivity
 import com.minhoi.memento.ui.question.QuestionListActivity
-import com.minhoi.memento.utils.ColumnItemDecoration
+import com.minhoi.memento.ui.common.ColumnItemDecoration
 import com.minhoi.memento.utils.setOnSingleClickListener
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest

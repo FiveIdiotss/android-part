@@ -7,9 +7,9 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.minhoi.memento.R
-import com.minhoi.memento.data.dto.BoardContentDto
-import com.minhoi.memento.data.dto.BoardContentForReceived
-import com.minhoi.memento.data.dto.MentoringReceivedDto
+import com.minhoi.memento.data.dto.board.BoardContentDto
+import com.minhoi.memento.data.dto.board.BoardContentForReceived
+import com.minhoi.memento.data.dto.mentoring.MentoringReceivedDto
 import com.minhoi.memento.data.model.ApplyStatus
 import com.minhoi.memento.databinding.ReceivedListInBoardRowItemBinding
 import com.minhoi.memento.databinding.ReceivedListRowItemBinding

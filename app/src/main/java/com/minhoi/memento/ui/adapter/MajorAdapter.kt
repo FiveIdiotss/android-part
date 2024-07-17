@@ -8,7 +8,7 @@ import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.minhoi.memento.R
-import com.minhoi.memento.data.dto.MajorDto
+import com.minhoi.memento.data.dto.join.MajorDto
 import com.minhoi.memento.databinding.MajorRowItemBinding
 
 class MajorAdapter(private val context: Context, private val onClickListener: (MajorDto) -> Unit) : RecyclerView.Adapter<MajorAdapter.ViewHolder>() {

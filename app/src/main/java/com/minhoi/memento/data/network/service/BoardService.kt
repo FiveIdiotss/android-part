@@ -1,9 +1,9 @@
 package com.minhoi.memento.data.network.service
 
 import com.minhoi.memento.base.CommonResponse
-import com.minhoi.memento.data.dto.BoardContentResponse
-import com.minhoi.memento.data.dto.BoardListResponse
-import com.minhoi.memento.data.dto.MentoringApplyRequest
+import com.minhoi.memento.data.dto.board.BoardContentResponse
+import com.minhoi.memento.data.dto.board.BoardListResponse
+import com.minhoi.memento.data.dto.mentoring.MentoringApplyRequest
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response

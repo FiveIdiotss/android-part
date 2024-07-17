@@ -6,6 +6,12 @@ import com.minhoi.memento.R
 import com.minhoi.memento.base.BaseFragment
 import com.minhoi.memento.databinding.FragmentMypageBinding
 import com.minhoi.memento.ui.login.LoginActivity
+import com.minhoi.memento.ui.mypage.apply.ApplyListActivity
+import com.minhoi.memento.ui.mypage.bookmark.BookmarkBoardListActivity
+import com.minhoi.memento.ui.mypage.edit.EditProfileActivity
+import com.minhoi.memento.ui.mypage.mentoring.MyMentoringActivity
+import com.minhoi.memento.ui.mypage.notification.NotificationSettingActivity
+import com.minhoi.memento.ui.mypage.posts.MyPostsActivity
 import com.minhoi.memento.ui.question.QuestionListActivity
 import com.minhoi.memento.utils.repeatOnStarted
 import com.minhoi.memento.utils.setOnSingleClickListener
